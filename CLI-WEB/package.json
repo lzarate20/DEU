@@ -1,0 +1,36 @@
+{
+  "name": "cli-web",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@esbuild/linux-x64": "^0.17.19",
+    "@fortawesome/fontawesome-svg-core": "^6.4.0",
+    "@fortawesome/free-brands-svg-icons": "^6.4.0",
+    "@fortawesome/free-regular-svg-icons": "^6.4.0",
+    "@fortawesome/free-solid-svg-icons": "^6.4.0",
+    "@fortawesome/vue-fontawesome": "^3.0.3",
+    "axios": "^1.4.0",
+    "moment": "^2.29.4",
+    "package-lock": "^1.0.5",
+    "package.json": "^0.0.0",
+    "socket.io-client": "^4.7.1",
+    "vue": "^3.3.2",
+    "vue-axios": "^3.5.2",
+    "vue-loading-overlay": "6.0",
+    "vue-router": "^4.2.2",
+    "vuex": "^4.1.0",
+    "express": "^4.19.2",
+    "path":"^0.12.7",
+    "http-proxy-middleware": "^3.0.0",
+    "cors": "^2.8.5"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-vue": "^4.2.3",
+    "vite": "^4.3.5"
+  }
+}
