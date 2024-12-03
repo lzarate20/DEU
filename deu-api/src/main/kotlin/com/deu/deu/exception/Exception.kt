@@ -14,3 +14,7 @@ class NotFoundException(
 class MissingParamException(
     msg: String? = null
 ) : Exception(msg)
+
+class InvalidUserIdException(
+    msg: String? = null
+) : Exception(msg)

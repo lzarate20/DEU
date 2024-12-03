@@ -1,16 +1,16 @@
 package com.deu.deu.repository
 
 import com.deu.deu.model.*
-import org.springframework.data.jpa.repository.JpaRepository
+import org.springframework.data.repository.CrudRepository
 
 
-interface UserRepository : JpaRepository<User, Int>{
+interface UserRepository : CrudRepository<User, Int> {
     fun findByEmail(email: String): User?
 }
 
-interface ExerciseRepository : JpaRepository<Exercise, Int>
-interface VideoRepository : JpaRepository<Video, Int>
-interface TrainingRepository : JpaRepository<Training, Int>
-interface CommentRepository : JpaRepository<Comment, Int>
-interface ConfigRepository : JpaRepository<Config, Int>
-interface TeamRepository : JpaRepository<Team, Int>
+interface ExerciseRepository : CrudRepository<Exercise, Int>
+interface VideoRepository : CrudRepository<Video, Int>
+interface TrainingRepository : CrudRepository<Training, Int>
+interface CommentRepository : CrudRepository<Comment, Int>
+interface ConfigRepository : CrudRepository<Config, Int>
+interface TeamRepository : CrudRepository<Team, Int>

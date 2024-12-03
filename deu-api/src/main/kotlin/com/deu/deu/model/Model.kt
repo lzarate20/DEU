@@ -56,8 +56,10 @@ data class Training(
     val date: Date,
     @Enumerated(EnumType.STRING)
     val type: TrainingType,
+    @OneToMany
+    val exercises: List<Exercise> = listOf(),
     @OneToMany(cascade = [CascadeType.ALL])
-    val comments: List<Comment>?
+    val comments: List<Comment> = listOf()
 )
 
 @Entity

@@ -11,6 +11,7 @@ import com.deu.deu.model.User
 import com.deu.deu.repository.UserRepository
 import com.deu.deu.utils.toDTO
 import com.deu.deu.utils.toTeamUserDTO
+import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 
 
@@ -25,8 +26,8 @@ class UserService(
         return usersDTO.map(User::toDTO)
     }
 
-    fun findUserById(id: Int): UserDTOResponse {
-        return userRepository.findById(id).orElseThrow { UserNotFoundException() }.toDTO()
+    fun findUserById(id: Int): UserDTOResponse? {
+        return userRepository.findByIdOrNull(id)?.toDTO()
     }
 
     fun persist(user: UserDTO){
@@ -53,12 +54,12 @@ class UserService(
     }
 
     fun getTeams(id: Int): List<TeamUserDTOResponse> {
-        val user = userRepository.findById(id).orElseThrow { UserNotFoundException() }
+        val user = userRepository.findByIdOrNull(id) ?:throw UserNotFoundException()
         return user.teams.map(Team::toTeamUserDTO)
     }
 
     fun delete(id: Int) {
-        val user = userRepository.findById(id).orElseThrow { UserNotFoundException() }
+        val user = userRepository.findByIdOrNull(id) ?: throw UserNotFoundException()
         userRepository.delete(user)
     }
 
@@ -69,14 +70,14 @@ class UserService(
     }
 
     fun quitFromTeam(id: Int, idGroup: Int) {
-        val user = userRepository.findById(id).orElseThrow { UserNotFoundException() }
+        val user = userRepository.findByIdOrNull(id) ?: throw UserNotFoundException()
         teamService.removeUser(id, idGroup)
         val teams = user.teams.filter { it.id != idGroup }
         userRepository.save(user.copy(teams = teams))
     }
 
     fun addUserToTeam(id:Int,idGroup: Int){
-        val user = userRepository.findById(id).orElseThrow { UserNotFoundException() }
+        val user = userRepository.findByIdOrNull(id) ?: throw UserNotFoundException()
         val team = teamService.findById(idGroup)
         teamService.addUser(team.id,user)
         userRepository.save(user.copy(teams = user.teams+team))

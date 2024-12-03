@@ -1,6 +1,7 @@
 package com.deu.deu.controller
 
 import com.deu.deu.dto.ExerciseDTO
+import com.deu.deu.exception.NotFoundException
 import com.deu.deu.model.Exercise
 import com.deu.deu.service.ExerciseService
 import org.springframework.web.bind.annotation.*
@@ -16,7 +17,7 @@ class ExerciseController(val exerciseService: ExerciseService) {
 
     @GetMapping("/exercise/{id}")
     fun getExercise(@PathVariable("id") id: Int): Exercise {
-        return exerciseService.getExercise(id)
+        return exerciseService.getExercise(id) ?: throw NotFoundException("No se encontro el ejercicio")
     }
 
     @PostMapping("/exercise")

@@ -1,6 +1,7 @@
 package com.deu.deu.controller
 
 import com.deu.deu.dto.*
+import com.deu.deu.exception.UserNotFoundException
 import com.deu.deu.model.Team
 import com.deu.deu.model.User
 import com.deu.deu.service.UserService
@@ -16,7 +17,7 @@ class UserController(val userService: UserService) {
 
     @GetMapping("/users/{id}")
     fun getUserById(@PathVariable("id") id: Int): UserDTOResponse {
-        return userService.findUserById(id)
+        return userService.findUserById(id) ?: throw UserNotFoundException()
     }
 
     @PostMapping("/user")
