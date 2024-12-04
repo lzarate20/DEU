@@ -26,8 +26,8 @@ class UserService(
         return usersDTO.map(User::toDTO)
     }
 
-    fun findUserById(id: Int): UserDTOResponse? {
-        return userRepository.findByIdOrNull(id)?.toDTO()
+    fun findUserById(id: Int): User? {
+        return userRepository.findByIdOrNull(id)
     }
 
     fun persist(user: UserDTO){

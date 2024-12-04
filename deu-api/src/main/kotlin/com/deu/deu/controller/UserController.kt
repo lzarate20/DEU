@@ -5,6 +5,7 @@ import com.deu.deu.exception.UserNotFoundException
 import com.deu.deu.model.Team
 import com.deu.deu.model.User
 import com.deu.deu.service.UserService
+import com.deu.deu.utils.toDTO
 import org.springframework.web.bind.annotation.*
 
 @RestController
@@ -17,7 +18,7 @@ class UserController(val userService: UserService) {
 
     @GetMapping("/users/{id}")
     fun getUserById(@PathVariable("id") id: Int): UserDTOResponse {
-        return userService.findUserById(id) ?: throw UserNotFoundException()
+        return userService.findUserById(id)?.toDTO() ?: throw UserNotFoundException()
     }
 
     @PostMapping("/user")

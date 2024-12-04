@@ -1,8 +1,8 @@
 package com.deu.deu.controller
 
+import com.deu.deu.dto.ExerciseDTO
 import com.deu.deu.dto.TrainingDTO
 import com.deu.deu.exception.NotFoundException
-import com.deu.deu.model.Exercise
 import com.deu.deu.model.Training
 import com.deu.deu.service.TrainingService
 import org.springframework.web.bind.annotation.*
@@ -21,9 +21,13 @@ class TrainingController(val trainingService: TrainingService) {
     }
 
     @PostMapping("/training")
-    fun postTraining(@RequestBody trainingDTO: TrainingDTO){
+    fun postTraining(@RequestBody trainingDTO: TrainingDTO) {
         trainingService.saveTraining(trainingDTO)
     }
 
+    @PatchMapping("/training/{id}")
+    fun postTraining(@PathVariable("id") id: Int, @RequestBody exercises: List<ExerciseDTO>) {
+        trainingService.addExercisesToTraining(id, exercises)
+    }
 
 }

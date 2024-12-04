@@ -12,5 +12,7 @@ interface ExerciseRepository : CrudRepository<Exercise, Int>
 interface VideoRepository : CrudRepository<Video, Int>
 interface TrainingRepository : CrudRepository<Training, Int>
 interface CommentRepository : CrudRepository<Comment, Int>
-interface ConfigRepository : CrudRepository<Config, Int>
+interface ConfigRepository : CrudRepository<Config, Int>{
+    fun findByUserId(userId: Int): Config?
+}
 interface TeamRepository : CrudRepository<Team, Int>

@@ -71,3 +71,9 @@ data class TrainingDTO(
 data class TeamDTO(
     val name: String
 )
+
+data class ConfigDTO(
+    val id: Int,
+    val idUser: Int,
+    val theme: ThemeType
+)

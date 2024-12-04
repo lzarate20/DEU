@@ -76,7 +76,7 @@ data class Config(
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Int = 0,
     @OneToOne
-    val idUser: User,
+    val user: User,
     @Enumerated(EnumType.STRING)
     val theme: ThemeType
 )

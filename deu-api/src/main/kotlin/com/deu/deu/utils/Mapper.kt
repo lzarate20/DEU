@@ -1,6 +1,7 @@
 package com.deu.deu.utils
 
 import com.deu.deu.dto.*
+import com.deu.deu.model.Config
 import com.deu.deu.model.Team
 import com.deu.deu.model.User
 
@@ -28,4 +29,11 @@ fun Team.toTeamUserDTO(): TeamUserDTOResponse {
         id = this.id,
         name = this.name
     )
+}
+
+fun Config.toDTO(): ConfigDTO {
+    return ConfigDTO(
+        id = this.id,
+        idUser = this.user.id,
+        theme = this.theme)
 }

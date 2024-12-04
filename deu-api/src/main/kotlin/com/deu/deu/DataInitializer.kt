@@ -56,16 +56,18 @@ class DataInitializer(
                 trainer = trainer,
                 date = Date(),
                 type = TrainingType.STRENGTH,
+                exercises = listOf(exercise),
                 comments = listOf()  // Sin comentarios al principio
             )
             trainingRepository.save(training)
 
             // Crear un comentario
             val comment = Comment(idUser = trainee, comment = "Great workout!")
+            val comment2 = Comment(idUser = trainee, comment = "Nice work!")
             commentRepository.save(comment)
 
             // Agregar el comentario al entrenamiento
-            val updatedTraining = training.copy(comments = listOf(comment))
+            val updatedTraining = training.copy(comments = listOf(comment,comment2))
             trainingRepository.save(updatedTraining)
 
             // Crear una configuración de tema para el usuario

@@ -1,10 +1,11 @@
 package com.deu.deu.service
 
+import com.deu.deu.dto.ExerciseDTO
 import com.deu.deu.dto.TrainingDTO
 import com.deu.deu.exception.InvalidUserIdException
+import com.deu.deu.exception.NotFoundException
 import com.deu.deu.model.Training
 import com.deu.deu.model.UserType
-import com.deu.deu.repository.ExerciseRepository
 import com.deu.deu.repository.TrainingRepository
 import com.deu.deu.repository.UserRepository
 import org.springframework.data.repository.findByIdOrNull
@@ -12,7 +13,6 @@ import org.springframework.stereotype.Service
 
 @Service
 class TrainingService(
-    val exerciseRepository: ExerciseRepository,
     val exerciseService: ExerciseService,
     val trainingRepository: TrainingRepository,
     val userRepository: UserRepository
@@ -39,5 +39,12 @@ class TrainingService(
             date = trainingDTO.date, type = trainingDTO.trainingType, exercises = exercises
         )
         trainingRepository.save(training)
+    }
+
+    fun addExercisesToTraining(trainingId: Int, exercisesDTO: List<ExerciseDTO>) {
+        val training = trainingRepository.findByIdOrNull(trainingId)
+            ?: throw NotFoundException("No se encontro el entrenamiento $trainingId")
+        val exercises = exercisesDTO.map { exerciseService.getExercise(it.id.toInt()) ?: exerciseService.persist(it) }
+        trainingRepository.save(training.copy(exercises = training.exercises+ exercises))
     }
 }
