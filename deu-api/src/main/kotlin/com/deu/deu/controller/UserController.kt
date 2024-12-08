@@ -36,11 +36,6 @@ class UserController(val userService: UserService) {
         userService.delete(id)
     }
 
-    @PostMapping("/login")
-    fun login(@RequestBody loginDto: LoginDTO): UserDTOResponse {
-       return userService.login(loginDto)
-    }
-
     @GetMapping("/user/{id}/teams")
     fun getTeamsUser(@PathVariable("id") id: Int): List<TeamUserDTOResponse> {
         return userService.getTeams(id)

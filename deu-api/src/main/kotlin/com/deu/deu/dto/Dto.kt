@@ -44,6 +44,11 @@ data class LoginDTO(
     val password: String
 )
 
+data class UserLoginResponse(
+    val token:String,
+    val user: UserDTOResponse
+)
+
 data class ExerciseDTO(
     val id: String,
     val name: String,

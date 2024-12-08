@@ -4,6 +4,8 @@ import com.deu.deu.model.*
 import com.deu.deu.repository.*
 import org.springframework.boot.CommandLineRunner
 import org.springframework.context.annotation.Bean
+import org.springframework.security.crypto.bcrypt.BCrypt
+import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Component
 import java.util.*
 
@@ -15,15 +17,17 @@ class DataInitializer(
     val videoRepository: VideoRepository,
     val trainingRepository: TrainingRepository,
     val commentRepository: CommentRepository,
-    val configRepository: ConfigRepository
+    val configRepository: ConfigRepository,
+    val passwordEncoder: PasswordEncoder
 ) {
 
     @Bean
     fun initData(): CommandLineRunner {
         return CommandLineRunner {
             // Crear Usuarios
-            val trainer = User(name = "John Trainer", email = "john.trainer@example.com", password = "1234", type = UserType.TRAINER)
-            val trainee = User(name = "Jane Trainee", email = "jane.trainee@example.com", password = "1234", type = UserType.TRAINEE, position = Position.FORWARD)
+            val encodedPass = passwordEncoder.encode("1234")
+            val trainer = User(name = "John Trainer", email = "john.trainer@example.com", password = encodedPass, type = UserType.TRAINER)
+            val trainee = User(name = "Jane Trainee", email = "jane.trainee@example.com", password = encodedPass, type = UserType.TRAINEE, position = Position.FORWARD)
 
             userRepository.saveAll(listOf(trainer, trainee))
 
@@ -71,7 +75,7 @@ class DataInitializer(
             trainingRepository.save(updatedTraining)
 
             // Crear una configuración de tema para el usuario
-            val config = Config(idUser = trainer, theme = ThemeType.DAY)
+            val config = Config(user = trainer, theme = ThemeType.DAY)
             configRepository.save(config)
         }
     }
