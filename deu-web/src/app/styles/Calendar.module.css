@@ -1,0 +1,51 @@
+/* Contenedor del calendario */
+.reactCalendar {
+    background-color: #f4f4f4;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Día actual (por defecto resaltado) */
+.react-calendar__tile--now {
+    background: #ffeb3b; /* Amarillo */
+    border-radius: 50%;
+    color: #000;
+    font-weight: bold;
+}
+
+/* Día seleccionado */
+.react-calendar__tile--active {
+    background: #0078d4; /* Azul */
+    color: white;
+    border-radius: 50%;
+    font-weight: bold;
+}
+
+/* Hover sobre los días */
+.react-calendar__tile:hover {
+    background-color: #0078d4;
+    color: white;
+}
+
+/* Encabezados del calendario */
+.react-calendar__navigation {
+    background-color: #0078d4;
+    color: white;
+    font-weight: bold;
+    padding: 10px;
+    border-radius: 8px 8px 0 0;
+}
+
+.react-calendar__navigation button {
+    background: none;
+    border: none;
+    color: white;
+    cursor: pointer;
+}
+.react-calendar__tile--active {
+    background: #0078d4; /* Fondo azul */
+    color: white;        /* Texto blanco */
+    border-radius: 50%;  /* Forma circular */
+    font-weight: bold;   /* Texto en negrita */
+}

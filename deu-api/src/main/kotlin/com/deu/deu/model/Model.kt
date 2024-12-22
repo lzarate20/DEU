@@ -2,6 +2,7 @@ package com.deu.deu.model
 
 import com.fasterxml.jackson.annotation.JsonIgnore
 import jakarta.persistence.*
+import java.time.LocalDateTime
 import java.util.Date
 
 @Entity
@@ -17,7 +18,11 @@ data class User(
     @Enumerated(EnumType.STRING)
     val position: Position? = null,
     @ManyToMany(mappedBy = "users")
-    val teams: List<Team> = listOf()
+    val teams: List<Team> = listOf(),
+    @OneToMany(cascade = [CascadeType.ALL])
+    val notifcations: List<Notification> = listOf(),
+    @OneToMany(cascade = [CascadeType.ALL])
+    val trainings: List<Training> = listOf()
 )
 
 @Entity
@@ -94,4 +99,13 @@ data class Team(
         inverseJoinColumns = [JoinColumn(name = "user_id")]
     )
     val users: List<User> = listOf()
+)
+
+@Entity
+data class Notification(
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    val id: Int = 0,
+    val message: String,
+    val date: LocalDateTime,
+    val viewed: Boolean
 )

@@ -1,36 +1,20 @@
 import Cookies from "js-cookie";
-
-interface Team{
-    id:bigint;
-    name:string;
-}
-
-interface User {
-    id:bigint;
-    name: string;
-    email: string;
-    type:string;
-    teams:Array<Team>;
-}
+import {NextRequest} from "next/server";
+import {User} from "@/app/lib/definition"
 
 const CookieService = {
-    setAuthToken: (token: string, expiresInDays = 7) => {
-        Cookies.set("authToken", token, { expires: expiresInDays });
-    },
-    setUser: (user: User, expiresInDays = 7) => {
-        Cookies.set("user", JSON.stringify(user), { expires: expiresInDays });
-    },
-    getAuthToken: () => {
-        return Cookies.get("authToken") || null;
+    setUser: (user: User, expiresInDays = 1) => {
+        Cookies.set("user", JSON.stringify(user), {expires: expiresInDays});
     },
     getUser: (): User | null => {
         const user = Cookies.get("user");
         return user ? JSON.parse(user) : null;
-    },
-    clearSession: () => {
-        Cookies.remove("authToken");
-        Cookies.remove("user");
-    },
+    }
 };
+export function getAuthToken(req: NextRequest): string | null {
+    const tokens = req.cookies.get('authToken')?.value;
+    if (!tokens) return null;
+    return tokens
+}
 
 export default CookieService;

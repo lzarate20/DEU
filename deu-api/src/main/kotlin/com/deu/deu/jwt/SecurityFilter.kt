@@ -43,11 +43,11 @@ class SecurityConfig {
             .csrf { it.disable() }
             .authorizeHttpRequests {
                 it
-                    .requestMatchers("/api/auth", "/error")
+                    .requestMatchers("/api/auth", "/error","/h2-console/**")
                     .permitAll()
                     .anyRequest()
                     .fullyAuthenticated()
-            }
+            }.headers { header -> header.frameOptions{}.disable() }
             .sessionManagement {
                 it.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
             }

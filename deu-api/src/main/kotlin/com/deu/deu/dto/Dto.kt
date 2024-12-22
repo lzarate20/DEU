@@ -2,6 +2,7 @@ package com.deu.deu.dto
 
 import com.deu.deu.model.*
 import com.fasterxml.jackson.annotation.JsonInclude
+import java.time.LocalDateTime
 import java.util.*
 
 data class UserDTO(
@@ -12,7 +13,7 @@ data class UserDTO(
     val position: Position?
 )
 
-data class TrainerRequestDTO(
+data class TrainerDTO(
     val id: Int
 )
 
@@ -45,8 +46,13 @@ data class LoginDTO(
 )
 
 data class UserLoginResponse(
-    val token:String,
+    val token: String,
+    val expirationDate: LocalDateTime,
     val user: UserDTOResponse
+)
+
+data class NotificationDTO(
+    val message: String
 )
 
 data class ExerciseDTO(
@@ -67,10 +73,25 @@ data class TrainingDTO(
     val id: String?,
     val name: String,
     val description: String?,
-    val trainer: TrainerRequestDTO,
+    val trainer: TrainerDTO,
     val date: Date,
     val trainingType: TrainingType,
     val exercises: List<ExerciseDTO> = listOf(),
+)
+
+data class TrainingDTOResponse(
+    val id: String?,
+    val name: String,
+    val description: String?,
+    val trainer: TrainerDTO,
+    val date: Date,
+    val trainingType: TrainingType,
+    val exercises: List<ExerciseDTO> = listOf(),
+    val comments: List<Comment>
+)
+
+data class TrainingTeamDTO(
+    val id: Int,
 )
 
 data class TeamDTO(

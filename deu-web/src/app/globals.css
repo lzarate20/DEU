@@ -1,0 +1,57 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: #ffffff;
+  --foreground: #171717;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #0a0a0a;
+    --foreground: #ededed;
+  }
+}
+
+body {
+  color: var(--foreground);
+  background: var(--background);
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+
+a {
+  text-decoration: none;
+  color: inherit;
+}
+
+a:hover {
+  color: #2b6cb0; /* Color al pasar el mouse por encima de los enlaces */
+}
+
+/* Header */
+.header {
+  background-color: #1D4ED8; /* Color azul primario */
+  padding: 1rem; /* Espaciado en el header */
+}
+
+.header__title {
+  font-size: 1.5rem;
+  font-weight: bold;
+}
+
+.header__nav {
+  display: flex;
+  gap: 1.5rem;
+}
+
+.header__link {
+  color: white;
+  transition: color 0.3s;
+}
+
+.header__link:hover {
+  color: #E2E8F0; /* Color gris claro */
+}
+

@@ -1,21 +1,20 @@
 import React from "react";
-import ProtectedRoute from "@/app/components/ProtectedRoute";
-import LogoutButton from "@/app/components/LogoutButton";
+import Image from 'next/image';
 
 const Header = () => {
     return (
-        <header className="header">
-            <div className="container mx-auto flex justify-between items-center">
-                <h1 className="header__title">Mi Aplicación</h1>
-                <nav>
-                    <ul className="header__nav">
-                        <li><a href="/public" className="header__link">Inicio</a></li>
-                        <li><a href="/about" className="header__link">Acerca de</a></li>
-                        <li><a href="/contact" className="header__link">Contacto</a></li>
-                        <ProtectedRoute component=<LogoutButton/> roles={['trainee', 'trainer']}/>
-                    </ul>
-                </nav>
-            </div>
+        <header className="bg-gray-800 text-white w-1/16 h-screen p-4 flex flex-col fixed top-0 left-0">
+            <nav>
+                <ul className="space-y-2">
+                    <li>
+                        <a href="/home" className="hover:text-gray-300"><Image width={30} height={30}
+                                                                               src="/icon/home.png"></Image></a>
+                    </li>
+                    <li>
+                        <a href="/about" className="hover:text-gray-300">Acerca de</a>
+                    </li>
+                </ul>
+            </nav>
         </header>
     );
 };

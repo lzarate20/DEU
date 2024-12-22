@@ -1,7 +1,9 @@
 package com.deu.deu.service
 
+import com.deu.deu.dto.NotificationDTO
 import com.deu.deu.dto.TeamDTO
 import com.deu.deu.dto.TeamDTOResponse
+import com.deu.deu.dto.TrainingTeamDTO
 import com.deu.deu.exception.NotFoundException
 import com.deu.deu.exception.UserNotFoundException
 import com.deu.deu.model.Team
@@ -13,7 +15,11 @@ import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 
 @Service
-class TeamService(val teamRepository: TeamRepository, val userRepository: UserRepository) {
+class TeamService(
+    val teamRepository: TeamRepository,
+    val userRepository: UserRepository,
+    private val userService: UserService
+) {
 
     fun findAll(): List<TeamDTOResponse> {
         val teamDTO = teamRepository.findAll()
@@ -25,7 +31,7 @@ class TeamService(val teamRepository: TeamRepository, val userRepository: UserRe
     }
 
     fun delete(id: Int) {
-        val team = teamRepository.findByIdOrNull(id)?: throw NotFoundException("No se encontro el grupo")
+        val team = teamRepository.findByIdOrNull(id) ?: throw NotFoundException("No se encontro el grupo")
         for (user in team.users) {
             this.removeTeam(user.id, team.id)
         }
@@ -50,5 +56,33 @@ class TeamService(val teamRepository: TeamRepository, val userRepository: UserRe
     fun addUser(id: Int, user: User) {
         val team = teamRepository.findByIdOrNull(id) ?: throw NotFoundException("No se encontro el grupo")
         teamRepository.save(team.copy(users = team.users + user))
+    }
+
+    fun notify(id: Int, notification: NotificationDTO) {
+        val team = teamRepository.findByIdOrNull(id) ?: throw NotFoundException("No se encontro el grupo")
+        team.users.forEach { it ->
+            userService.addNotification(it.id, notification)
+        }
+    }
+
+    fun addTraining(id: Int, training: TrainingTeamDTO) {
+        val team = teamRepository.findByIdOrNull(id) ?: throw NotFoundException("No se encontro el grupo")
+        team.users.forEach { it ->
+            userService.addTraining(it.id, training.id)
+        }
+    }
+
+    fun quitFromTeam(id: Int, idGroup: Int) {
+        val user = userRepository.findByIdOrNull(id) ?: throw UserNotFoundException()
+        this.removeUser(id, idGroup)
+        val teams = user.teams.filter { it.id != idGroup }
+        userRepository.save(user.copy(teams = teams))
+    }
+
+    fun addUserToTeam(id: Int, idGroup: Int) {
+        val user = userRepository.findByIdOrNull(id) ?: throw UserNotFoundException()
+        val team = this.findById(idGroup)
+        this.addUser(team.id, user)
+        userRepository.save(user.copy(teams = user.teams + team))
     }
 }

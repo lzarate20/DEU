@@ -1,9 +1,7 @@
 package com.deu.deu.utils
 
 import com.deu.deu.dto.*
-import com.deu.deu.model.Config
-import com.deu.deu.model.Team
-import com.deu.deu.model.User
+import com.deu.deu.model.*
 
 fun User.toDTO(): UserDTOResponse {
     return UserDTOResponse(
@@ -29,6 +27,39 @@ fun Team.toTeamUserDTO(): TeamUserDTOResponse {
         id = this.id,
         name = this.name
     )
+}
+
+fun Training.toTrainingDTOResponse(): TrainingDTOResponse {
+    return TrainingDTOResponse(
+        this.id.toString(),
+        this.name,
+        this.description,
+        this.trainer.ToTrainerDTO(),
+        this.date,
+        this.type,
+        this.exercises.map { it -> it.toExerciseDto() },
+        this.comments
+    )
+}
+
+fun Exercise.toExerciseDto(): ExerciseDTO{
+    return ExerciseDTO(
+        this.id.toString(),
+        this.name,
+        this.description,
+        this.time,
+        this.units,
+        this.count,
+        this.type,
+        this.category,
+        this.video.id,
+        this.video.url,
+        this.isVisible
+    )
+}
+
+fun User.ToTrainerDTO():TrainerDTO{
+    return TrainerDTO(this.id)
 }
 
 fun Config.toDTO(): ConfigDTO {

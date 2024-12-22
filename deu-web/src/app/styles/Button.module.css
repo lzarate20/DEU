@@ -1,0 +1,63 @@
+.button {
+    display: inline-block;
+    padding: 12px 24px;
+    font-size: 16px;
+    font-weight: 600;
+    text-align: center;
+    text-decoration: none;
+    border: 2px solid transparent;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    background-color: #0070f3;
+    color: #fff;
+}
+
+.button:hover {
+    background-color: #005bb5;
+    border-color: #005bb5;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.button:active {
+    transform: scale(0.98);
+}
+
+.button:focus {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(0, 118, 255, 0.5);
+}
+
+/* Variaciones para diferentes colores */
+.button-primary {
+    background-color: #0070f3;
+    border-color: #0070f3;
+}
+
+.button-primary:hover {
+    background-color: #005bb5;
+    border-color: #005bb5;
+}
+
+.button-secondary {
+    background-color: #fff;
+    color: #0070f3;
+    border: 2px solid #0070f3;
+}
+
+.button-secondary:hover {
+    background-color: #0070f3;
+    color: #fff;
+}
+
+/* Para botones pequeños */
+.button-small {
+    padding: 8px 16px;
+    font-size: 14px;
+}
+
+/* Para botones grandes */
+.button-large {
+    padding: 16px 32px;
+    font-size: 18px;
+}

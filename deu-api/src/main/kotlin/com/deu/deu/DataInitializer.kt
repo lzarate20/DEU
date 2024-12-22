@@ -1,12 +1,16 @@
 package com.deu.deu
 
+import com.deu.deu.dto.TrainingTeamDTO
 import com.deu.deu.model.*
 import com.deu.deu.repository.*
+import com.deu.deu.service.TeamService
 import org.springframework.boot.CommandLineRunner
 import org.springframework.context.annotation.Bean
-import org.springframework.security.crypto.bcrypt.BCrypt
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Component
+import java.time.LocalDate
+import java.time.LocalDateTime
+import java.time.ZoneOffset
 import java.util.*
 
 @Component
@@ -22,12 +26,23 @@ class DataInitializer(
 ) {
 
     @Bean
-    fun initData(): CommandLineRunner {
+    fun initData(notificationRepository: NotificationRepository, teamService: TeamService): CommandLineRunner {
         return CommandLineRunner {
             // Crear Usuarios
             val encodedPass = passwordEncoder.encode("1234")
-            val trainer = User(name = "John Trainer", email = "john.trainer@example.com", password = encodedPass, type = UserType.TRAINER)
-            val trainee = User(name = "Jane Trainee", email = "jane.trainee@example.com", password = encodedPass, type = UserType.TRAINEE, position = Position.FORWARD)
+            val trainer = User(
+                name = "John Trainer",
+                email = "john.trainer@example.com",
+                password = encodedPass,
+                type = UserType.TRAINER
+            )
+            val trainee = User(
+                name = "Jane Trainee",
+                email = "jane.trainee@example.com",
+                password = encodedPass,
+                type = UserType.TRAINEE,
+                position = Position.FORWARD
+            )
 
             userRepository.saveAll(listOf(trainer, trainee))
 
@@ -58,11 +73,12 @@ class DataInitializer(
                 name = "Morning Strength Training",
                 description = "A strength training session for the morning.",
                 trainer = trainer,
-                date = Date(),
+                date = Date.from(LocalDateTime.now().toInstant(ZoneOffset.ofHours(-3))),
                 type = TrainingType.STRENGTH,
                 exercises = listOf(exercise),
                 comments = listOf()  // Sin comentarios al principio
             )
+            //teamService.addTraining(1, TrainingTeamDTO(1))
             trainingRepository.save(training)
 
             // Crear un comentario
@@ -70,8 +86,12 @@ class DataInitializer(
             val comment2 = Comment(idUser = trainee, comment = "Nice work!")
             commentRepository.save(comment)
 
+            val notification = Notification(message = "Una notificacion", date = LocalDateTime.now(), viewed = false)
+            notificationRepository.save(notification)
+            val updatedTrainer = trainer.copy(trainings = listOf(training), notifcations = listOf(notification))
+            userRepository.save(updatedTrainer)
             // Agregar el comentario al entrenamiento
-            val updatedTraining = training.copy(comments = listOf(comment,comment2))
+            val updatedTraining = training.copy(comments = listOf(comment, comment2))
             trainingRepository.save(updatedTraining)
 
             // Crear una configuración de tema para el usuario

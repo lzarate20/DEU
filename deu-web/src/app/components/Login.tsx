@@ -1,8 +1,8 @@
 "use client";
 
+import CookieService from "@/app/services/CookieService";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import CookieService from "@/app/services/CookieService";
 
 function LoginForm() {
     const [email, setEmail] = useState("");
@@ -11,17 +11,15 @@ function LoginForm() {
 
     const handleSubmit = async (e: { preventDefault: () => void; }) => {
         e.preventDefault();
-        const response = await fetch("http://localhost:8080/api/auth", {
+        const response = await fetch("/api/login", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ email, password }),
         });
-
         const data = await response.json();
         if (response.ok) {
-            CookieService.setAuthToken(data.token);
-            CookieService.setUser(data.user);
             console.log("Login exitoso:", data);
+            CookieService.setUser(data.user)
             router.push("/");
         } else {
             console.error("Error en el login:", data.message);

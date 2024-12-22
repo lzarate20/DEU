@@ -2,6 +2,7 @@ package com.deu.deu.controller
 
 import com.deu.deu.dto.*
 import com.deu.deu.exception.UserNotFoundException
+import com.deu.deu.model.Notification
 import com.deu.deu.model.Team
 import com.deu.deu.model.User
 import com.deu.deu.service.UserService
@@ -41,14 +42,14 @@ class UserController(val userService: UserService) {
         return userService.getTeams(id)
     }
 
-    @DeleteMapping("/user/{id}/teams/{idTeam}")
-    fun removeUserFromTeam(@PathVariable("id") id: Int, @PathVariable("idTeam") team: Int) {
-        userService.quitFromTeam(id,team)
+    @GetMapping("/user/notifications")
+    fun getNotifications(@RequestParam("user_id") id: Int):List<Notification>{
+        return userService.getNotifications(id)
     }
 
-    @PostMapping("/users/{id}/team/{idTeam}")
-    fun addUserToTeam(@PathVariable("id") id: Int, @PathVariable("idTeam") team: Int) {
-        userService.addUserToTeam(id, team)
+    @GetMapping("/user/trainings")
+    fun getTrainings(@RequestParam("user_id") id: Int):List<TrainingDTOResponse> {
+        return userService.getTrainings(id)
     }
 
 

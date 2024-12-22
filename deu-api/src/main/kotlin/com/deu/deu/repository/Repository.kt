@@ -16,3 +16,4 @@ interface ConfigRepository : CrudRepository<Config, Int>{
     fun findByUserId(userId: Int): Config?
 }
 interface TeamRepository : CrudRepository<Team, Int>
+interface NotificationRepository : CrudRepository<Notification, Int>
