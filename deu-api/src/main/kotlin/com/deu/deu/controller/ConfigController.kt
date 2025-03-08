@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.*
 @RestController
 class ConfigController(val configService: ConfigService) {
 
-    @GetMapping("/config")
+    @GetMapping("/config/{id}")
     fun getConfig(@PathVariable("id") id: Int): ConfigDTO {
         return configService.getConfig(id).toDTO()
     }

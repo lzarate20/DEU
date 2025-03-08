@@ -1,51 +1,22 @@
-/* Contenedor del calendario */
-.reactCalendar {
-    background-color: #f4f4f4;
-    border: 1px solid #ccc;
-    border-radius: 8px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-}
-
-/* Día actual (por defecto resaltado) */
 .react-calendar__tile--now {
-    background: #ffeb3b; /* Amarillo */
-    border-radius: 50%;
-    color: #000;
-    font-weight: bold;
+    background: #ffeb3b !important; /* Amarillo */
+    border-radius: 50% !important;
+    color: #000 !important;
+    font-weight: bold !important;
+    box-shadow: 0 0 8px rgba(255, 235, 59, 0.6) !important; /* Sombra sutil */
 }
 
-/* Día seleccionado */
 .react-calendar__tile--active {
-    background: #0078d4; /* Azul */
-    color: white;
-    border-radius: 50%;
-    font-weight: bold;
+    background: #0078d4 !important; /* Azul */
+    color: white !important;
+    border-radius: 50% !important;
+    font-weight: bold !important;
+    box-shadow: 0 0 8px rgba(0, 120, 212, 0.6) !important; /* Sombra sutil */
 }
 
-/* Hover sobre los días */
 .react-calendar__tile:hover {
-    background-color: #0078d4;
-    color: white;
+    background-color: #005bb5 !important; /* Azul más oscuro */
+    color: white !important;
+    transition: background-color 0.3s ease-in-out, color 0.3s ease-in-out !important;
 }
 
-/* Encabezados del calendario */
-.react-calendar__navigation {
-    background-color: #0078d4;
-    color: white;
-    font-weight: bold;
-    padding: 10px;
-    border-radius: 8px 8px 0 0;
-}
-
-.react-calendar__navigation button {
-    background: none;
-    border: none;
-    color: white;
-    cursor: pointer;
-}
-.react-calendar__tile--active {
-    background: #0078d4; /* Fondo azul */
-    color: white;        /* Texto blanco */
-    border-radius: 50%;  /* Forma circular */
-    font-weight: bold;   /* Texto en negrita */
-}

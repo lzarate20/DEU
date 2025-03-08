@@ -3,21 +3,28 @@ package com.deu.deu.service
 import com.deu.deu.dto.ConfigDTO
 import com.deu.deu.exception.UserNotFoundException
 import com.deu.deu.model.Config
+import com.deu.deu.model.LetterSize
 import com.deu.deu.model.ThemeType
 import com.deu.deu.repository.ConfigRepository
 import org.springframework.stereotype.Service
 
 @Service
-class ConfigService(val configRepository: ConfigRepository,val userService: UserService) {
+class ConfigService(val configRepository: ConfigRepository, val userService: UserService) {
 
-    fun getConfig(idUser:Int): Config {
+    fun getConfig(idUser: Int): Config {
         val user = userService.findUserById(idUser) ?: throw UserNotFoundException("No se encontro el usuario $idUser")
-        return configRepository.findByUserId(idUser) ?: configRepository.save(Config(user=user, theme = ThemeType.DAY))
+        return configRepository.findByUserId(idUser) ?: configRepository.save(
+            Config(
+                user = user,
+                theme = ThemeType.DAY,
+                letterSize = LetterSize.SMALL
+            )
+        )
     }
 
     fun updateConfig(newConfig: ConfigDTO) {
         val config = getConfig(newConfig.idUser)
-        configRepository.save(config.copy(theme = config.theme))
+        configRepository.save(config.copy(theme = newConfig.theme, letterSize = newConfig.letterSize))
     }
 
 

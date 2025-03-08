@@ -83,7 +83,9 @@ data class Config(
     @OneToOne
     val user: User,
     @Enumerated(EnumType.STRING)
-    val theme: ThemeType
+    val theme: ThemeType,
+    @Enumerated(EnumType.STRING)
+    val letterSize: LetterSize
 )
 
 @Entity

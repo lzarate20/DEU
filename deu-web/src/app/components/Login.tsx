@@ -3,6 +3,7 @@
 import CookieService from "@/app/services/CookieService";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import {getConfig} from "@/app/services/ConfigService";
 
 function LoginForm() {
     const [email, setEmail] = useState("");
@@ -20,6 +21,8 @@ function LoginForm() {
         if (response.ok) {
             console.log("Login exitoso:", data);
             CookieService.setUser(data.user)
+            const configData = await getConfig(data.user.id)
+            CookieService.setConfig(configData);
             router.push("/");
         } else {
             console.error("Error en el login:", data.message);

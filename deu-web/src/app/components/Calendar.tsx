@@ -1,11 +1,15 @@
-"use client"
-import React from "react";
-import {Calendar} from "@nextui-org/react";
-import {parseDate} from "@internationalized/date";
+import React from 'react';
+import Calendar from 'react-calendar';
+import 'react-calendar/dist/Calendar.css';
 
-export default function App() {
-    let [value, setValue] = React.useState(parseDate("2024-03-07"));
 
-    return <Calendar aria-label="Date (Controlled)" value={value} onChange={setValue} />;
+const CustomCalendar = () => {
+    return (
+        <Calendar
+            className="reactCalendar"
+            locale="es"
+        />
+    );
 }
 
+export default CustomCalendar;

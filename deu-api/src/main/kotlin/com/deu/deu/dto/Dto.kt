@@ -101,5 +101,6 @@ data class TeamDTO(
 data class ConfigDTO(
     val id: Int,
     val idUser: Int,
-    val theme: ThemeType
+    val theme: ThemeType,
+    val letterSize: LetterSize
 )

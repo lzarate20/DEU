@@ -1,6 +1,6 @@
 import Cookies from "js-cookie";
 import {NextRequest} from "next/server";
-import {User} from "@/app/lib/definition"
+import {ConfigData, User} from "@/app/lib/definition"
 
 const CookieService = {
     setUser: (user: User, expiresInDays = 1) => {
@@ -9,6 +9,13 @@ const CookieService = {
     getUser: (): User | null => {
         const user = Cookies.get("user");
         return user ? JSON.parse(user) : null;
+    },
+    setConfig:(config:ConfigData, expiresInDays = 1)=>{
+        Cookies.set("conf", JSON.stringify(config), {expires: expiresInDays});
+    },
+    getConfig: (): ConfigData | null => {
+        const conf = Cookies.get("conf");
+        return conf ? JSON.parse(conf) : null;
     }
 };
 export function getAuthToken(req: NextRequest): string | null {

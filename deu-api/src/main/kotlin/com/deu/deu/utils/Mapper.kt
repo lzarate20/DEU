@@ -66,5 +66,6 @@ fun Config.toDTO(): ConfigDTO {
     return ConfigDTO(
         id = this.id,
         idUser = this.user.id,
-        theme = this.theme)
+        theme = this.theme,
+        letterSize = this.letterSize)
 }

@@ -42,7 +42,7 @@ function MyTrainings() {
                         <div className={styles.card} key={training.id.toString()}>
                             <h2>{training.name}</h2>
                             <h2>{training.type}</h2>
-                            <h2><Image width={30} height={30} src="/icon/weightlifting.ico"></Image>Exercises count:{training.exercises.length}</h2>
+                            <h2><Image width={30} height={30} src="/icon/weightlifting.ico" alt={"fuerza"}></Image>Exercises count:{training.exercises.length}</h2>
                         </div>
                     ))
                 ) : (

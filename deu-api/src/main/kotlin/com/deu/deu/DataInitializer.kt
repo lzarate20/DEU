@@ -95,7 +95,7 @@ class DataInitializer(
             trainingRepository.save(updatedTraining)
 
             // Crear una configuración de tema para el usuario
-            val config = Config(user = trainer, theme = ThemeType.DAY)
+            val config = Config(user = trainer, theme = ThemeType.DAY, letterSize = LetterSize.SMALL)
             configRepository.save(config)
         }
     }

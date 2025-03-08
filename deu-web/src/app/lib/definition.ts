@@ -21,7 +21,7 @@ export interface UserTeam {
 }
 
 export interface Team {
-    id: bigint,
+    id: number,
     name: string,
     users: Array<UserTeam>;
 }
@@ -30,6 +30,18 @@ export interface LoginPayload{
     user:User;
     token:string;
     expirationDate:Date
+}
+
+export interface ConfigData{
+    theme:ThemeType,
+    letterSize:LetterSize
+}
+
+export interface PatchConfigData{
+    id:number,
+    userId:bigint,
+    theme:ThemeType,
+    letterSize:LetterSize
 }
 
 export interface Exercise {
@@ -67,6 +79,21 @@ export const TrainingType = {
     SPEED: "SPEED",
     DRIBBLING: "DRIBBLING",
 } as const;
+
+export const ThemeType = {
+    DAY: "DAY",
+    NIGHT: "NIGHT",
+} as const;
+
+export type ThemeType = (typeof ThemeType)[keyof typeof ThemeType];
+
+export const LetterSize = {
+    SMALL: "SMALL",
+    MEDIUM: "MEDIUM",
+    LARGE: "LARGE"
+} as const;
+
+export type LetterSize = (typeof LetterSize)[keyof typeof LetterSize];
 
 export type TrainingType = (typeof TrainingType)[keyof typeof TrainingType];
 
