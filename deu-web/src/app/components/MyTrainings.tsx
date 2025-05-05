@@ -7,7 +7,8 @@ import { getTrainings } from "@/app/services/TrainingService";
 import {Training} from "@/app/lib/definition";
 import Image from 'next/image';
 
-function MyTrainings() {
+function MyTrainings({ selectedDate }){
+    const formatDateKey = (date) => date.toISOString().split('T')[0];
     const [trainings, setTrainings] = useState<Training[]>([]);
     const [loading, setLoading] = useState(true);
     const userId = CookieService.getUser()?.id;
@@ -16,7 +17,7 @@ function MyTrainings() {
         const fetchTeams = async () => {
             try {
                 if(userId!=null) {
-                    const fetchedTrainings = await getTrainings(userId);
+                    const fetchedTrainings = await getTrainings(userId, formatDateKey(selectedDate));
                     setTrainings(fetchedTrainings);
                 }
             } catch (error) {
@@ -27,7 +28,7 @@ function MyTrainings() {
         };
 
         fetchTeams();
-    }, []);
+    }, [selectedDate]);
 
     if (loading) {
         return <div>Loading...</div>;
@@ -42,7 +43,7 @@ function MyTrainings() {
                         <div className={styles.card} key={training.id.toString()}>
                             <h2>{training.name}</h2>
                             <h2>{training.type}</h2>
-                            <h2><Image width={30} height={30} src="/icon/weightlifting.ico" alt={"fuerza"}></Image>Exercises count:{training.exercises.length}</h2>
+                            <h2><Image width={30} height={30} src="/icon/weightlifting.ico" alt={"fuerza"}></Image>Exercises count:</h2>
                         </div>
                     ))
                 ) : (

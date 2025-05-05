@@ -2,6 +2,7 @@ package com.deu.deu.model
 
 import com.fasterxml.jackson.annotation.JsonIgnore
 import jakarta.persistence.*
+import java.time.LocalDate
 import java.time.LocalDateTime
 import java.util.Date
 
@@ -58,10 +59,10 @@ data class Training(
     val description: String?,
     @ManyToOne
     val trainer: User,
-    val date: Date,
+    val date: LocalDate,
     @Enumerated(EnumType.STRING)
     val type: TrainingType,
-    @OneToMany
+    @OneToMany()
     val exercises: List<Exercise> = listOf(),
     @OneToMany(cascade = [CascadeType.ALL])
     val comments: List<Comment> = listOf()

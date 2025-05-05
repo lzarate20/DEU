@@ -8,9 +8,7 @@ import org.springframework.boot.CommandLineRunner
 import org.springframework.context.annotation.Bean
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Component
-import java.time.LocalDate
-import java.time.LocalDateTime
-import java.time.ZoneOffset
+import java.time.*
 import java.util.*
 
 @Component
@@ -73,7 +71,7 @@ class DataInitializer(
                 name = "Morning Strength Training",
                 description = "A strength training session for the morning.",
                 trainer = trainer,
-                date = Date.from(LocalDateTime.now().toInstant(ZoneOffset.ofHours(-3))),
+                date = LocalDate.from(Instant.now().atZone(ZoneId.systemDefault()).toLocalDate()),
                 type = TrainingType.STRENGTH,
                 exercises = listOf(exercise),
                 comments = listOf()  // Sin comentarios al principio

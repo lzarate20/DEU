@@ -1,8 +1,8 @@
 import {Training} from "@/app/lib/definition";
 
-export async function getTrainings(id:bigint): Promise<Training[]> {
+export async function getTrainings(id:bigint,date:string): Promise<Training[]> {
     try {
-        const response = await fetch(`/api/proxy/user/trainings?user_id=${id}`, {
+        const response = await fetch(`/api/proxy/trainings?id=${id}&date=${date}`, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json'

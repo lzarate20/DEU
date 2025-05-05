@@ -7,12 +7,12 @@
   --foreground: #171717;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+[data-theme="NIGHT"] {
+  --background: #121212; /* Tema oscuro */
+  --foreground: #e0e0e0;
+  --text-color: white;
 }
+
 
 body {
   color: var(--foreground);

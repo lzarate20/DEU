@@ -39,7 +39,7 @@ export interface ConfigData{
 
 export interface PatchConfigData{
     id:number,
-    userId:bigint,
+    idUser:bigint,
     theme:ThemeType,
     letterSize:LetterSize
 }

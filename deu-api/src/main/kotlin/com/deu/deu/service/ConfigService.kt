@@ -6,6 +6,7 @@ import com.deu.deu.model.Config
 import com.deu.deu.model.LetterSize
 import com.deu.deu.model.ThemeType
 import com.deu.deu.repository.ConfigRepository
+import com.deu.deu.utils.toDTO
 import org.springframework.stereotype.Service
 
 @Service
@@ -22,9 +23,9 @@ class ConfigService(val configRepository: ConfigRepository, val userService: Use
         )
     }
 
-    fun updateConfig(newConfig: ConfigDTO) {
+    fun updateConfig(newConfig: ConfigDTO): ConfigDTO {
         val config = getConfig(newConfig.idUser)
-        configRepository.save(config.copy(theme = newConfig.theme, letterSize = newConfig.letterSize))
+        return configRepository.save(config.copy(theme = newConfig.theme, letterSize = newConfig.letterSize)).toDTO()
     }
 
 

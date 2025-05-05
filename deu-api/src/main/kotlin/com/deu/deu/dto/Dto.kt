@@ -2,6 +2,7 @@ package com.deu.deu.dto
 
 import com.deu.deu.model.*
 import com.fasterxml.jackson.annotation.JsonInclude
+import java.time.LocalDate
 import java.time.LocalDateTime
 import java.util.*
 
@@ -74,7 +75,7 @@ data class TrainingDTO(
     val name: String,
     val description: String?,
     val trainer: TrainerDTO,
-    val date: Date,
+    val date: LocalDate,
     val trainingType: TrainingType,
     val exercises: List<ExerciseDTO> = listOf(),
 )
@@ -84,7 +85,7 @@ data class TrainingDTOResponse(
     val name: String,
     val description: String?,
     val trainer: TrainerDTO,
-    val date: Date,
+    val date: LocalDate,
     val trainingType: TrainingType,
     val exercises: List<ExerciseDTO> = listOf(),
     val comments: List<Comment>

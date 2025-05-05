@@ -10,6 +10,7 @@ import com.deu.deu.repository.TrainingRepository
 import com.deu.deu.repository.UserRepository
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
+import java.time.LocalDate
 
 @Service
 class TrainingService(
@@ -21,6 +22,10 @@ class TrainingService(
 
     fun getTrainings(): List<Training> {
         return trainingRepository.findAll().toList()
+    }
+
+    fun getUserTrainingsByDate(id: Int, date: LocalDate): List<Training> {
+        return trainingRepository.findByIdAndDate(id,date).toList();
     }
 
     fun getTraining(trainingId: Int): Training? {
@@ -45,6 +50,6 @@ class TrainingService(
         val training = trainingRepository.findByIdOrNull(trainingId)
             ?: throw NotFoundException("No se encontro el entrenamiento $trainingId")
         val exercises = exercisesDTO.map { exerciseService.getExercise(it.id.toInt()) ?: exerciseService.persist(it) }
-        trainingRepository.save(training.copy(exercises = training.exercises+ exercises))
+        trainingRepository.save(training.copy(exercises = training.exercises + exercises))
     }
 }

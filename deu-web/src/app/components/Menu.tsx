@@ -1,11 +1,11 @@
 "use client"
 
-import { useState, useEffect } from 'react';
+import {useEffect, useState} from 'react';
 import Link from 'next/link';
 import CookieService from "@/app/services/CookieService";
 import {LetterSize, ThemeType} from "@/app/lib/definition";
-import {patchConfig} from "@/app/services/ConfigService";
 import {FaCheck} from "react-icons/fa";
+import ThemeSwitch from "@/app/components/theme/ThemeSwitch";
 
 const ProfileMenu = () => {
     const [isOpen, setIsOpen] = useState(false);
@@ -39,21 +39,13 @@ const ProfileMenu = () => {
         };
     }, []);
 
-    const updateConfigInDB = async (theme: ThemeType, fontSize: LetterSize) => {
-        const userId = CookieService.getUser()?.id;
-        patchConfig({ id:0,idUser:userId,theme:theme,letterSize:fontSize });
-
-    };
-
     const toggleMenu = () => {
         if (isOpen) {
             setIsOpen(false);
-        }
-        else if(submenu != ""){
+        } else if (submenu != "") {
             setIsOpen(false);
             setSubmenu("")
-        }
-        else {
+        } else {
             setIsOpen(true);
         }
     };
@@ -67,19 +59,13 @@ const ProfileMenu = () => {
 
     const changeTheme = (newTheme: ThemeType) => {
         if (newTheme !== theme) {
-            setTheme(newTheme); // Actualiza el tema en el estado
-            setSubmenu(""); // Cierra el submenú
-            CookieService.setConfig({theme: newTheme, letterSize: fontSize});
-            updateConfigInDB(newTheme, fontSize);
+            setSubmenu("");
         }
     };
 
     const changeFontSize = (size: LetterSize) => {
-        if(size!= fontSize) {
-            setFontSize(size);
+        if (size != fontSize) {
             setSubmenu("");
-            CookieService.setConfig({theme, letterSize: size});
-            updateConfigInDB(theme, size);
         }
     };
 
@@ -135,26 +121,7 @@ const ProfileMenu = () => {
 
             {submenu === "theme" && (
                 <div className="absolute right-0 mt-2 bg-white shadow-lg rounded-md w-48">
-                    <ul className="space-y-2 p-2">
-                        <li>
-                            <button
-                                onClick={() => changeTheme(ThemeType.DAY)}
-                                className="block px-4 py-2 hover:bg-gray-100 flex items-center justify-start space-x-2"
-                            >
-                                {theme === ThemeType.DAY && <FaCheck className="text-blue-500"/>}
-                                <span>Día</span>
-                            </button>
-                        </li>
-                        <li>
-                            <button
-                                onClick={() => changeTheme(ThemeType.NIGHT)}
-                                className="block px-4 py-2 hover:bg-gray-100 flex items-center justify-start space-x-2"
-                            >
-                                {theme === ThemeType.NIGHT && <FaCheck className="text-blue-500"/>}
-                                <span>Noche</span>
-                            </button>
-                        </li>
-                    </ul>
+                    <ThemeSwitch onClick={changeTheme}/>
                 </div>
             )}
 

@@ -15,8 +15,8 @@ class ConfigController(val configService: ConfigService) {
     }
 
     @PatchMapping("/config")
-    fun updateConfig(@RequestBody config: ConfigDTO) {
-        configService.updateConfig(config)
+    fun updateConfig(@RequestBody config: ConfigDTO):ConfigDTO {
+        return configService.updateConfig(config)
     }
 
 }
