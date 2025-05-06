@@ -74,10 +74,18 @@ class DataInitializer(
                 date = LocalDate.from(Instant.now().atZone(ZoneId.systemDefault()).toLocalDate()),
                 type = TrainingType.STRENGTH,
                 exercises = listOf(exercise),
-                comments = listOf()  // Sin comentarios al principio
+                comments = listOf()
             )
-            //teamService.addTraining(1, TrainingTeamDTO(1))
-            trainingRepository.save(training)
+            val training2 = Training(
+                name = "Morning Strength Training 2",
+                description = "A speed training session for the morning.",
+                trainer = trainer,
+                date = LocalDate.from(Instant.now().atZone(ZoneId.systemDefault()).toLocalDate()),
+                type = TrainingType.SPEED,
+                exercises = listOf(exercise),
+                comments = listOf()
+            )
+            trainingRepository.saveAll(listOf(training,training2))
 
             // Crear un comentario
             val comment = Comment(idUser = trainee, comment = "Great workout!")
@@ -86,7 +94,7 @@ class DataInitializer(
 
             val notification = Notification(message = "Una notificacion", date = LocalDateTime.now(), viewed = false)
             notificationRepository.save(notification)
-            val updatedTrainer = trainer.copy(trainings = listOf(training), notifcations = listOf(notification))
+            val updatedTrainer = trainer.copy(trainings = listOf(training,training2), notifcations = listOf(notification))
             userRepository.save(updatedTrainer)
             // Agregar el comentario al entrenamiento
             val updatedTraining = training.copy(comments = listOf(comment, comment2))

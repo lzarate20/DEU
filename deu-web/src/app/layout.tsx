@@ -30,13 +30,15 @@ export default function RootLayout({
   return (
     <html lang="en">
     <ThemeProvider>
-    <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased min-h-screen flex flex-col`}
-    >
-    <Header/>
-    <main className="flex-1 p-4">{children}</main>
-    <Footer/>
-    </body>
+      <body
+          className={`${geistSans.variable} ${geistMono.variable} antialiased min-h-screen flex flex-col`}
+      >
+      <Header />
+      <main className="flex-1 p-4 ml-32 mt-4">
+        {children}
+      </main>
+      <Footer/>
+      </body>
     </ThemeProvider>
     </html>
   );

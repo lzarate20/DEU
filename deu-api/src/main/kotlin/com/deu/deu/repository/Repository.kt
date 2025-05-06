@@ -11,9 +11,7 @@ interface UserRepository : CrudRepository<User, Int> {
 
 interface ExerciseRepository : CrudRepository<Exercise, Int>
 interface VideoRepository : CrudRepository<Video, Int>
-interface TrainingRepository : CrudRepository<Training, Int> {
-    fun findByIdAndDate(id: Int, date: LocalDate): List<Training>
-}
+interface TrainingRepository : CrudRepository<Training, Int>
 
 interface CommentRepository : CrudRepository<Comment, Int>
 interface ConfigRepository : CrudRepository<Config, Int> {

@@ -24,10 +24,6 @@ class TrainingService(
         return trainingRepository.findAll().toList()
     }
 
-    fun getUserTrainingsByDate(id: Int, date: LocalDate): List<Training> {
-        return trainingRepository.findByIdAndDate(id,date).toList();
-    }
-
     fun getTraining(trainingId: Int): Training? {
         return trainingRepository.findByIdOrNull(trainingId)
     }

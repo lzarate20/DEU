@@ -15,6 +15,7 @@ import com.deu.deu.utils.toTeamUserDTO
 import com.deu.deu.utils.toTrainingDTOResponse
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
+import java.time.LocalDate
 import java.time.LocalDateTime
 
 
@@ -90,9 +91,10 @@ class UserService(
         userRepository.save(newUser)
     }
 
-    fun getTrainings(id:Int):List<TrainingDTOResponse> {
+    fun getUserTrainingsByDate(date: LocalDate, id:Int):List<TrainingDTOResponse> {
         val user = userRepository.findByIdOrNull(id) ?: throw UserNotFoundException()
-        return user.trainings.map{it->it.toTrainingDTOResponse()}
+        val filteredTrainings = user.trainings.filter { it-> it.date == date }.map{it->it.toTrainingDTOResponse()}
+        return filteredTrainings
     }
 
     fun addTraining(id: Int, trainingId: Int) {

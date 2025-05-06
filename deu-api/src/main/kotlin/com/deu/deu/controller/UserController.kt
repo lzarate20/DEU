@@ -7,7 +7,9 @@ import com.deu.deu.model.Team
 import com.deu.deu.model.User
 import com.deu.deu.service.UserService
 import com.deu.deu.utils.toDTO
+import org.springframework.format.annotation.DateTimeFormat
 import org.springframework.web.bind.annotation.*
+import java.time.LocalDate
 
 @RestController
 class UserController(val userService: UserService) {
@@ -48,8 +50,8 @@ class UserController(val userService: UserService) {
     }
 
     @GetMapping("/user/trainings")
-    fun getTrainings(@RequestParam("user_id") id: Int):List<TrainingDTOResponse> {
-        return userService.getTrainings(id)
+    fun getTrainings(@RequestParam("date") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) date: LocalDate, @RequestParam("id") id: Int):List<TrainingDTOResponse> {
+        return userService.getUserTrainingsByDate(date,id)
     }
 
 
