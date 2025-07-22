@@ -3,9 +3,16 @@ package com.deu.deu.service
 import com.deu.deu.dto.ExerciseDTO
 import com.deu.deu.exception.NotFoundException
 import com.deu.deu.model.Exercise
+import com.deu.deu.model.ExerciseType
 import com.deu.deu.model.Video
 import com.deu.deu.repository.ExerciseRepository
 import com.deu.deu.repository.VideoRepository
+import com.deu.deu.repository.spec.byCategory
+import com.deu.deu.repository.spec.byName
+import com.deu.deu.repository.spec.byVisibility
+import org.springframework.data.domain.Page
+import org.springframework.data.domain.PageRequest
+import org.springframework.data.jpa.domain.Specification
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 
@@ -22,6 +29,22 @@ class ExerciseService(
 
     fun getExercise(id: Int): Exercise? {
         return exerciseRepository.findByIdOrNull(id)
+    }
+
+    fun getExercises(
+        page: Int,
+        size: Int,
+        name: String?,
+        category: ExerciseType?,
+        isVisible: Boolean?
+    ): Page<Exercise> {
+        val pageable = PageRequest.of(page, size)
+        val spec = Specification.where<Exercise>(null)
+            .and(name?.let { byName(it) })
+            .and(category?.let { byCategory(it) })
+            .and(isVisible?.let { byVisibility(it) })
+
+        return exerciseRepository.findAll(spec, pageable)
     }
 
     fun persist(exerciseDTO: ExerciseDTO): Exercise {

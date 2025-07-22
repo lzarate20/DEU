@@ -14,6 +14,7 @@ import com.deu.deu.utils.toDTO
 import com.deu.deu.utils.toTeamUserDTO
 import com.deu.deu.utils.toTrainingDTOResponse
 import org.springframework.data.repository.findByIdOrNull
+import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -23,7 +24,8 @@ import java.time.LocalDateTime
 class UserService(
     private val userRepository: UserRepository,
     private val trainingService: TrainingService,
-    private val notificationRepository: NotificationRepository
+    private val notificationRepository: NotificationRepository,
+    private val passwordEncoder: PasswordEncoder
 ) {
 
     fun findAllUsers(): List<UserDTOResponse> {
@@ -39,7 +41,7 @@ class UserService(
         val newUser = User(
             name = user.name,
             email = user.email,
-            password = user.password,
+            password = passwordEncoder.encode(user.password),
             type = user.type,
             position = user.position
         )

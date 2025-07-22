@@ -7,11 +7,12 @@ import java.time.LocalDateTime
 import java.util.Date
 
 @Entity
-@Table(name = "appUser")
+@Table(name = "appUser",uniqueConstraints = [UniqueConstraint(columnNames = ["email"])])
 data class User(
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Int = 0,
     val name: String,
+    @Column(nullable = false, unique = true)
     val email: String,
     val password: String,
     @Enumerated(EnumType.STRING)

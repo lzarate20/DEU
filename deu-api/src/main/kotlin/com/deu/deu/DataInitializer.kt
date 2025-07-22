@@ -49,8 +49,11 @@ class DataInitializer(
             teamRepository.save(team)
 
             // Crear un video de ejercicio
-            val video = Video(name = "Warmup Video", url = "http://example.com/videos/warmup")
+            val video = Video(name = "Warmup Video", url = "https://www.youtube.com/embed/ZFEIxGNErd4")
+            val video2 = Video(name = "Warmup Video", url = "https://www.youtube.com/embed/gu0GGcG1Ux4")
+
             videoRepository.save(video)
+            videoRepository.save(video2)
 
             // Crear un ejercicio
             val exercise = Exercise(
@@ -64,7 +67,19 @@ class DataInitializer(
                 video = video,
                 isVisible = true
             )
+            val exercise2 = Exercise(
+                name = "Push-ups 2",
+                description = "Standard push-up exercise",
+                time = 60,
+                units = UnitsType.SEC,
+                count = 10,
+                type = TimeType.REPETITION,
+                category = ExerciseType.TRAINING,
+                video = video2,
+                isVisible = true
+            )
             exerciseRepository.save(exercise)
+            exerciseRepository.save(exercise2)
 
             // Crear un entrenamiento
             val training = Training(
@@ -73,7 +88,7 @@ class DataInitializer(
                 trainer = trainer,
                 date = LocalDate.from(Instant.now().atZone(ZoneId.systemDefault()).toLocalDate()),
                 type = TrainingType.STRENGTH,
-                exercises = listOf(exercise),
+                exercises = listOf(exercise,exercise2),
                 comments = listOf()
             )
             val training2 = Training(

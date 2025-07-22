@@ -24,11 +24,6 @@ class UserController(val userService: UserService) {
         return userService.findUserById(id)?.toDTO() ?: throw UserNotFoundException()
     }
 
-    @PostMapping("/user")
-    fun postUser(@RequestBody user: UserDTO){
-        userService.persist(user)
-    }
-
     @PutMapping("/user")
     fun updateUser(@RequestBody user: UserDTO){
         userService.update(user)
