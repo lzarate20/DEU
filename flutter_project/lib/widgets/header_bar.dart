@@ -37,9 +37,9 @@ class HeaderBar extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          const Text(
+          Text(
             'Mi Aplicación',
-            style: TextStyle(color: Colors.white, fontSize: 20),
+              style: Theme.of(context).textTheme.titleLarge
           ),
           Row(
             children: [

@@ -109,6 +109,8 @@ class _TrainingPageState extends State<TrainingPage> {
                   calendarFormat: CalendarFormat.month,
                   availableCalendarFormats: const {CalendarFormat.month: 'Mes'},
                   headerStyle: const HeaderStyle(formatButtonVisible: false),
+                  rowHeight: 70,
+                  daysOfWeekHeight: 30,
                 ),
               ),
             ),

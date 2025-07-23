@@ -111,11 +111,14 @@ class _TrainingDetailPageState extends State<TrainingDetailPage> {
                   const SizedBox(height: 20),
                   Text(
                     training['description'] ?? '',
-                    style: const TextStyle(fontSize: 16),
+                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(fontSize: 16),
                   ),
                   const SizedBox(height: 20),
-                  const Text('Comentarios:',
-                      style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
+                   Text('Comentarios:',
+                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 18,
+                      )),
                   const SizedBox(height: 10),
                   Expanded(
                     child: ListView.builder(

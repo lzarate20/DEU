@@ -21,9 +21,10 @@ class SettingsModalContent extends StatelessWidget {
             max: 2.0,
             divisions: 12,
             value: themeProvider.fontSizeFactor,
-            onChanged: (value) {
-              themeProvider.setFontSizeFactor(value);
-            },
+              onChanged: (value) {
+                debugPrint('Nuevo fontSizeFactor: $value');
+                themeProvider.setFontSizeFactor(value);
+              },
           ),
           const SizedBox(height: 20),
           ElevatedButton(
