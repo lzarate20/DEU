@@ -1,6 +1,9 @@
 import 'dart:convert';
+
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:http/http.dart' as http;
+
+import '../models/user_config.dart';
 
 class AuthService {
   static const _storage = FlutterSecureStorage();
@@ -20,6 +23,7 @@ class AuthService {
 
       await _storage.write(key: 'jwt_token', value: token);
       await _storage.write(key: 'user_id', value: userId);
+
       return true;
     } else {
       return false;

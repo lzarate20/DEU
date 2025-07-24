@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_project/services/auth_service.dart';
-import 'package:flutter_project/widgets/base_layout.dart';
+import 'package:flutter_project/services/config_service.dart';
+import 'package:flutter_project/widgets/theme_provider.dart';
+import 'package:provider/provider.dart';
 
 class LoginForm extends StatefulWidget {
   const LoginForm({super.key});
@@ -21,6 +23,9 @@ class _LoginFormState extends State<LoginForm> {
       final success = await AuthService.login(_username, _password);
 
       if (success) {
+        final userConfig = await ConfigService.getUserConfig();
+        final themeProvider = Provider.of<ThemeProvider>(context, listen: false);
+        await themeProvider.initFromConfig(userConfig);
         if (!mounted) return;
         Navigator.of(context).pushReplacementNamed('/home');
       } else {

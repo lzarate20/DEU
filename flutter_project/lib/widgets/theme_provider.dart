@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../configProject/NoTransitionBuilder.dart';
+import '../models/user_config.dart';
+import '../services/config_service.dart';
 
 class ThemeProvider extends ChangeNotifier {
   bool isDarkMode = false;
@@ -14,17 +16,59 @@ class ThemeProvider extends ChangeNotifier {
   void toggleTheme() {
     isDarkMode = !isDarkMode;
     notifyListeners();
+    _saveConfig();
   }
 
   void setFontSizeFactor(double factor) {
     fontSizeFactor = factor;
     notifyListeners();
+    _saveConfig();
   }
 
   void setFontFamily(String family) {
     fontFamily = family;
     notifyListeners();
   }
+
+  Future<void> _saveConfig() async {
+    try {
+      final theme = isDarkMode ? 'NIGHT' : 'DAY';
+      final size = _mapFontSizeToLabel(fontSizeFactor); // SMALL, MEDIUM, LARGE
+
+      await ConfigService.saveUserConfig(
+        theme: theme,
+        letterSize: size,
+      );
+    } catch (e) {
+      debugPrint("Error guardando config: $e");
+    }
+  }
+
+  String _mapFontSizeToLabel(double factor) {
+    if (factor <= 0.8) return 'SMALL';
+    if (factor >= 1.7) return 'LARGE';
+    return 'MEDIUM';
+  }
+
+  Future<void> initFromConfig(UserConfig config) async {
+    isDarkMode = config.theme == ThemeType.dark;
+    fontSizeFactor = _mapLetterSizeToFactor(config.letterSize);
+    debugPrint('Init desde backend: ${isDarkMode}, ${fontSizeFactor}');
+    fontFamily = 'Roboto';
+    notifyListeners();
+  }
+
+  double _mapLetterSizeToFactor(LetterSize size) {
+    switch (size) {
+      case LetterSize.small:
+        return 0.8;
+      case LetterSize.medium:
+        return 1.0;
+      case LetterSize.large:
+        return 1.7;
+    }
+  }
+
 }
 
 ThemeData buildTheme(
