@@ -68,18 +68,10 @@ class _TrainingPageState extends State<TrainingPage> {
                                 size: 16,
                               ),
                               onTap: () {
-                                Navigator.push(
+                                Navigator.pushNamed(
                                   context,
-                                  PageRouteBuilder(
-                                    pageBuilder:
-                                        (
-                                          context,
-                                          animation,
-                                          secondaryAnimation,
-                                        ) => TrainingDetailPage(
-                                          training: training,
-                                        ),
-                                  ),
+                                  '/training',
+                                  arguments: training,
                                 );
                               },
                             );

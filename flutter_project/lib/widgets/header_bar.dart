@@ -3,13 +3,15 @@ import 'package:flutter_project/widgets/settings.dart';
 import 'package:flutter_project/widgets/theme_provider.dart';
 import 'package:provider/provider.dart';
 
+import '../services/auth_service.dart';
+
 
 class HeaderBar extends StatelessWidget {
   final VoidCallback? onLoginPressed;
 
-  const HeaderBar({super.key, this.onLoginPressed, required Future<void> Function(dynamic value) onMenuSelect});
+  const HeaderBar({super.key, this.onLoginPressed});
 
-  void _handleMenuSelect(BuildContext context, String value) {
+  Future<void> _handleMenuSelect(BuildContext context, String value) async{
     switch (value) {
       case 'perfil':
         break;
@@ -22,13 +24,20 @@ class HeaderBar extends StatelessWidget {
         );
         break;
       case 'salir':
+        await _logout(context);
         break;
     }
+  }
+
+  Future<void> _logout(BuildContext context) async {
+    await AuthService.logout();
+    Navigator.of(context).pushNamedAndRemoveUntil('/', (route) => false);
   }
 
   @override
   Widget build(BuildContext context) {
     final themeProvider = Provider.of<ThemeProvider>(context);
+
 
     return Container(
       color: Colors.blue,
@@ -51,12 +60,24 @@ class HeaderBar extends StatelessWidget {
                 ),
                 onPressed: themeProvider.toggleTheme,
               ),
-              TextButton(
-                onPressed: onLoginPressed,
-                style: TextButton.styleFrom(
-                  foregroundColor: Colors.white,
-                ),
-                child: const Text('Iniciar sesión'),
+
+              FutureBuilder<bool>(
+                future: AuthService.isLoggedIn(),
+                builder: (context, snapshot) {
+                  final isLoggedIn = snapshot.data ?? false;
+
+                  if (!isLoggedIn && onLoginPressed != null) {
+                    return TextButton(
+                      onPressed: onLoginPressed,
+                      style: TextButton.styleFrom(
+                        foregroundColor: Colors.white,
+                      ),
+                      child: const Text('Iniciar sesión'),
+                    );
+                  } else {
+                    return const SizedBox.shrink();
+                  }
+                },
               ),
               PopupMenuButton<String>(
                 onSelected: (value) => _handleMenuSelect(context, value),

@@ -8,25 +8,6 @@ class BaseLayout extends StatelessWidget {
 
   const BaseLayout({super.key, required this.child});
 
-  Future<void> _handleMenuSelection(BuildContext context, String value) async {
-    switch (value) {
-      case 'perfil':
-        Navigator.pushNamed(context, '/perfil');
-        break;
-      case 'configuracion':
-        Navigator.pushNamed(context, '/configuracion');
-        break;
-      case 'salir':
-        await _logout(context);
-        break;
-    }
-  }
-
-  Future<void> _logout(BuildContext context) async {
-    await AuthService.logout();
-    Navigator.of(context).pushNamedAndRemoveUntil('/', (route) => false);
-  }
-
   void _handleLogin(BuildContext context) {
     Navigator.of(context).pushNamed('/login');
   }
@@ -56,7 +37,6 @@ class BaseLayout extends StatelessWidget {
             child: Column(
               children: [
                 HeaderBar(
-                  onMenuSelect: (value) => _handleMenuSelection(context, value),
                   onLoginPressed: () => _handleLogin(context),
                 ),
                 Expanded(child: child),
