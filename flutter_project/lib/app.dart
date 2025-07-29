@@ -3,6 +3,7 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_project/pages/landing_page.dart';
 import 'package:flutter_project/pages/register.dart';
 import 'package:flutter_project/pages/training_detail_page.dart';
+import 'package:flutter_project/pages/trainings/trainings_page.dart';
 import 'package:flutter_project/widgets/base_layout.dart';
 import 'package:flutter_project/widgets/theme_provider.dart';
 import 'package:provider/provider.dart';
@@ -36,6 +37,7 @@ class MyApp extends StatelessWidget {
             '/': (context) =>  LandingPage(),
             '/register': (context) => const RegisterPage(),
             '/home': (context) => const BaseLayout(child: DashboardPage()),
+            '/trainings': (context) => const BaseLayout(child: TrainingListPage()),
             '/training': (context) {
               final training = ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
               return BaseLayout(child: TrainingDetailPage(training: training));

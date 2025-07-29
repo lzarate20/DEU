@@ -75,7 +75,6 @@ class _TrainingDetailPageState extends State<TrainingDetailPage> {
       appBar: AppBar(title: Text(training['name'] ?? 'Detalle')),
       body: Row(
         children: [
-          // ────── LISTA DE EJERCICIOS ──────
           Expanded(
             flex: 2,
             child: ListView.builder(
@@ -96,8 +95,6 @@ class _TrainingDetailPageState extends State<TrainingDetailPage> {
               },
             ),
           ),
-
-          // ────── VIDEO + DETALLE ──────
           Expanded(
             flex: 3,
             child: Padding(

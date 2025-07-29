@@ -2,10 +2,13 @@ import 'dart:convert';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:http/http.dart' as http;
 
+import 'api_service.dart' show AuthHttpClient;
+
 
 class TrainingService {
   static const _storage = FlutterSecureStorage();
   final String host;
+  static final client = AuthHttpClient();
 
   TrainingService({this.host = 'localhost:8080'});
 
@@ -16,11 +19,37 @@ class TrainingService {
 
     try {
       final token = await _storage.read(key: 'jwt_token');
-      final response = await http.get(url,
+      final response = await client.get(url,
         headers: {
         'Authorization': 'Bearer $token',
         'Content-Type': 'application/json',
       }
+      );
+      if (response.statusCode == 200) {
+        final List<dynamic> jsonList = jsonDecode(response.body);
+        return jsonList
+            .map((item) => item as Map<String, dynamic>)
+            .toList();
+      } else {
+        print('Error: ${response.statusCode}');
+        return List.empty();
+      }
+    } catch (e) {
+      print('Error de red: $e');
+      return List.empty();
+    }
+  }
+
+  Future<List<Map<String, dynamic>>?> fetchTrainings() async {
+    final url = Uri.parse('http://$host/trainings');
+
+    try {
+      final token = await _storage.read(key: 'jwt_token');
+      final response = await client.get(url,
+          headers: {
+            'Authorization': 'Bearer $token',
+            'Content-Type': 'application/json',
+          }
       );
       if (response.statusCode == 200) {
         final List<dynamic> jsonList = jsonDecode(response.body);

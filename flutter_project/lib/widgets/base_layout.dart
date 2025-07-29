@@ -27,12 +27,11 @@ class BaseLayout extends StatelessWidget {
                 Icon(Icons.dashboard, size: 50, color: Colors.white),
                 SizedBox(height: 20),
                 _NavButton(icon: Icons.home, label: 'Home'),
-                _NavButton(icon: Icons.person, label: 'Perfil'),
+                _NavButton(icon: Icons.person, label: 'Entrenamientos'),
                 _NavButton(icon: Icons.settings, label: 'Configuración'),
               ],
             ),
           ),
-          // Contenido
           Expanded(
             child: Column(
               children: [
@@ -55,6 +54,11 @@ class _NavButton extends StatelessWidget {
 
   const _NavButton({required this.icon, required this.label, super.key});
 
+  static const Map<String, String> labelToRoute = {
+    'Home': '/home',
+    'Entrenamientos': '/trainings',
+  };
+
   @override
   Widget build(BuildContext context) {
     return TextButton.icon(
@@ -64,7 +68,8 @@ class _NavButton extends StatelessWidget {
         alignment: Alignment.centerLeft,
       ),
       onPressed: () {
-        Navigator.of(context).pushReplacementNamed('/${label.toLowerCase()}');
+        final route = labelToRoute[label] ?? '/${label.toLowerCase()}';
+        Navigator.of(context).pushNamedAndRemoveUntil(route, (route) => false);
       },
       icon: Icon(icon, color: Colors.white),
       label: Text(label),

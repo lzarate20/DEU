@@ -31,7 +31,7 @@ class _TrainingPageState extends State<TrainingPage> {
 
   @override
   Widget build(BuildContext context) {
-    return // En la pantalla principal (lista + calendario)
+    return
     Scaffold(
       appBar: AppBar(title: const Text('Entrenamientos')),
       body: Row(
@@ -81,8 +81,6 @@ class _TrainingPageState extends State<TrainingPage> {
               ),
             ),
           ),
-
-          // Calendario a la derecha
           Expanded(
             flex: 2,
             child: Center(
