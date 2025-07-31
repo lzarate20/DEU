@@ -70,12 +70,6 @@ class UserService(
         userRepository.delete(user)
     }
 
-    fun login(loginDTO: LoginDTO): UserDTOResponse {
-        val user = userRepository.findByEmail(loginDTO.email) ?: throw LoginException()
-        return if (user.password == loginDTO.password) user.toDTO() else throw LoginException()
-
-    }
-
     fun getNotifications(id: Int): List<Notification> {
         val user = userRepository.findByIdOrNull(id) ?: throw UserNotFoundException()
         return user.notifcations;

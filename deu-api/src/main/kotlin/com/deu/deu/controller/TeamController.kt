@@ -30,8 +30,8 @@ class TeamController(val teamService: TeamService) {
     }
 
     @PostMapping("/team/training")
-    fun postTraining(@RequestParam("team_id")id:Int,@RequestBody training: TrainingTeamDTO){
-        return teamService.addTraining(id,training)
+    fun postTraining(@RequestParam("team_id")id:Int,@RequestParam("position")position:String?,@RequestBody training: TrainingTeamDTO){
+        return teamService.addTraining(id,position,training)
     }
 
     @DeleteMapping("/teams/{idTeam}/user/{id}")

@@ -65,9 +65,10 @@ class TeamService(
         }
     }
 
-    fun addTraining(id: Int, training: TrainingTeamDTO) {
+    fun addTraining(id: Int,position: String?, training: TrainingTeamDTO) {
         val team = teamRepository.findByIdOrNull(id) ?: throw NotFoundException("No se encontro el grupo")
-        team.users.forEach { it ->
+        val users = if(position != null){team.users.filter{ it.position?.name == position }.toList()}else team.users
+        users.forEach { it ->
             userService.addTraining(it.id, training.id)
         }
     }

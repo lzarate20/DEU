@@ -40,6 +40,7 @@ class TrainingService(
             date = trainingDTO.date, type = trainingDTO.trainingType, exercises = exercises
         )
         trainingRepository.save(training)
+        userRepository.save(trainer.copy(trainings = trainer.trainings.plus(training) ))
     }
 
     fun addExercisesToTraining(trainingId: Int, exercisesDTO: List<ExerciseDTO>) {
