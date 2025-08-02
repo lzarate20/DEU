@@ -49,8 +49,8 @@ class DataInitializer(
             teamRepository.save(team)
 
             // Crear un video de ejercicio
-            val video = Video(name = "Warmup Video", url = "https://www.youtube.com/embed/ZFEIxGNErd4")
-            val video2 = Video(name = "Warmup Video", url = "https://www.youtube.com/embed/gu0GGcG1Ux4")
+            val video = Video(name = "Warmup Video", url = "https://videos.pexels.com/video-files/29160300/12594551_1920_1080_30fps.mp4")
+            val video2 = Video(name = "Warmup Video", url = "https://videos.pexels.com/video-files/32469700/13847440_2560_1440_25fps.mp4")
 
             videoRepository.save(video)
             videoRepository.save(video2)

@@ -14,35 +14,33 @@ class ExerciseList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Expanded(
-      flex: 2,
-      child: ListView.builder(
-        padding: const EdgeInsets.all(12),
-        itemCount: exercises.length,
-        itemBuilder: (context, index) {
-          final e = exercises[index];
-          return GestureDetector(
-            onTap: () => onSelect(index),
-            child: Card(
-              color: index == selectedIndex ? Colors.blue.shade50 : null,
-              margin: const EdgeInsets.symmetric(vertical: 8),
-              child: Padding(
-                padding: const EdgeInsets.all(12),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(e['name'] ?? '', style: const TextStyle(fontWeight: FontWeight.bold)),
-                    const SizedBox(height: 4),
-                    Text(e['description'] ?? '', maxLines: 2, overflow: TextOverflow.ellipsis),
-                    const SizedBox(height: 4),
-                    Text('${e['count']} ${e['units']}'),
-                  ],
-                ),
+    return ListView.builder(
+      padding: const EdgeInsets.all(12),
+      itemCount: exercises.length,
+      itemBuilder: (context, index) {
+        final e = exercises[index];
+        return GestureDetector(
+          onTap: () => onSelect(index),
+          child: Card(
+            color: index == selectedIndex ? Colors.blue.shade50 : null,
+            margin: const EdgeInsets.symmetric(vertical: 8),
+            child: Padding(
+              padding: const EdgeInsets.all(12),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(e['name'] ?? '', style: const TextStyle(fontWeight: FontWeight.bold)),
+                  const SizedBox(height: 4),
+                  Text(e['description'] ?? '', maxLines: 2, overflow: TextOverflow.ellipsis),
+                  const SizedBox(height: 4),
+                  Text('${e['count']} ${e['units']}'),
+                ],
               ),
             ),
-          );
-        },
-      ),
+          ),
+        );
+      },
     );
   }
 }
+
