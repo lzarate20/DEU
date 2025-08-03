@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../widgets/exercise/comment_panel.dart';
 import '../widgets/exercise/comment_toggle.dart';
 import '../widgets/exercise/exercise_list.dart';
+import '../widgets/exercise/training_actions.dart';
 import '../widgets/exercise/video_player.dart';
 
 class TrainingDetailPage extends StatefulWidget {
@@ -54,6 +55,19 @@ class _TrainingDetailPageState extends State<TrainingDetailPage> {
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.training['name'] ?? 'Detalle'),
+          actions: [
+            TrainingActions(
+              training: widget.training,
+              onCopied: () {
+              },
+              onEdited: () {
+                Navigator.pushNamed(context, '/edit_training', arguments: widget.training);
+              },
+              onDeleted: () {
+                Navigator.pop(context); // Volver al listado
+              },
+            ),
+          ],
       ),
       body: Stack(
         children: [
@@ -63,7 +77,7 @@ class _TrainingDetailPageState extends State<TrainingDetailPage> {
                 child: Row(
                   children: [
                     Expanded(
-                      flex: 1, // 1 parte del espacio total
+                      flex: 1,
                       child: ExerciseList(
                         exercises: exercises,
                         selectedIndex: _selectedIndex,
@@ -71,7 +85,7 @@ class _TrainingDetailPageState extends State<TrainingDetailPage> {
                       ),
                     ),
                     Expanded(
-                      flex: 3, // 3 partes del espacio total
+                      flex: 3,
                       child: VideoPlayerArea(
                         videoUrl: videoUrl,
                         showComments: _showComments,

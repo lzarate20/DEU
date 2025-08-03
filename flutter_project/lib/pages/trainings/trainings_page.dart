@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../configProject/global_config.dart';
 import '../../services/training_service.dart';
 import '../../services/user_service.dart';
 import '../../widgets/search_filter.dart';
@@ -12,11 +13,10 @@ class TrainingListPage extends StatefulWidget {
   State<TrainingListPage> createState() => _TrainingPageState();
 }
 
-class _TrainingPageState extends State<TrainingListPage> {
+class _TrainingPageState extends State<TrainingListPage> with RouteAware {
   final TrainingService _service = TrainingService();
   final UserService _userService = UserService();
 
-  late Future<void> _loadDataFuture;
   final TextEditingController _searchController = TextEditingController();
   String _searchQuery = '';
 
@@ -29,18 +29,36 @@ class _TrainingPageState extends State<TrainingListPage> {
   @override
   void initState() {
     super.initState();
-    _loadDataFuture = _loadData();
+    _loadData();
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    routeObserver.subscribe(this, ModalRoute.of(context)! as PageRoute);
   }
 
   @override
   void dispose() {
     _searchController.dispose();
+    routeObserver.unsubscribe(this);
     super.dispose();
   }
 
+  @override
+  void didPopNext() {
+    _loadData();
+  }
+
+
   Future<void> _loadData() async {
-    _trainings = await _service.fetchTrainings() ?? [];
-    _users = await _userService.fetchUsers();
+    final trainings = await _service.fetchTrainings() ?? [];
+    final users = await _userService.fetchUsers();
+    print(trainings);
+    setState(() {
+      _trainings = trainings;
+      _users = users;
+    });
   }
 
   Future<void> _pickDate(BuildContext context, bool isStart) async {
@@ -70,112 +88,97 @@ class _TrainingPageState extends State<TrainingListPage> {
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder<void>(
-      future: _loadDataFuture,
-      builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return const Center(child: CircularProgressIndicator());
-        }
+    final filteredTrainings = _trainings.where((training) {
+      final name = (training['name'] ?? '').toString().toLowerCase();
+      final trainingType = (training['trainingType'] ?? '').toString().toLowerCase();
+      final dateStr = training['date'] ?? '';
+      final trainerId = training['trainer']?['id'];
 
-        if (snapshot.hasError) {
-          return Center(child: Text('Error: ${snapshot.error}'));
-        }
+      final trainer = _users.firstWhere(
+            (user) => user['id'] == trainerId,
+        orElse: () => {'name': ''},
+      );
+      final trainerName = (trainer['name'] ?? '').toString().toLowerCase();
 
-        final filteredTrainings = _trainings.where((training) {
-          final name = (training['name'] ?? '').toString().toLowerCase();
-          final trainingType = (training['trainingType'] ?? '')
-              .toString()
-              .toLowerCase();
-          final dateStr = training['date'] ?? '';
-          final trainerId = training['trainer']?['id'];
+      final matchesText = _searchQuery.isEmpty ||
+          name.contains(_searchQuery) ||
+          trainingType.contains(_searchQuery) ||
+          trainerName.contains(_searchQuery);
 
-          final trainer = _users.firstWhere(
-                (user) => user['id'] == trainerId,
-            orElse: () => {'name': ''},
-          );
-          final trainerName = (trainer['name'] ?? '').toString().toLowerCase();
+      DateTime? trainingDate;
+      try {
+        trainingDate = DateTime.parse(dateStr);
+      } catch (_) {}
 
-          final matchesText = _searchQuery.isEmpty ||
-              name.contains(_searchQuery) ||
-              trainingType.contains(_searchQuery) ||
-              trainerName.contains(_searchQuery);
-
-          DateTime? trainingDate;
-          try {
-            trainingDate = DateTime.parse(dateStr);
-          } catch (_) {}
-
-          bool matchesDate = true;
-          if (_startDate != null || _endDate != null) {
-            if (trainingDate == null) {
-              matchesDate = false;
-            } else {
-              if (_startDate != null &&
-                  trainingDate.isBefore(_startDate!)) {
-                matchesDate = false;
-              }
-              if (_endDate != null &&
-                  trainingDate.isAfter(_endDate!)) {
-                matchesDate = false;
-              }
-            }
+      bool matchesDate = true;
+      if (_startDate != null || _endDate != null) {
+        if (trainingDate == null) {
+          matchesDate = false;
+        } else {
+          if (_startDate != null && trainingDate.isBefore(_startDate!)) {
+            matchesDate = false;
           }
+          if (_endDate != null && trainingDate.isAfter(_endDate!)) {
+            matchesDate = false;
+          }
+        }
+      }
 
-          return matchesText && matchesDate;
-        }).toList();
+      return matchesText && matchesDate;
+    }).toList();
 
-        return Column(
-          children: [
-            SearchFilters(
-              controller: _searchController,
-              onSearch: (value) {
-                setState(() {
-                  _searchQuery = value.toLowerCase();
-                });
-              },
-              startDate: _startDate,
-              endDate: _endDate,
-              onPickStartDate: () => _pickDate(context, true),
-              onPickEndDate: () => _pickDate(context, false),
-              onClearDates: () {
-                setState(() {
-                  _startDate = null;
-                  _endDate = null;
-                });
-              },
-            ),
-            Expanded(
-              child: filteredTrainings.isEmpty
-                  ? const Center(
-                  child: Text('No hay entrenamientos disponibles.'))
-                  : ListView.builder(
-                itemCount: filteredTrainings.length,
-                itemBuilder: (context, index) {
-                  final training = filteredTrainings[index];
-                  final trainerId = training['trainer']?['id'];
-                  final trainer = _users.firstWhere(
-                        (user) => user['id'] == trainerId,
-                    orElse: () => {'name': 'Desconocido'},
-                  );
+    return Column(
+      children: [
+        SearchFilters(
+          controller: _searchController,
+          onSearch: (value) {
+            setState(() {
+              _searchQuery = value.toLowerCase();
+            });
+          },
+          startDate: _startDate,
+          endDate: _endDate,
+          onPickStartDate: () => _pickDate(context, true),
+          onPickEndDate: () => _pickDate(context, false),
+          onClearDates: () {
+            setState(() {
+              _startDate = null;
+              _endDate = null;
+            });
+          },
+        ),
+        Expanded(
+          child: _trainings.isEmpty || _users.isEmpty
+              ? const Center(child: CircularProgressIndicator())
+              : filteredTrainings.isEmpty
+              ? const Center(child: Text('No hay entrenamientos disponibles.'))
+              : ListView.builder(
+            itemCount: filteredTrainings.length,
+            itemBuilder: (context, index) {
+              final training = filteredTrainings[index];
+              final trainerId = training['trainer']?['id'];
+              final trainer = _users.firstWhere(
+                    (user) => user['id'] == trainerId,
+                orElse: () => {'name': 'Desconocido'},
+              );
 
-                  return TrainingCard(
-                    training: training,
-                    trainer: trainer,
-                    onTap: () {
-                      Navigator.pushNamed(
-                        context,
-                        '/training',
-                        arguments: training,
-                      );
-                    },
-                    onAdd: () {},
+              return TrainingCard(
+                training: training,
+                trainer: trainer,
+                onTap: () {
+                  Navigator.pushNamed(
+                    context,
+                    '/training',
+                    arguments: training,
                   );
                 },
-              ),
-            ),
-          ],
-        );
-      },
+                onAdd: () {},
+              );
+            },
+          ),
+        ),
+      ],
     );
   }
+
 }

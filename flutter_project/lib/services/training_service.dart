@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:http/http.dart' as http;
 
@@ -65,4 +66,61 @@ class TrainingService {
       return List.empty();
     }
   }
+
+  Future<bool> createTraining(Map<String, dynamic> trainingData) async {
+    final url = Uri.parse('http://$host/training');
+    try {
+      final token = await _storage.read(key: 'jwt_token');
+      final response = await client.post(
+        url,
+        headers: {
+          'Authorization': 'Bearer $token',
+          'Content-Type': 'application/json',
+        },
+        body: jsonEncode(trainingData),
+      );
+      return response.statusCode == 200 || response.statusCode == 201;
+    } catch (e) {
+      print('Error al crear entrenamiento: $e');
+      return false;
+    }
+  }
+
+  Future<bool> copyTraining(Map<String, dynamic> originalTraining) async {
+    final userId = await _storage.read(key: 'user_id');
+    if (userId == null) return false;
+
+    final newTraining = Map<String, dynamic>.from(originalTraining);
+    newTraining.remove('id');
+    newTraining['trainer'] = {'id': int.parse(userId)};
+    newTraining['date'] = DateTime.now().toIso8601String().split('T').first;
+
+    return await createTraining(newTraining);
+  }
+
+  Future<bool> removeTraining(String id) async {
+    final url = Uri.parse('http://$host/training/$id');
+
+    try {
+      final token = await _storage.read(key: 'jwt_token');
+      final response = await client.delete(
+        url,
+        headers: {
+          'Authorization': 'Bearer $token',
+          'Content-Type': 'application/json',
+        },
+      );
+
+      if (response.statusCode == 200 || response.statusCode == 204) {
+        return true;
+      } else {
+        print('Error al eliminar entrenamiento: ${response.statusCode}');
+        return false;
+      }
+    } catch (e) {
+      print('Error de red al eliminar entrenamiento: $e');
+      return false;
+    }
+  }
+
 }

@@ -1,7 +1,6 @@
 package com.deu.deu.service
 
 import com.deu.deu.dto.*
-import com.deu.deu.exception.LoginException
 import com.deu.deu.exception.NotFoundException
 import com.deu.deu.exception.UserNotFoundException
 import com.deu.deu.model.Notification
@@ -72,7 +71,7 @@ class UserService(
 
     fun getNotifications(id: Int): List<Notification> {
         val user = userRepository.findByIdOrNull(id) ?: throw UserNotFoundException()
-        return user.notifcations;
+        return user.notifcations
     }
 
     fun addNotification(id: Int, notificationDTO: NotificationDTO) {
@@ -87,17 +86,26 @@ class UserService(
         userRepository.save(newUser)
     }
 
-    fun getUserTrainingsByDate(date: LocalDate, id:Int):List<TrainingDTOResponse> {
+    fun getUserTrainingsByDate(date: LocalDate, id: Int): List<TrainingDTOResponse> {
         val user = userRepository.findByIdOrNull(id) ?: throw UserNotFoundException()
-        val filteredTrainings = user.trainings.filter { it-> it.date == date }.map{it->it.toTrainingDTOResponse()}
+        val filteredTrainings = user.trainings.filter { training -> training.date == date }.map { it -> it.toTrainingDTOResponse() }
         return filteredTrainings
     }
 
     fun addTraining(id: Int, trainingId: Int) {
         val user = userRepository.findByIdOrNull(id) ?: throw UserNotFoundException()
-        val training = trainingService.getTraining(trainingId) ?: throw NotFoundException("No se encontro el entrenamiento")
+        val training =
+            trainingService.getTraining(trainingId) ?: throw NotFoundException("No se encontro el entrenamiento")
         val newUser = user.copy(trainings = user.trainings + training)
         userRepository.save(newUser)
+    }
+
+    fun removeTraining(id: Int) {
+        val users = userRepository.findAll()
+        users.filter { user -> user.trainings.map(Training::id).contains(id) }.map {
+            val user = it.copy(trainings = it.trainings.filter { training -> training.id != id }.toList())
+            userRepository.save(user)
+        }
     }
 
 

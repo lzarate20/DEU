@@ -10,13 +10,12 @@ import com.deu.deu.repository.TrainingRepository
 import com.deu.deu.repository.UserRepository
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
-import java.time.LocalDate
 
 @Service
 class TrainingService(
     val exerciseService: ExerciseService,
     val trainingRepository: TrainingRepository,
-    val userRepository: UserRepository
+    val userRepository: UserRepository,
 ) {
 
 
@@ -48,5 +47,9 @@ class TrainingService(
             ?: throw NotFoundException("No se encontro el entrenamiento $trainingId")
         val exercises = exercisesDTO.map { exerciseService.getExercise(it.id.toInt()) ?: exerciseService.persist(it) }
         trainingRepository.save(training.copy(exercises = training.exercises + exercises))
+    }
+
+    fun removeTraining(trainingId: Int) {
+        trainingRepository.deleteById(trainingId)
     }
 }

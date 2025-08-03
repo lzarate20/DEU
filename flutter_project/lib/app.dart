@@ -8,7 +8,7 @@ import 'package:flutter_project/widgets/base_layout.dart';
 import 'package:flutter_project/widgets/theme_provider.dart';
 import 'package:provider/provider.dart';
 
-import 'configProject/global_navigator.dart';
+import 'configProject/global_config.dart';
 import 'pages/dashboard_page.dart';
 
 class MyApp extends StatelessWidget {
@@ -33,6 +33,7 @@ class MyApp extends StatelessWidget {
           ),
           themeAnimationStyle: AnimationStyle.noAnimation,
           navigatorKey: navigatorKey,
+          navigatorObservers: [routeObserver],
           routes: {
             '/': (context) =>  LandingPage(),
             '/register': (context) => const RegisterPage(),

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_project/pages/training_detail_page.dart';
 import 'package:table_calendar/table_calendar.dart';
 
+import '../configProject/global_config.dart';
 import '../services/training_service.dart';
 
 class TrainingPage extends StatefulWidget {
@@ -11,7 +11,7 @@ class TrainingPage extends StatefulWidget {
   State<TrainingPage> createState() => _TrainingPageState();
 }
 
-class _TrainingPageState extends State<TrainingPage> {
+class _TrainingPageState extends State<TrainingPage> with RouteAware {
   final TrainingService _service = TrainingService();
   DateTime _selectedDay = DateTime.now();
   List<Map<String, dynamic>>? _trainingData;
@@ -30,10 +30,30 @@ class _TrainingPageState extends State<TrainingPage> {
   }
 
   @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    routeObserver.subscribe(this, ModalRoute.of(context)! as PageRoute);
+  }
+
+  @override
+  void dispose() {
+    routeObserver.unsubscribe(this);
+    super.dispose();
+  }
+
+  @override
+  void didPopNext() {
+    _loadTraining();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return
     Scaffold(
-      appBar: AppBar(title: const Text('Entrenamientos')),
+      appBar:AppBar(
+        title: Text('Entrenamientos'),
+        automaticallyImplyLeading: false,
+      ),
       body: Row(
         children: [
           Expanded(
