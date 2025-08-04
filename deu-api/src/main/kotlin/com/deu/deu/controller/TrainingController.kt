@@ -27,8 +27,8 @@ class TrainingController(
     }
 
     @PostMapping("/training")
-    fun postTraining(@RequestBody trainingDTO: TrainingDTO) {
-        trainingService.saveTraining(trainingDTO)
+    fun postTraining(@RequestBody trainingDTO: TrainingDTO):TrainingDTOResponse {
+        return trainingService.saveTraining(trainingDTO).toTrainingDTOResponse()
     }
 
     @PatchMapping("/training/{id}")

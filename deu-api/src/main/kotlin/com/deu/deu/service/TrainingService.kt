@@ -1,9 +1,11 @@
 package com.deu.deu.service
 
+import com.deu.deu.dto.ExerciseTrainingSaveDTO
 import com.deu.deu.dto.ExerciseDTO
 import com.deu.deu.dto.TrainingDTO
 import com.deu.deu.exception.InvalidUserIdException
 import com.deu.deu.exception.NotFoundException
+import com.deu.deu.model.Exercise
 import com.deu.deu.model.Training
 import com.deu.deu.model.UserType
 import com.deu.deu.repository.TrainingRepository
@@ -27,25 +29,34 @@ class TrainingService(
         return trainingRepository.findByIdOrNull(trainingId)
     }
 
-    fun saveTraining(trainingDTO: TrainingDTO) {
+    fun saveTraining(trainingDTO: TrainingDTO):Training {
         val trainer = userRepository.findByIdOrNull(trainingDTO.trainer.id) ?: throw InvalidUserIdException()
         if (trainer.type != UserType.TRAINER) {
             throw InvalidUserIdException("El id no corresponde a un entrenador válido")
         }
         val exercises =
-            trainingDTO.exercises.map { exerciseService.getExercise(it.id.toInt()) ?: exerciseService.persist(it) }
+            trainingDTO.exercises.map {getExercise(it) }
         val training = Training(
             name = trainingDTO.name, description = trainingDTO.description, trainer = trainer,
             date = trainingDTO.date, type = trainingDTO.trainingType, exercises = exercises
         )
         trainingRepository.save(training)
         userRepository.save(trainer.copy(trainings = trainer.trainings.plus(training) ))
+        return training
+    }
+
+    private fun getExercise(dto: ExerciseTrainingSaveDTO): Exercise {
+        return when {
+            dto.id != null -> dto.id.toIntOrNull()?.let { exerciseService.getExercise(it) } ?: throw NotFoundException()
+            dto.exercise != null -> exerciseService.persist(dto.exercise)
+            else -> throw NotFoundException()
+        }
     }
 
     fun addExercisesToTraining(trainingId: Int, exercisesDTO: List<ExerciseDTO>) {
         val training = trainingRepository.findByIdOrNull(trainingId)
             ?: throw NotFoundException("No se encontro el entrenamiento $trainingId")
-        val exercises = exercisesDTO.map { exerciseService.getExercise(it.id.toInt()) ?: exerciseService.persist(it) }
+        val exercises = exercisesDTO.map { ex-> ex.id?.let{exerciseService.getExercise(ex.id.toInt())} ?: exerciseService.persist(ex) }
         trainingRepository.save(training.copy(exercises = training.exercises + exercises))
     }
 

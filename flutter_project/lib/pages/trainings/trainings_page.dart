@@ -127,57 +127,69 @@ class _TrainingPageState extends State<TrainingListPage> with RouteAware {
       return matchesText && matchesDate;
     }).toList();
 
-    return Column(
-      children: [
-        SearchFilters(
-          controller: _searchController,
-          onSearch: (value) {
-            setState(() {
-              _searchQuery = value.toLowerCase();
-            });
-          },
-          startDate: _startDate,
-          endDate: _endDate,
-          onPickStartDate: () => _pickDate(context, true),
-          onPickEndDate: () => _pickDate(context, false),
-          onClearDates: () {
-            setState(() {
-              _startDate = null;
-              _endDate = null;
-            });
-          },
-        ),
-        Expanded(
-          child: _trainings.isEmpty || _users.isEmpty
-              ? const Center(child: CircularProgressIndicator())
-              : filteredTrainings.isEmpty
-              ? const Center(child: Text('No hay entrenamientos disponibles.'))
-              : ListView.builder(
-            itemCount: filteredTrainings.length,
-            itemBuilder: (context, index) {
-              final training = filteredTrainings[index];
-              final trainerId = training['trainer']?['id'];
-              final trainer = _users.firstWhere(
-                    (user) => user['id'] == trainerId,
-                orElse: () => {'name': 'Desconocido'},
-              );
-
-              return TrainingCard(
-                training: training,
-                trainer: trainer,
-                onTap: () {
-                  Navigator.pushNamed(
-                    context,
-                    '/training',
-                    arguments: training,
-                  );
-                },
-                onAdd: () {},
-              );
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Entrenamientos'),
+      ),
+      body: Column(
+        children: [
+          SearchFilters(
+            controller: _searchController,
+            onSearch: (value) {
+              setState(() {
+                _searchQuery = value.toLowerCase();
+              });
+            },
+            startDate: _startDate,
+            endDate: _endDate,
+            onPickStartDate: () => _pickDate(context, true),
+            onPickEndDate: () => _pickDate(context, false),
+            onClearDates: () {
+              setState(() {
+                _startDate = null;
+                _endDate = null;
+              });
             },
           ),
-        ),
-      ],
+          Expanded(
+            child: _trainings.isEmpty || _users.isEmpty
+                ? const Center(child: CircularProgressIndicator())
+                : filteredTrainings.isEmpty
+                ? const Center(child: Text('No hay entrenamientos disponibles.'))
+                : ListView.builder(
+              itemCount: filteredTrainings.length,
+              itemBuilder: (context, index) {
+                final training = filteredTrainings[index];
+                final trainerId = training['trainer']?['id'];
+                final trainer = _users.firstWhere(
+                      (user) => user['id'] == trainerId,
+                  orElse: () => {'name': 'Desconocido'},
+                );
+
+                return TrainingCard(
+                  training: training,
+                  trainer: trainer,
+                  onTap: () {
+                    Navigator.pushNamed(
+                      context,
+                      '/training',
+                      arguments: training,
+                    );
+                  },
+                  onAdd: () {},
+                );
+              },
+            ),
+          ),
+        ],
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          Navigator.pushNamed(context, '/training/new');
+        },
+        child: const Icon(Icons.add),
+        tooltip: 'Crear nuevo entrenamiento',
+      ),
     );
   }
 

@@ -72,7 +72,7 @@ class ExerciseService(
     }
 
     fun update(exerciseDTO: ExerciseDTO): Exercise {
-        val exerciseId = exerciseDTO.id.let(String::toInt)
+        val exerciseId = exerciseDTO.id?.let(String::toInt)
         val exercise =
             exerciseRepository.findByIdOrNull(exerciseId) ?: throw NotFoundException("No se encontró el ejercicio")
         val video: Video = exerciseDTO.idVideo?.let { videoRepository.findByIdOrNull(exerciseDTO.idVideo) }
