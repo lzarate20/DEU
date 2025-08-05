@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import 'exercise_selector_form.dart';
+
 class ExerciseForm extends StatefulWidget {
   final void Function(Map<String, dynamic>) onSaved;
   final void Function()? onRemove;
@@ -44,18 +46,12 @@ class ExerciseFormState extends State<ExerciseForm> {
     {'label': 'Horas', 'value': 'HOUR'},
   ];
 
-  void _save() {
-    final result = saveIfValid();
-    if (result != null) {
-      widget.onSaved(result);
-    }
-  }
 
   Map<String, dynamic>? saveIfValid() {
     if (_useExisting) {
       final id = int.tryParse(_existingIdCtrl.text);
       if (id != null) {
-        return {"id": id};
+        return {"id": id}; // Devuelve como ExerciseTrainingSaveDTO con solo ID
       } else {
         return null;
       }
@@ -82,7 +78,9 @@ class ExerciseFormState extends State<ExerciseForm> {
         exercise["url"] = _urlCtrl.text;
       }
 
-      return  exercise;
+      return {
+        "exercise": exercise  // Devuelve como ExerciseTrainingSaveDTO con el campo "exercise"
+      };
     }
 
     return null;
@@ -109,6 +107,43 @@ class ExerciseFormState extends State<ExerciseForm> {
       constraints: const BoxConstraints(maxWidth: 500),
       child: child,
     );
+  }
+
+  void _openExistingExerciseModal() async {
+
+    final selectedId = await showDialog<int>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text("Elegí un ejercicio existente"),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ListTile(
+              title: const Text("Push-ups (ID: 1)"),
+              onTap: () => Navigator.pop(context, 1),
+            ),
+            ListTile(
+              title: const Text("Squats (ID: 2)"),
+              onTap: () => Navigator.pop(context, 2),
+            ),
+            ListTile(
+              title: const Text("Sit-ups (ID: 3)"),
+              onTap: () => Navigator.pop(context, 3),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text("Cancelar"),
+          ),
+        ],
+      ),
+    );
+
+    if (selectedId != null) {
+      setState(() => _existingIdCtrl.text = selectedId.toString());
+    }
   }
 
   @override
@@ -150,15 +185,22 @@ class ExerciseFormState extends State<ExerciseForm> {
               ),
               const SizedBox(height: 12),
 
-              // Modo: Usar existente
               if (_useExisting)
-                _buildCompactField(
-                  child: TextFormField(
-                    controller: _existingIdCtrl,
-                    decoration: const InputDecoration(labelText: "ID del ejercicio existente"),
-                    keyboardType: TextInputType.number,
-                    validator: _required,
-                  ),
+                ExistingExerciseSelector(
+                  onSelected: (exercise) {
+                    setState(() {
+                      if (exercise != null) {
+                        _existingIdCtrl.text = exercise['id'].toString();
+                        // Opcional: guardar también otros campos para mostrar en el form, pero solo lectura
+                        _nameCtrl.text = exercise['name'] ?? '';
+                        _descCtrl.text = exercise['description'] ?? '';
+                      } else {
+                        _existingIdCtrl.text = '';
+                        _nameCtrl.text = '';
+                        _descCtrl.text = '';
+                      }
+                    });
+                  },
                 ),
 
               // Modo: Crear nuevo
@@ -261,10 +303,6 @@ class ExerciseFormState extends State<ExerciseForm> {
               ],
 
               const SizedBox(height: 12),
-              ElevatedButton(
-                onPressed: _save,
-                child: const Text("Guardar ejercicio"),
-              ),
             ],
           ),
         ),

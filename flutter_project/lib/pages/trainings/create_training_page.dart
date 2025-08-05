@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import '../../services/training_service.dart';
-import '../../widgets/exercise/exercise_form.dart';
+import '../../widgets/forms/exercise_form.dart';
+import '../../widgets/forms/exercise_list_form.dart';
+import '../../widgets/forms/training_form.dart';
 
 class CreateTrainingPage extends StatefulWidget {
   const CreateTrainingPage({super.key});
@@ -12,13 +14,19 @@ class CreateTrainingPage extends StatefulWidget {
 
 class _CreateTrainingPageState extends State<CreateTrainingPage> {
   final _secureStorage = const FlutterSecureStorage();
+
   final _formKey = GlobalKey<FormState>();
   final _nameCtrl = TextEditingController();
   final _descCtrl = TextEditingController();
   DateTime? _selectedDate;
   String _trainingType = 'DRIBBLING';
 
-  final List<String> _trainingTypes = ['DRIBBLING', 'SPEED', 'STRENGHT'];
+  final List<String> _trainingTypes = ['DRIBBLING', 'SPEED', 'STRENGTH'];
+  final Map<String, String> trainingTypeLabels = {
+    'DRIBBLING': 'Regate',
+    'SPEED': 'Velocidad',
+    'STRENGTH': 'Fuerza',
+  };
 
   final List<Map<String, dynamic>> _exerciseData = [];
   final List<GlobalKey<ExerciseFormState>> _exerciseFormKeys = [];
@@ -56,7 +64,7 @@ class _CreateTrainingPageState extends State<CreateTrainingPage> {
       final state = key.currentState;
       final data = state?.saveIfValid();
       if (data != null) {
-        _exerciseData.add({"exercise": data});
+        _exerciseData.add(data);
       } else {
         allValid = false;
       }
@@ -113,64 +121,45 @@ class _CreateTrainingPageState extends State<CreateTrainingPage> {
       appBar: AppBar(title: const Text("Nuevo Entrenamiento")),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
-        child: Form(
-          key: _formKey,
-          child: ListView(
-            children: [
-              TextFormField(
-                controller: _nameCtrl,
-                decoration: const InputDecoration(labelText: "Nombre del entrenamiento"),
-                validator: (v) => v!.isEmpty ? "Campo obligatorio" : null,
+        child: ListView(
+          children: [
+            TrainingForm(
+              formKey: _formKey,
+              nameCtrl: _nameCtrl,
+              descCtrl: _descCtrl,
+              selectedDate: _selectedDate,
+              onPickDate: _pickDate,
+              trainingType: _trainingType,
+              onTrainingTypeChanged: (val) => setState(() => _trainingType = val),
+              trainingTypes: _trainingTypes,
+              trainingTypeLabels: trainingTypeLabels,  // nuevo parámetro
+            ),
+            const SizedBox(height: 24),
+            ExerciseListForm(
+              exerciseFormKeys: _exerciseFormKeys,
+              onRemove: _removeExerciseForm,
+              onAdd: _addExerciseForm,
+            ),
+            const SizedBox(height: 24),
+            Align(
+              alignment: Alignment.centerLeft,
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: 500),
+                child: ElevatedButton(
+                  onPressed: _submit,
+                  child: const Text("Crear entrenamiento"),
+                ),
               ),
-              TextFormField(
-                controller: _descCtrl,
-                decoration: const InputDecoration(labelText: "Descripción"),
-                validator: (v) => v!.isEmpty ? "Campo obligatorio" : null,
-              ),
-              const SizedBox(height: 12),
-              ListTile(
-                title: Text(_selectedDate == null
-                    ? "Seleccionar fecha"
-                    : "Fecha: ${_selectedDate!.toLocal().toString().split(' ')[0]}"),
-                trailing: const Icon(Icons.calendar_today),
-                onTap: _pickDate,
-              ),
-              const SizedBox(height: 16),
-              const Text("Tipo de entrenamiento:", style: TextStyle(fontWeight: FontWeight.bold)),
-              Wrap(
-                spacing: 8,
-                children: _trainingTypes.map((type) {
-                  return ChoiceChip(
-                    label: Text(type),
-                    selected: _trainingType == type,
-                    onSelected: (_) => setState(() => _trainingType = type),
-                  );
-                }).toList(),
-              ),
-              const SizedBox(height: 24),
-              const Text("Ejercicios:", style: TextStyle(fontWeight: FontWeight.bold)),
-              const SizedBox(height: 10),
-              ..._exerciseFormKeys.map((key) => ExerciseForm(
-                key: key,
-                onSaved: (_) {},
-                onRemove: () => _removeExerciseForm(key),
-              )),
-              ElevatedButton.icon(
-                onPressed: _addExerciseForm,
-                icon: const Icon(Icons.add),
-                label: const Text("Agregar ejercicio"),
-              ),
-              const SizedBox(height: 24),
-              ElevatedButton(
-                onPressed: _submit,
-                child: const Text("Crear entrenamiento"),
-              ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );
   }
 }
+
+
+
+
 
 
