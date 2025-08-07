@@ -31,7 +31,7 @@ class TokenService(
         return extractAllClaims(token).subject
     }
 
-    private fun extractAllClaims(token: String): Claims {
+    fun extractAllClaims(token: String): Claims {
         return Jwts.parserBuilder()
             .setSigningKey(signingKey)
             .build()

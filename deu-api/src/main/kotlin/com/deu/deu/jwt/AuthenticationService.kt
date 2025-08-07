@@ -46,7 +46,10 @@ class AuthenticationService(
     private fun createAccessToken(user: UserDetails): String {
         return tokenService.generateToken(
             subject = user.username,
-            expiration = Date.from(Instant.now().plusSeconds(accessTokenExpiration))
+            expiration = Date.from(Instant.now().plusSeconds(accessTokenExpiration)),
+            additionalClaims = mapOf(
+                "authorities" to user.authorities.map { it.authority }
+            )
         )
     }
 }

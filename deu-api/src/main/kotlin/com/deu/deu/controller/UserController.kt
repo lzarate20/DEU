@@ -8,6 +8,7 @@ import com.deu.deu.model.User
 import com.deu.deu.service.UserService
 import com.deu.deu.utils.toDTO
 import org.springframework.format.annotation.DateTimeFormat
+import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.web.bind.annotation.*
 import java.time.LocalDate
 
@@ -15,6 +16,7 @@ import java.time.LocalDate
 class UserController(val userService: UserService) {
 
     @GetMapping("/users")
+    @PreAuthorize("hasAuthority('ROLE_TRAINER')")
     fun getUsers(): List<UserDTOResponse> {
         return userService.findAllUsers()
     }
