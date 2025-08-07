@@ -92,7 +92,7 @@ data class TrainingDTOResponse(
     val date: LocalDate,
     val trainingType: TrainingType,
     val exercises: List<ExerciseDTO> = listOf(),
-    val comments: List<Comment>
+    val comments: List<CommentDTO> = listOf()
 )
 
 data class TrainingTeamDTO(
@@ -108,4 +108,14 @@ data class ConfigDTO(
     val idUser: Int,
     val theme: ThemeType,
     val letterSize: LetterSize
+)
+
+data class CommentRequest(
+    val userId:String,
+    val comment:String
+)
+
+data class CommentDTO(
+    val user:UserDTOResponse,
+    val comment:String
 )

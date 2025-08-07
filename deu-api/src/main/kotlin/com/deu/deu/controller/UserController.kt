@@ -9,6 +9,8 @@ import com.deu.deu.service.UserService
 import com.deu.deu.utils.toDTO
 import org.springframework.format.annotation.DateTimeFormat
 import org.springframework.security.access.prepost.PreAuthorize
+import org.springframework.security.core.annotation.AuthenticationPrincipal
+import org.springframework.security.core.userdetails.UserDetails
 import org.springframework.web.bind.annotation.*
 import java.time.LocalDate
 
@@ -41,14 +43,14 @@ class UserController(val userService: UserService) {
         return userService.getTeams(id)
     }
 
-    @GetMapping("/user/notifications")
-    fun getNotifications(@RequestParam("user_id") id: Int):List<Notification>{
-        return userService.getNotifications(id)
-    }
-
     @GetMapping("/user/trainings")
     fun getTrainings(@RequestParam("date") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) date: LocalDate, @RequestParam("id") id: Int):List<TrainingDTOResponse> {
         return userService.getUserTrainingsByDate(date,id)
+    }
+
+    @GetMapping("/user/notifications")
+    fun getNotifications(@AuthenticationPrincipal userDetails: UserDetails):List<Notification>{
+        return userService.getNotifications(userDetails.username)
     }
 
 

@@ -2,16 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter_project/widgets/settings.dart';
 import 'package:flutter_project/widgets/theme_provider.dart';
 import 'package:provider/provider.dart';
-
 import '../services/auth_service.dart';
-
+import '../widgets/notification_icon.dart'; // <-- importar el widget
 
 class HeaderBar extends StatelessWidget {
   final VoidCallback? onLoginPressed;
 
   const HeaderBar({super.key, this.onLoginPressed});
 
-  Future<void> _handleMenuSelect(BuildContext context, String value) async{
+  Future<void> _handleMenuSelect(BuildContext context, String value) async {
     switch (value) {
       case 'perfil':
         break;
@@ -38,7 +37,6 @@ class HeaderBar extends StatelessWidget {
   Widget build(BuildContext context) {
     final themeProvider = Provider.of<ThemeProvider>(context);
 
-
     return Container(
       color: Colors.blue,
       padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -48,18 +46,23 @@ class HeaderBar extends StatelessWidget {
         children: [
           Text(
             'Mi Aplicación',
-              style: Theme.of(context).textTheme.titleLarge
+            style: Theme.of(context).textTheme.titleLarge,
           ),
           Row(
             children: [
               IconButton(
                 tooltip: 'Cambiar tema',
                 icon: Icon(
-                  themeProvider.isDarkMode ? Icons.light_mode : Icons.dark_mode,
+                  themeProvider.isDarkMode
+                      ? Icons.light_mode
+                      : Icons.dark_mode,
                   color: Colors.white,
                 ),
                 onPressed: themeProvider.toggleTheme,
               ),
+
+              // 🔔 Campanita de notificaciones
+              const NotificationIcon(),
 
               FutureBuilder<bool>(
                 future: AuthService.isLoggedIn(),
@@ -79,12 +82,14 @@ class HeaderBar extends StatelessWidget {
                   }
                 },
               ),
+
               PopupMenuButton<String>(
                 onSelected: (value) => _handleMenuSelect(context, value),
                 icon: const Icon(Icons.more_vert, color: Colors.white),
                 itemBuilder: (context) => const [
                   PopupMenuItem(value: 'perfil', child: Text('Perfil')),
-                  PopupMenuItem(value: 'configuracion', child: Text('Configuración')),
+                  PopupMenuItem(
+                      value: 'configuracion', child: Text('Configuración')),
                   PopupMenuItem(value: 'salir', child: Text('Salir')),
                 ],
               ),
@@ -95,6 +100,7 @@ class HeaderBar extends StatelessWidget {
     );
   }
 }
+
 
 
 

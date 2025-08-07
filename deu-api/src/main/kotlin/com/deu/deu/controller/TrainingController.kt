@@ -1,5 +1,6 @@
 package com.deu.deu.controller
 
+import com.deu.deu.dto.CommentRequest
 import com.deu.deu.dto.ExerciseDTO
 import com.deu.deu.dto.TrainingDTO
 import com.deu.deu.dto.TrainingDTOResponse
@@ -40,6 +41,11 @@ class TrainingController(
     fun postTraining(@PathVariable("id") id: Int) {
         userService.removeTraining(id)
         trainingService.removeTraining(id)
+    }
+
+    @PostMapping("/training/comment/{idTeam}")
+    fun addCommentToTeam(@PathVariable("idTeam") id:Int, @RequestBody comment:CommentRequest ): TrainingDTOResponse{
+        return trainingService.addCommentToTraining(id,comment).toTrainingDTOResponse()
     }
 
 }

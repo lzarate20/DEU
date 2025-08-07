@@ -123,4 +123,42 @@ class TrainingService {
     }
   }
 
+  Future<Map<String, dynamic>?> addCommentToTraining({
+    required String idTeam,
+    required String comment,
+  }) async {
+    final userId = await _storage.read(key: 'user_id');
+    if (userId == null) return null;
+
+    final url = Uri.parse('http://$host/training/comment/$idTeam');
+
+    final Map<String, dynamic> body = {
+      'userId': userId,
+      'comment': comment,
+    };
+
+    try {
+      final token = await _storage.read(key: 'jwt_token');
+      final response = await client.post(
+        url,
+        headers: {
+          'Authorization': 'Bearer $token',
+          'Content-Type': 'application/json',
+        },
+        body: jsonEncode(body),
+      );
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        final Map<String, dynamic> updatedTraining = jsonDecode(response.body);
+        return updatedTraining;
+      } else {
+        print('Error al agregar comentario: ${response.statusCode}');
+        return null;
+      }
+    } catch (e) {
+      print('Error de red al agregar comentario: $e');
+      return null;
+    }
+  }
+
 }

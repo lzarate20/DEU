@@ -38,7 +38,7 @@ fun Training.toTrainingDTOResponse(): TrainingDTOResponse {
         this.date,
         this.type,
         this.exercises.map { it -> it.toExerciseDto() },
-        this.comments
+        this.comments.map { it -> it.toCommentDTO()}
     )
 }
 
@@ -68,4 +68,11 @@ fun Config.toDTO(): ConfigDTO {
         idUser = this.user.id,
         theme = this.theme,
         letterSize = this.letterSize)
+}
+
+fun Comment.toCommentDTO(): CommentDTO{
+    return CommentDTO(
+        user = this.idUser.toDTO(),
+        comment = this.comment,
+    )
 }

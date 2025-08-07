@@ -39,4 +39,30 @@ class UserService {
     }
   }
 
+  Future<List<Map<String, dynamic>>> fetchNotifications() async {
+    final token = await _storage.read(key: 'jwt_token');
+
+    if (token == null) {
+      print('No se encontró el token JWT');
+      return [];
+    }
+
+    final url = Uri.parse('http://$host/user/notifications');
+    final response = await client.get(
+      url,
+      headers: {
+        'Authorization': 'Bearer $token',
+        'Content-Type': 'application/json',
+      },
+    );
+
+    if (response.statusCode == 200) {
+      final List<dynamic> data = jsonDecode(response.body);
+      return data.cast<Map<String, dynamic>>();
+    } else {
+      print('Error al obtener notificaciones: ${response.statusCode}');
+      return [];
+    }
+  }
+
 }

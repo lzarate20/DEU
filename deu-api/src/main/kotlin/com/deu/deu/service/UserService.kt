@@ -69,9 +69,9 @@ class UserService(
         userRepository.delete(user)
     }
 
-    fun getNotifications(id: Int): List<Notification> {
-        val user = userRepository.findByIdOrNull(id) ?: throw UserNotFoundException()
-        return user.notifcations
+    fun getNotifications(username:String): List<Notification> {
+        val user = userRepository.findByEmail(username) ?: throw UserNotFoundException()
+        return user.notifcations.sortedByDescending { it -> it.date }
     }
 
     fun addNotification(id: Int, notificationDTO: NotificationDTO) {

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../services/training_service.dart';
 import '../widgets/exercise/comment_panel.dart';
 import '../widgets/exercise/comment_toggle.dart';
 import '../widgets/exercise/exercise_list.dart';
@@ -15,17 +16,18 @@ class TrainingDetailPage extends StatefulWidget {
 }
 
 class _TrainingDetailPageState extends State<TrainingDetailPage> {
+  late Map<String, dynamic> training;
   late List<dynamic> exercises;
   int _selectedIndex = 0;
   bool _showComments = false;
   late String videoUrl;
 
-
-    @override
-    void initState() {
-      super.initState();
-      exercises = widget.training['exercises'] ?? [];
-      videoUrl = exercises.isNotEmpty ? exercises[0]['url'] ?? '' : '';
+  @override
+  void initState() {
+    super.initState();
+    training = widget.training;
+    exercises = training['exercises'] ?? [];
+    videoUrl = exercises.isNotEmpty ? exercises[0]['url'] ?? '' : '';
   }
 
   void _onExerciseSelected(int index) {
@@ -50,24 +52,23 @@ class _TrainingDetailPageState extends State<TrainingDetailPage> {
 
   @override
   Widget build(BuildContext context) {
-    final comments = widget.training['comments'] ?? [];
+    final comments = training['comments'] ?? [];
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.training['name'] ?? 'Detalle'),
-          actions: [
-            TrainingActions(
-              training: widget.training,
-              onCopied: () {
-              },
-              onEdited: () {
-                Navigator.pushNamed(context, '/edit_training', arguments: widget.training);
-              },
-              onDeleted: () {
-                Navigator.pop(context); // Volver al listado
-              },
-            ),
-          ],
+        title: Text(training['name'] ?? 'Detalle'),
+        actions: [
+          TrainingActions(
+            training: training,
+            onCopied: () {},
+            onEdited: () {
+              Navigator.pushNamed(context, '/edit_training', arguments: training);
+            },
+            onDeleted: () {
+              Navigator.pop(context);
+            },
+          ),
+        ],
       ),
       body: Stack(
         children: [
@@ -93,7 +94,6 @@ class _TrainingDetailPageState extends State<TrainingDetailPage> {
                     ),
                   ],
                 ),
-
               ),
               CommentToggleBar(
                 showComments: _showComments,
@@ -108,8 +108,23 @@ class _TrainingDetailPageState extends State<TrainingDetailPage> {
               onDismiss: _closeComments,
             ),
             CommentsPanel(
-              comments: comments,
+              initialComments: comments,
               onClose: _closeComments,
+              onSendComment: (text) async {
+                final updated = await TrainingService().addCommentToTraining(
+                  idTeam: training['id'],
+                  comment: text,
+                );
+
+                if (updated != null) {
+                  setState(() {
+                    training = updated;
+                    exercises = training['exercises'] ?? [];
+                  });
+                }
+
+                return updated;
+              },
             ),
           ],
         ],
@@ -117,6 +132,7 @@ class _TrainingDetailPageState extends State<TrainingDetailPage> {
     );
   }
 }
+
 
 
 
