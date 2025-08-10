@@ -61,7 +61,6 @@ class HeaderBar extends StatelessWidget {
                 onPressed: themeProvider.toggleTheme,
               ),
 
-              // 🔔 Campanita de notificaciones
               const NotificationIcon(),
 
               FutureBuilder<bool>(

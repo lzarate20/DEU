@@ -41,6 +41,32 @@ class TrainingService {
     }
   }
 
+  Future<Map<String, dynamic>?> fetchTrainingById(String trainingId) async {
+    final url = Uri.parse('http://$host/training/$trainingId');
+
+    try {
+      final token = await _storage.read(key: 'jwt_token');
+      final response = await client.get(
+        url,
+        headers: {
+          'Authorization': 'Bearer $token',
+          'Content-Type': 'application/json',
+        },
+      );
+
+      if (response.statusCode == 200) {
+        final Map<String, dynamic> data = jsonDecode(response.body);
+        return data;
+      } else {
+        print('Error: ${response.statusCode}');
+        return null;
+      }
+    } catch (e) {
+      print('Error de red: $e');
+      return null;
+    }
+  }
+
   Future<List<Map<String, dynamic>>?> fetchTrainings() async {
     final url = Uri.parse('http://$host/trainings');
 

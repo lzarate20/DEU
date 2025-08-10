@@ -52,7 +52,8 @@ data class UserLoginResponse(
 )
 
 data class NotificationDTO(
-    val message: String
+    val message: String,
+    val context: NotificationContext
 )
 
 data class ExerciseTrainingSaveDTO(

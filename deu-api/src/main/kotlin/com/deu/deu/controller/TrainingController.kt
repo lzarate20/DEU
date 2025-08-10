@@ -23,8 +23,8 @@ class TrainingController(
     }
 
     @GetMapping("/training/{id}")
-    fun getTraining(@PathVariable("id") id: Int): Training {
-        return trainingService.getTraining(id) ?: throw NotFoundException("No se encontro el entrenamiento $id")
+    fun getTraining(@PathVariable("id") id: Int): TrainingDTOResponse {
+        return trainingService.getTraining(id)?.toTrainingDTOResponse() ?: throw NotFoundException("No se encontro el entrenamiento $id")
     }
 
     @PostMapping("/training")

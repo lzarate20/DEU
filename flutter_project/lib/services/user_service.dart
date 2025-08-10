@@ -65,4 +65,21 @@ class UserService {
     }
   }
 
+  Future<bool> markNotificationsViewed() async {
+    final token = await _storage.read(key: 'jwt_token');
+    if (token == null) return false;
+
+    final url = Uri.parse('http://$host/user/notifications/viewed'); // endpoint que maneja el POST
+
+    final response = await client.post(
+      url,
+      headers: {
+        'Authorization': 'Bearer $token',
+        'Content-Type': 'application/json',
+      },
+    );
+
+    return response.statusCode == 200;
+  }
+
 }

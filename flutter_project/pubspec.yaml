@@ -43,6 +43,7 @@ dependencies:
   google_fonts: ^4.0.4
   chewie: ^1.6.0
   video_player: ^2.6.0
+  intl: ^0.20.2
 
 
 dev_dependencies:

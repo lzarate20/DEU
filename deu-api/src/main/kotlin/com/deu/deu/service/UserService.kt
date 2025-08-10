@@ -74,12 +74,20 @@ class UserService(
         return user.notifcations.sortedByDescending { it -> it.date }
     }
 
+    fun markNotificationsAsViewed(username:String){
+        val user = userRepository.findByEmail(username) ?: throw UserNotFoundException()
+        val notifications = user.notifcations.map { it -> it.copy(viewed = true) }
+        notificationRepository.saveAll(notifications)
+    }
+
+
     fun addNotification(id: Int, notificationDTO: NotificationDTO) {
         val user = userRepository.findByIdOrNull(id) ?: throw UserNotFoundException()
         val notification = Notification(
             message = notificationDTO.message,
             date = LocalDateTime.now(),
-            viewed = false
+            viewed = false,
+            context = notificationDTO.context
         )
         val newUser = user.copy(notifcations = user.notifcations + notification)
         notificationRepository.save(notification)

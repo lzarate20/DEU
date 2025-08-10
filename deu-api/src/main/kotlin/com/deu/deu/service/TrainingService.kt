@@ -84,7 +84,8 @@ class TrainingService(
             Notification(
                 message = "Mensaje nuevo",
                 date = LocalDateTime.now(),
-                viewed = false
+                viewed = false,
+                context = NotificationContext("TRAINING",trainingId.toString())
             )
         )
         usersToNotify.forEach { us -> userRepository.save(us.copy(notifcations = us.notifcations.plus(notification))) }

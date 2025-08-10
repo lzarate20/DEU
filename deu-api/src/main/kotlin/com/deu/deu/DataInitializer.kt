@@ -107,7 +107,7 @@ class DataInitializer(
             val comment2 = Comment(idUser = trainee, comment = "Nice work!")
             commentRepository.save(comment)
 
-            val notification = Notification(message = "Una notificacion", date = LocalDateTime.now(), viewed = false)
+            val notification = Notification(message = "Una notificacion", date = LocalDateTime.now(), viewed = false, context = NotificationContext("TRAINING","1"))
             notificationRepository.save(notification)
             val updatedTrainer = trainer.copy(trainings = listOf(training,training2), notifcations = listOf(notification))
             userRepository.save(updatedTrainer)

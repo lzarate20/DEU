@@ -111,5 +111,12 @@ data class Notification(
     val id: Int = 0,
     val message: String,
     val date: LocalDateTime,
-    val viewed: Boolean
+    val viewed: Boolean,
+    val context: NotificationContext
+)
+
+@Embeddable
+data class NotificationContext(
+    val type: String,
+    val contextId: String,
 )

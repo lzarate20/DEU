@@ -3,8 +3,6 @@ package com.deu.deu.controller
 import com.deu.deu.dto.*
 import com.deu.deu.exception.UserNotFoundException
 import com.deu.deu.model.Notification
-import com.deu.deu.model.Team
-import com.deu.deu.model.User
 import com.deu.deu.service.UserService
 import com.deu.deu.utils.toDTO
 import org.springframework.format.annotation.DateTimeFormat
@@ -51,6 +49,11 @@ class UserController(val userService: UserService) {
     @GetMapping("/user/notifications")
     fun getNotifications(@AuthenticationPrincipal userDetails: UserDetails):List<Notification>{
         return userService.getNotifications(userDetails.username)
+    }
+
+    @PostMapping("/user/notifications/viewed")
+    fun markNotifcationsAsViewed(@AuthenticationPrincipal userDetails: UserDetails){
+        userService.markNotificationsAsViewed(userDetails.username)
     }
 
 
