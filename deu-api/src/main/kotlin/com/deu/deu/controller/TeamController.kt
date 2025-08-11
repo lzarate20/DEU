@@ -5,6 +5,7 @@ import com.deu.deu.model.Team
 import com.deu.deu.model.Training
 import com.deu.deu.service.TeamService
 import com.deu.deu.service.UserService
+import com.deu.deu.utils.toDTO
 import org.springframework.web.bind.annotation.*
 
 @RestController
@@ -13,6 +14,12 @@ class TeamController(val teamService: TeamService) {
     fun getGroups() : List<TeamDTOResponse>{
         return teamService.findAll()
     }
+
+    @GetMapping( "/teams/{id}")
+    fun getGroupById(@PathVariable("id") id: Int) : TeamDTOResponse{
+        return teamService.findById(id).toDTO()
+    }
+
 
     @DeleteMapping("/team/{id}")
     fun deleteGroup(@PathVariable("id") id: Int){

@@ -39,4 +39,18 @@ class TeamService {
       return List.empty();
     }
   }
+
+  Future<Map<String, dynamic>?> fetchTeamById(String id) async {
+    final url = Uri.parse('http://$host/teams/$id');
+    final token = await _storage.read(key: 'jwt_token');
+    final response = await client.get(url, headers: {
+      'Authorization': 'Bearer $token',
+      'Content-Type': 'application/json',
+    });
+
+    if (response.statusCode == 200) {
+      return jsonDecode(response.body) as Map<String, dynamic>;
+    }
+    return null;
+  }
 }

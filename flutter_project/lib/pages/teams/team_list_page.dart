@@ -57,9 +57,6 @@ class _TeamListPageState extends State<TeamListPage> with RouteAware {
     });
   }
 
-  Future<void> _pickDate(BuildContext context, bool isStart) async {
-    // similar a lo que tenés en entrenamientos
-  }
 
   @override
   Widget build(BuildContext context) {

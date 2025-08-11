@@ -5,6 +5,7 @@ import '../pages/dashboard_page.dart';
 import '../pages/error_page.dart';
 import '../pages/landing_page.dart';
 import '../pages/register.dart';
+import '../pages/teams/team_detail_page.dart';
 import '../pages/training_detail_page.dart';
 import '../pages/trainings/create_training_page.dart';
 import '../pages/trainings/trainings_page.dart';
@@ -66,6 +67,16 @@ final GoRouter router = GoRouter(
         GoRoute(
           path: '/teams',
           pageBuilder: (context, state) => NoTransitionPage(child: const TeamListPage()),
+        ),
+        GoRoute(
+          path: '/team/:id',
+          pageBuilder: (context, state) {
+            final id = state.pathParameters['id']!;
+            final team = state.extra as Map<String, dynamic>?;
+            return NoTransitionPage(
+              child: TeamDetailPage(teamId: id, team: team),
+            );
+          },
         ),
       ],
     ),

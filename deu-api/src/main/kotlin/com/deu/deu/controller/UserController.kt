@@ -16,7 +16,6 @@ import java.time.LocalDate
 class UserController(val userService: UserService) {
 
     @GetMapping("/users")
-    @PreAuthorize("hasAuthority('ROLE_TRAINER')")
     fun getUsers(): List<UserDTOResponse> {
         return userService.findAllUsers()
     }
