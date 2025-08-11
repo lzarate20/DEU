@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'auth_service.dart';
 
 class AuthGuard extends StatelessWidget {
@@ -20,14 +21,13 @@ class AuthGuard extends StatelessWidget {
         final token = snapshot.data;
 
         if (token == null) {
-          // Si no hay token, redirigimos al inicio
           Future.microtask(() {
-            Navigator.of(context).pushNamedAndRemoveUntil('/', (_) => false);
+            context.go('/');
           });
-          return const SizedBox(); // evitar mostrar pantalla protegida
+          return const SizedBox();
         }
 
-        return protectedPage; // Hay sesión, mostrar la página protegida
+        return protectedPage;
       },
     );
   }

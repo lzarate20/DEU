@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:go_router/go_router.dart';
 import '../../services/training_service.dart';
 import '../../widgets/forms/exercise_form.dart';
 import '../../widgets/forms/exercise_list_form.dart';
@@ -107,7 +108,7 @@ class _CreateTrainingPageState extends State<CreateTrainingPage> {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Entrenamiento creado')),
       );
-      Navigator.pop(context);
+      context.go('/trainings');
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Error al crear entrenamiento')),

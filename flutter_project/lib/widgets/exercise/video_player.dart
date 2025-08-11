@@ -39,7 +39,6 @@ class _VideoPlayerAreaState extends State<VideoPlayerArea> {
   }
 
   Future<void> _initializePlayer(String url) async {
-    // Creamos primero un nuevo controlador temporal
     final newVideoController = VideoPlayerController.networkUrl(Uri.parse(url));
     await newVideoController.initialize();
 

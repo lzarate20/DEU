@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:table_calendar/table_calendar.dart';
 
 import '../configProject/global_config.dart';
@@ -88,11 +89,7 @@ class _TrainingPageState extends State<TrainingPage> with RouteAware {
                                 size: 16,
                               ),
                               onTap: () {
-                                Navigator.pushNamed(
-                                  context,
-                                  '/training',
-                                  arguments: training,
-                                );
+                                context.go('/training/${training['id']}', extra: training);
                               },
                             );
                           },

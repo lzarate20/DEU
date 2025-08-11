@@ -1,33 +1,75 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import '../services/training_service.dart';
 import '../widgets/exercise/comment_panel.dart';
+import 'package:flutter/material.dart';
 import '../widgets/exercise/comment_toggle.dart';
 import '../widgets/exercise/exercise_list.dart';
 import '../widgets/exercise/training_actions.dart';
 import '../widgets/exercise/video_player.dart';
+import '../services/training_service.dart';
 
 class TrainingDetailPage extends StatefulWidget {
-  final Map<String, dynamic> training;
+  final String trainingId;
+  final Map<String, dynamic>? training;
 
-  const TrainingDetailPage({required this.training, super.key});
+  const TrainingDetailPage({
+    required this.trainingId,
+    this.training,
+    super.key,
+  });
 
   @override
   State<TrainingDetailPage> createState() => _TrainingDetailPageState();
 }
 
 class _TrainingDetailPageState extends State<TrainingDetailPage> {
-  late Map<String, dynamic> training;
-  late List<dynamic> exercises;
+  Map<String, dynamic>? training;
+  List<dynamic> exercises = [];
   int _selectedIndex = 0;
   bool _showComments = false;
-  late String videoUrl;
+  String videoUrl = '';
+  bool _loading = true;
 
   @override
   void initState() {
     super.initState();
-    training = widget.training;
-    exercises = training['exercises'] ?? [];
+    if (widget.training != null) {
+      _initWithData(widget.training!);
+    } else {
+      _fetchTraining();
+    }
+  }
+
+  void _initWithData(Map<String, dynamic> data) {
+    training = data;
+    exercises = data['exercises'] ?? [];
     videoUrl = exercises.isNotEmpty ? exercises[0]['url'] ?? '' : '';
+    _loading = false;
+  }
+
+  Future<void> _fetchTraining() async {
+    try {
+      final fetched = await TrainingService().fetchTrainingById(widget.trainingId);
+      if (mounted) {
+        setState(() {
+          if (fetched != null) {
+            _initWithData(fetched);
+          } else {
+            _loading = false;
+          }
+        });
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() {
+          _loading = false;
+        });
+      }
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error al cargar: $e')),
+      );
+    }
   }
 
   void _onExerciseSelected(int index) {
@@ -52,20 +94,32 @@ class _TrainingDetailPageState extends State<TrainingDetailPage> {
 
   @override
   Widget build(BuildContext context) {
-    final comments = training['comments'] ?? [];
+    if (_loading) {
+      return const Scaffold(
+        body: Center(child: CircularProgressIndicator()),
+      );
+    }
+
+    if (training == null) {
+      return const Scaffold(
+        body: Center(child: Text('Entrenamiento no encontrado')),
+      );
+    }
+
+    final comments = training!['comments'] ?? [];
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(training['name'] ?? 'Detalle'),
+        title: Text(training!['name'] ?? 'Detalle'),
         actions: [
           TrainingActions(
-            training: training,
+            training: training!,
             onCopied: () {},
             onEdited: () {
-              Navigator.pushNamed(context, '/edit_training', arguments: training);
+              context.push('/edit_training', extra: training);
             },
             onDeleted: () {
-              Navigator.pop(context);
+              context.go('/trainings');
             },
           ),
         ],
@@ -112,14 +166,13 @@ class _TrainingDetailPageState extends State<TrainingDetailPage> {
               onClose: _closeComments,
               onSendComment: (text) async {
                 final updated = await TrainingService().addCommentToTraining(
-                  idTeam: training['id'],
+                  idTeam: training!['id'],
                   comment: text,
                 );
 
                 if (updated != null) {
                   setState(() {
-                    training = updated;
-                    exercises = training['exercises'] ?? [];
+                    _initWithData(updated);
                   });
                 }
 
@@ -132,7 +185,3 @@ class _TrainingDetailPageState extends State<TrainingDetailPage> {
     );
   }
 }
-
-
-
-

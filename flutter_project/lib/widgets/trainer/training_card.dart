@@ -86,11 +86,6 @@ class TrainingCard extends StatelessWidget {
             ),
           ],
         ),
-        trailing: IconButton(
-          icon: const Icon(Icons.add, color: Colors.green),
-          tooltip: 'Agregar a mis entrenamientos',
-          onPressed: onAdd,
-        ),
         onTap: onTap,
       ),
     );

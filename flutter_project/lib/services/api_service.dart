@@ -1,8 +1,8 @@
-import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:http/http.dart' as http;
 
 import '../configProject/global_config.dart';
+import '../configProject/global_router.dart';
 
 class AuthHttpClient extends http.BaseClient {
   final http.Client _inner = http.Client();
@@ -23,7 +23,7 @@ class AuthHttpClient extends http.BaseClient {
 
       final navigator = navigatorKey.currentState;
       if (navigator != null) {
-        navigator.pushNamedAndRemoveUntil('/', (route) => false);
+        router.go('/');
       }
     }
 

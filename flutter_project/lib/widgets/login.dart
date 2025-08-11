@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_project/services/auth_service.dart';
 import 'package:flutter_project/services/config_service.dart';
 import 'package:flutter_project/widgets/theme_provider.dart';
+import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
 class LoginForm extends StatefulWidget {
@@ -27,7 +28,7 @@ class _LoginFormState extends State<LoginForm> {
         final themeProvider = Provider.of<ThemeProvider>(context, listen: false);
         await themeProvider.initFromConfig(userConfig);
         if (!mounted) return;
-        Navigator.of(context).pushReplacementNamed('/home');
+        context.go('/home');
       } else {
         if (!mounted) return;
         ScaffoldMessenger.of(context).showSnackBar(

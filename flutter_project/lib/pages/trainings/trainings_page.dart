@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../configProject/global_config.dart';
 import '../../services/training_service.dart';
@@ -170,11 +171,7 @@ class _TrainingPageState extends State<TrainingListPage> with RouteAware {
                   training: training,
                   trainer: trainer,
                   onTap: () {
-                    Navigator.pushNamed(
-                      context,
-                      '/training',
-                      arguments: training,
-                    );
+                    context.go('/training/${training['id']}', extra: training);
                   },
                   onAdd: () {},
                 );
@@ -185,7 +182,7 @@ class _TrainingPageState extends State<TrainingListPage> with RouteAware {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          Navigator.pushNamed(context, '/training/new');
+          context.go('/training/new');
         },
         child: const Icon(Icons.add),
         tooltip: 'Crear nuevo entrenamiento',

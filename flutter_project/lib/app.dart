@@ -1,16 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
-import 'package:flutter_project/pages/landing_page.dart';
-import 'package:flutter_project/pages/register.dart';
-import 'package:flutter_project/pages/training_detail_page.dart';
-import 'package:flutter_project/pages/trainings/create_training_page.dart';
-import 'package:flutter_project/pages/trainings/trainings_page.dart';
-import 'package:flutter_project/widgets/base_layout.dart';
 import 'package:flutter_project/widgets/theme_provider.dart';
 import 'package:provider/provider.dart';
-
-import 'configProject/global_config.dart';
-import 'pages/dashboard_page.dart';
+import 'configProject/global_router.dart';
 
 class MyApp extends StatelessWidget {
   MyApp({super.key});
@@ -19,7 +11,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return Consumer<ThemeProvider>(
       builder: (context, themeProvider, child) {
-        return MaterialApp(
+        return MaterialApp.router(
           title: 'DEU app',
           themeMode: themeProvider.currentTheme,
           theme: buildTheme(
@@ -33,19 +25,7 @@ class MyApp extends StatelessWidget {
             fontFamily: themeProvider.fontFamily,
           ),
           themeAnimationStyle: AnimationStyle.noAnimation,
-          navigatorKey: navigatorKey,
-          navigatorObservers: [routeObserver],
-          routes: {
-            '/': (context) =>  LandingPage(),
-            '/register': (context) => const RegisterPage(),
-            '/home': (context) => const BaseLayout(child: DashboardPage()),
-            '/trainings': (context) => const BaseLayout(child: TrainingListPage()),
-            '/training/new': (context) => const BaseLayout(child: CreateTrainingPage()),
-            '/training': (context) {
-              final training = ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
-              return BaseLayout(child: TrainingDetailPage(training: training));
-            },
-          },
+          routerConfig: router,
           supportedLocales: const [
             Locale('en', 'US'),
             Locale('es', 'ES'),
@@ -61,5 +41,6 @@ class MyApp extends StatelessWidget {
     );
   }
 }
+
 
 

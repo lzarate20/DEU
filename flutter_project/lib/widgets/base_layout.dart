@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
+import '../configProject/global_router.dart';
 import '../services/auth_service.dart';
 import 'header_bar.dart';
 
@@ -9,7 +11,7 @@ class BaseLayout extends StatelessWidget {
   const BaseLayout({super.key, required this.child});
 
   void _handleLogin(BuildContext context) {
-    Navigator.of(context).pushNamed('/login');
+    router.go('/login');
   }
 
   @override
@@ -28,7 +30,7 @@ class BaseLayout extends StatelessWidget {
                 SizedBox(height: 20),
                 _NavButton(icon: Icons.home, label: 'Home'),
                 _NavButton(icon: Icons.person, label: 'Entrenamientos'),
-                _NavButton(icon: Icons.settings, label: 'Configuración'),
+                _NavButton(icon: Icons.group , label: 'Teams'),
               ],
             ),
           ),
@@ -57,6 +59,7 @@ class _NavButton extends StatelessWidget {
   static const Map<String, String> labelToRoute = {
     'Home': '/home',
     'Entrenamientos': '/trainings',
+    'Teams': '/teams'
   };
 
   @override
@@ -69,7 +72,7 @@ class _NavButton extends StatelessWidget {
       ),
       onPressed: () {
         final route = labelToRoute[label] ?? '/${label.toLowerCase()}';
-        Navigator.of(context).pushNamedAndRemoveUntil(route, (route) => false);
+        context.go(route);
       },
       icon: Icon(icon, color: Colors.white),
       label: Text(label),

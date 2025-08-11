@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_project/services/training_service.dart';
+import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import '../services/user_service.dart';
 
@@ -90,11 +91,7 @@ class _NotificationIconState extends State<NotificationIcon> {
             return;
           }
 
-          Navigator.pushNamed(
-            context,
-            '/training',
-            arguments: training,
-          );
+          context.go('/training/${training['id']}', extra: training);
           break;
 
         case 'team':

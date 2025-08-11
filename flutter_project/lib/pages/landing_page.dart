@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 import '../services/auth_service.dart';
 import '../widgets/login.dart';
@@ -21,7 +22,7 @@ class _LandingPageState extends State<LandingPage> {
   void _checkLogin() async {
     final isLoggedIn = await AuthService.isLoggedIn();
     if (isLoggedIn && mounted) {
-      Navigator.pushReplacementNamed(context, '/home');
+      context.go('/home');
     } else {
       setState(() {
         _checkingLogin = false;
@@ -70,7 +71,7 @@ class _LandingPageState extends State<LandingPage> {
                             width: double.infinity,
                             child: FilledButton(
                               onPressed: () {
-                                Navigator.pushNamed(context, '/register');
+                                context.go('/register');
                               },
                               child: const Text('Registrarse'),
                             ),

@@ -62,8 +62,8 @@ class _TrainingActionsState extends State<TrainingActions> {
           ),
           TextButton(
             onPressed: () async {
-              Navigator.pop(ctx); // Cerramos el diálogo primero
-              await _deleteTraining(); // Luego ejecutamos la eliminación
+              Navigator.pop(ctx);
+              await _deleteTraining();
             },
             child: const Text('Eliminar', style: TextStyle(color: Colors.red)),
           ),

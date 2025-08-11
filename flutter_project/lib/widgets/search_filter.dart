@@ -3,22 +3,24 @@ import 'package:intl/intl.dart';
 
 class SearchFilters extends StatelessWidget {
   final TextEditingController controller;
-  final VoidCallback onClearDates;
-  final VoidCallback onPickStartDate;
-  final VoidCallback onPickEndDate;
   final DateTime? startDate;
   final DateTime? endDate;
+  final VoidCallback? onClearDates;
+  final VoidCallback? onPickStartDate;
+  final VoidCallback? onPickEndDate;
   final ValueChanged<String> onSearch;
+  final bool showDateFilters;
 
   const SearchFilters({
     super.key,
     required this.controller,
-    required this.onClearDates,
-    required this.onPickStartDate,
-    required this.onPickEndDate,
-    required this.startDate,
-    required this.endDate,
     required this.onSearch,
+    this.showDateFilters = true,
+    this.startDate,
+    this.endDate,
+    this.onPickStartDate,
+    this.onPickEndDate,
+    this.onClearDates,
   });
 
   @override
@@ -39,38 +41,41 @@ class SearchFilters extends StatelessWidget {
             onChanged: onSearch,
           ),
         ),
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-          child: Row(
-            children: [
-              Expanded(
-                child: ElevatedButton.icon(
-                  onPressed: onPickStartDate,
-                  icon: const Icon(Icons.date_range),
-                  label: Text(startDate == null
-                      ? 'Desde'
-                      : 'Desde: ${dateFormat.format(startDate!)}'),
+        if (showDateFilters) ...[
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+            child: Row(
+              children: [
+                Expanded(
+                  child: ElevatedButton.icon(
+                    onPressed: onPickStartDate,
+                    icon: const Icon(Icons.date_range),
+                    label: Text(startDate == null
+                        ? 'Desde'
+                        : 'Desde: ${dateFormat.format(startDate!)}'),
+                  ),
                 ),
-              ),
-              const SizedBox(width: 10),
-              Expanded(
-                child: ElevatedButton.icon(
-                  onPressed: onPickEndDate,
-                  icon: const Icon(Icons.date_range),
-                  label: Text(endDate == null
-                      ? 'Hasta'
-                      : 'Hasta: ${dateFormat.format(endDate!)}'),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: ElevatedButton.icon(
+                    onPressed: onPickEndDate,
+                    icon: const Icon(Icons.date_range),
+                    label: Text(endDate == null
+                        ? 'Hasta'
+                        : 'Hasta: ${dateFormat.format(endDate!)}'),
+                  ),
                 ),
-              ),
-              IconButton(
-                onPressed: onClearDates,
-                tooltip: 'Limpiar fechas',
-                icon: const Icon(Icons.clear, color: Colors.red),
-              )
-            ],
+                IconButton(
+                  onPressed: onClearDates,
+                  tooltip: 'Limpiar fechas',
+                  icon: const Icon(Icons.clear, color: Colors.red),
+                )
+              ],
+            ),
           ),
-        ),
+        ],
       ],
     );
   }
 }
+

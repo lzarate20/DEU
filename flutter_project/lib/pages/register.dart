@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 import '../services/auth_service.dart';
 
@@ -39,7 +40,7 @@ class _RegisterPageState extends State<RegisterPage> {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Registro exitoso')),
         );
-        Navigator.pushReplacementNamed(context, '/login');
+        context.go('/login');
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Error al registrar usuario')),
