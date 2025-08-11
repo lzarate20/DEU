@@ -51,10 +51,6 @@ class _TrainingPageState extends State<TrainingPage> with RouteAware {
   Widget build(BuildContext context) {
     return
     Scaffold(
-      appBar:AppBar(
-        title: Text('Entrenamientos'),
-        automaticallyImplyLeading: false,
-      ),
       body: Row(
         children: [
           Expanded(

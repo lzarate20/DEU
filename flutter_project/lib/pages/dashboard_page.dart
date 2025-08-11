@@ -40,7 +40,7 @@ class _DashboardPageState extends State<DashboardPage> {
           children: [
             const Text(
               'Mis Entrenamientos',
-              style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+              style: TextStyle(fontWeight: FontWeight.bold),
             ),
             const Divider(thickness: 2),
             const SizedBox(height: 8),
@@ -54,7 +54,7 @@ class _DashboardPageState extends State<DashboardPage> {
 
             const Text(
               'Mis Equipos',
-              style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+              style: TextStyle(fontWeight: FontWeight.bold),
             ),
             const Divider(thickness: 2),
 
@@ -84,7 +84,7 @@ class _DashboardPageState extends State<DashboardPage> {
                             Text(
                               team['name'] ?? 'Equipo',
                               style: const TextStyle(
-                                  fontWeight: FontWeight.bold, fontSize: 16),
+                                  fontWeight: FontWeight.bold),
                             ),
                             Text('${(team['users'] as List).length} miembros'),
                           ],
