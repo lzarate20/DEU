@@ -22,8 +22,8 @@ data class User(
     @ManyToMany(mappedBy = "users")
     val teams: List<Team> = listOf(),
     @OneToMany(cascade = [CascadeType.ALL])
-    val notifcations: List<Notification> = listOf(),
-    @OneToMany(cascade = [CascadeType.ALL])
+    val notifcations: List<Notification> = mutableListOf(),
+    @ManyToMany(cascade = [CascadeType.ALL])
     val trainings: List<Training> = listOf()
 )
 

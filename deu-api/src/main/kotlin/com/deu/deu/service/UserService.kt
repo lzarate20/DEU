@@ -15,6 +15,7 @@ import com.deu.deu.utils.toTrainingDTOResponse
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDate
 import java.time.LocalDateTime
 
@@ -101,11 +102,12 @@ class UserService(
     }
 
     fun addTraining(id: Int, trainingId: Int) {
-        val user = userRepository.findByIdOrNull(id) ?: throw UserNotFoundException()
-        val training =
-            trainingService.getTraining(trainingId) ?: throw NotFoundException("No se encontro el entrenamiento")
-        val newUser = user.copy(trainings = user.trainings + training)
-        userRepository.save(newUser)
+        if(!userRepository.existsTrainingForUser(id,trainingId)) {
+            val user = userRepository.findByIdOrNull(id) ?: throw UserNotFoundException()
+            val training =
+                trainingService.getTraining(trainingId) ?: throw NotFoundException("No se encontro el entrenamiento")
+            userRepository.save(user.copy(trainings = listOf(training)))
+        }
     }
 
     fun removeTraining(id: Int) {

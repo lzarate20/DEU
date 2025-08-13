@@ -115,8 +115,8 @@ class _TrainingDetailPageState extends State<TrainingDetailPage> {
           TrainingActions(
             training: training!,
             onCopied: () {},
-            onEdited: () {
-              context.push('/edit_training', extra: training);
+            onAssign: () {
+              context.go('/assign_training', extra: training);
             },
             onDeleted: () {
               context.go('/trainings');

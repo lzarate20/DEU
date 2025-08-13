@@ -120,3 +120,7 @@ data class CommentDTO(
     val user:UserDTOResponse,
     val comment:String
 )
+
+data class UserListRequest(
+    val users: List<Int>,
+)

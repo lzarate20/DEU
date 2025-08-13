@@ -45,6 +45,12 @@ class UserController(val userService: UserService) {
         return userService.getUserTrainingsByDate(date,id)
     }
 
+    @PostMapping("/user/training/{id}")
+    fun postTrainingToUser(@PathVariable("id") id: Int,@RequestBody users:UserListRequest)
+    {
+        users.users.forEach{u->userService.addTraining(u,id)}
+    }
+
     @GetMapping("/user/notifications")
     fun getNotifications(@AuthenticationPrincipal userDetails: UserDetails):List<Notification>{
         return userService.getNotifications(userDetails.username)

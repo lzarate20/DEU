@@ -39,6 +39,64 @@ class UserService {
     }
   }
 
+  Future<List<Map<String, dynamic>>> fetchUserTeams(String userId) async {
+    final url = Uri.parse('http://$host/user/$userId/teams');
+
+    try {
+      final token = await _storage.read(key: 'jwt_token');
+      final response = await client.get(
+        url,
+        headers: {
+          'Authorization': 'Bearer $token',
+          'Content-Type': 'application/json',
+        },
+      );
+
+      if (response.statusCode == 200) {
+        final List<dynamic> jsonList = jsonDecode(response.body);
+        return jsonList
+            .map((item) => item as Map<String, dynamic>)
+            .toList();
+      } else {
+        print('Error al obtener equipos del usuario: ${response.statusCode}');
+        return [];
+      }
+    } catch (e) {
+      print('Error de red al obtener equipos del usuario: $e');
+      return [];
+    }
+  }
+
+  Future<void> assignTrainingToUsers(int trainingId, List<int> userIds) async {
+    final url = Uri.parse('http://$host/user/training/$trainingId');
+
+    try {
+      final token = await _storage.read(key: 'jwt_token');
+
+      final body = {
+        "users": userIds,
+      };
+      print(body.toString());
+      final response = await client.post(
+        url,
+        headers: {
+          'Authorization': 'Bearer $token',
+          'Content-Type': 'application/json',
+        },
+        body: jsonEncode(body),
+      );
+
+      if (response.statusCode == 200) {
+        print('Entrenamiento asignado correctamente');
+      } else {
+        print('Error al asignar entrenamiento: ${response.statusCode}');
+        print('Respuesta: ${response.body}');
+      }
+    } catch (e) {
+      print('Error de red al asignar entrenamiento: $e');
+    }
+  }
+
   Future<List<Map<String, dynamic>>> fetchNotifications() async {
     final token = await _storage.read(key: 'jwt_token');
 

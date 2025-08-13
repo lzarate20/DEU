@@ -6,13 +6,13 @@ class TrainingActions extends StatefulWidget {
   final Map<String, dynamic> training;
   final VoidCallback? onCopied;
   final VoidCallback? onDeleted;
-  final VoidCallback? onEdited;
+  final VoidCallback? onAssign;
 
   const TrainingActions({
     required this.training,
     this.onCopied,
     this.onDeleted,
-    this.onEdited,
+    this.onAssign,
     super.key,
   });
 
@@ -45,8 +45,8 @@ class _TrainingActionsState extends State<TrainingActions> {
     widget.onCopied?.call();
   }
 
-  void _editTraining() {
-    widget.onEdited?.call();
+  void _assignTraining() {
+    widget.onAssign?.call();
   }
 
   void _confirmDelete() {
@@ -86,17 +86,18 @@ class _TrainingActionsState extends State<TrainingActions> {
   Widget build(BuildContext context) {
     return Row(
       children: [
+        if (_isOwner) ...[
+        IconButton(
+          icon: const Icon(Icons.list_alt),
+          onPressed: _assignTraining,
+          tooltip: 'Asignar entrenamiento',
+        ),        ],
         IconButton(
           icon: const Icon(Icons.copy),
           onPressed: _copyTraining,
           tooltip: 'Copiar entrenamiento',
         ),
         if (_isOwner) ...[
-          IconButton(
-            icon: const Icon(Icons.edit),
-            onPressed: _editTraining,
-            tooltip: 'Editar entrenamiento',
-          ),
           IconButton(
             icon: const Icon(Icons.delete),
             onPressed: _confirmDelete,

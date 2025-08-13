@@ -7,6 +7,7 @@ import '../pages/landing_page.dart';
 import '../pages/register.dart';
 import '../pages/teams/team_detail_page.dart';
 import '../pages/training_detail_page.dart';
+import '../pages/trainings/assign_training_page.dart';
 import '../pages/trainings/create_training_page.dart';
 import '../pages/trainings/trainings_page.dart';
 import '../widgets/base_layout.dart';
@@ -78,6 +79,13 @@ final GoRouter router = GoRouter(
             );
           },
         ),
+        GoRoute(
+          path: '/assign_training',
+          builder: (context, state) {
+            final training = state.extra as Map<String, dynamic>;
+            return AssignTrainingPage(training: training);
+          },
+        )
       ],
     ),
   ],
