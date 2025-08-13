@@ -38,7 +38,8 @@ fun Training.toTrainingDTOResponse(): TrainingDTOResponse {
         this.date,
         this.type,
         this.exercises.map { it -> it.toExerciseDto() },
-        this.comments.map { it -> it.toCommentDTO()}
+        this.comments.map { it -> it.toCommentDTO()},
+        this.trainees.map {it -> it.id}
     )
 }
 

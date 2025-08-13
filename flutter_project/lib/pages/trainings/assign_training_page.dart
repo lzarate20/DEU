@@ -2,12 +2,19 @@ import 'package:flutter/material.dart';
 import 'package:flutter_project/services/team_service.dart';
 import 'package:flutter_project/services/user_service.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:go_router/go_router.dart';
 
+import '../../services/training_service.dart';
 
 class AssignTrainingPage extends StatefulWidget {
-  final Map<String, dynamic> training;
+  final int trainingId;
+  final Map<String, dynamic>? training;
 
-  const AssignTrainingPage({super.key, required this.training});
+  const AssignTrainingPage({
+    super.key,
+    required this.trainingId,
+    this.training,
+  });
 
   @override
   State<AssignTrainingPage> createState() => _AssignTrainingPageState();
@@ -16,18 +23,64 @@ class AssignTrainingPage extends StatefulWidget {
 class _AssignTrainingPageState extends State<AssignTrainingPage> {
   static const _storage = FlutterSecureStorage();
 
+  late Map<String, dynamic> training;
   List<Map<String, dynamic>> allTrainees = [];
   Map<String, bool> selectedPlayers = {};
+  Map<String, bool> hasTraining = {};
   Set<String> selectedPositions = {};
 
   bool isLoading = false;
-  final TextEditingController searchController = TextEditingController();
-  String searchQuery = '';
 
   @override
   void initState() {
     super.initState();
-    _loadAllTraineesFromAllTeams();
+    if (widget.training != null) {
+      training = widget.training!;
+      _fetchTrainingAndLoadTrainees();
+    } else {
+      _fetchTrainingById();
+    }
+  }
+
+  Future<void> _fetchTrainingById() async {
+    setState(() => isLoading = true);
+    final trainingData = await TrainingService().fetchTrainingById(widget.trainingId.toString());
+    if (trainingData != null) {
+      training = trainingData;
+      _fetchTrainingAndLoadTrainees();
+    } else {
+      setState(() => isLoading = false);
+    }
+  }
+
+  final TextEditingController searchController = TextEditingController();
+  String searchQuery = '';
+
+  final Map<String, String> positionTranslations = {
+    'DEFENCE': 'Defensa',
+    'MIDFIELD': 'Mediocampo',
+    'FORWARD': 'Delantero',
+    'Sin posición': 'Sin posición',
+  };
+
+  Future<void> _fetchTrainingAndLoadTrainees() async {
+    final trainingId = training['id'].toString();
+    if (trainingId.isEmpty) return;
+
+    final existingTraineeIds = (training['trainees'] as List)
+        .map((e) => e.toString())
+        .toSet();
+
+    await _loadAllTraineesFromAllTeams();
+
+    setState(() {
+      for (final trainee in allTrainees) {
+        final id = trainee['id'].toString();
+        final alreadyHas = existingTraineeIds.contains(id);
+        hasTraining[id] = alreadyHas;
+        selectedPlayers[id] = !alreadyHas;
+      }
+    });
   }
 
   Future<void> _loadAllTraineesFromAllTeams() async {
@@ -35,6 +88,7 @@ class _AssignTrainingPageState extends State<AssignTrainingPage> {
       isLoading = true;
       allTrainees = [];
       selectedPlayers.clear();
+      hasTraining.clear();
       searchController.clear();
       searchQuery = '';
       selectedPositions.clear();
@@ -57,10 +111,22 @@ class _AssignTrainingPageState extends State<AssignTrainingPage> {
       }
     }
 
+    final trainingId = int.tryParse(training['id'].toString());
+
     setState(() {
       allTrainees = uniqueTrainees.values.toList();
       for (final trainee in allTrainees) {
-        selectedPlayers[trainee['id'].toString()] = true;
+        final id = trainee['id'].toString();
+
+        final trainings = (trainee['trainings'] ?? []) as List;
+        final alreadyHas =
+            trainingId != null &&
+            trainings.any(
+              (t) => int.tryParse(t['id'].toString()) == trainingId,
+            );
+
+        hasTraining[id] = alreadyHas;
+        selectedPlayers[id] = !alreadyHas;
       }
       isLoading = false;
     });
@@ -71,7 +137,11 @@ class _AssignTrainingPageState extends State<AssignTrainingPage> {
 
     if (selectedPositions.isNotEmpty) {
       filtered = filtered
-          .where((u) => selectedPositions.contains(u['position'] ?? 'Sin posición'))
+          .where(
+            (u) => selectedPositions.contains(
+              positionTranslations[u['position']] ?? 'Sin posición',
+            ),
+          )
           .toList();
     }
 
@@ -92,8 +162,12 @@ class _AssignTrainingPageState extends State<AssignTrainingPage> {
   }
 
   void _toggleSelectAllVisible() {
-    final visibles = filteredTrainees;
-    final allSelected = visibles.every((u) => selectedPlayers[u['id'].toString()] ?? false);
+    final visibles = filteredTrainees
+        .where((u) => !(hasTraining[u['id'].toString()] ?? false))
+        .toList();
+    final allSelected = visibles.every(
+      (u) => selectedPlayers[u['id'].toString()] ?? false,
+    );
 
     setState(() {
       for (final player in visibles) {
@@ -104,10 +178,20 @@ class _AssignTrainingPageState extends State<AssignTrainingPage> {
 
   @override
   Widget build(BuildContext context) {
-    final allPositions = allTrainees.map((u) => u['position'] ?? 'Sin posición').toSet();
+    final allPositions = allTrainees
+        .map((u) => positionTranslations[u['position']] ?? 'Sin posición')
+        .toSet();
+
     final visibles = filteredTrainees;
-    final allVisibleSelected =
-        visibles.isNotEmpty && visibles.every((u) => selectedPlayers[u['id'].toString()] ?? false);
+    final visiblesSeleccionables = visibles
+        .where((u) => !(hasTraining[u['id'].toString()] ?? false))
+        .toList();
+
+    final allVisibleSelected = visiblesSeleccionables.isNotEmpty &&
+        visiblesSeleccionables
+            .every((u) => selectedPlayers[u['id'].toString()] ?? false);
+
+
 
     return Scaffold(
       appBar: AppBar(title: Text('Asignar Entrenamiento')),
@@ -116,7 +200,6 @@ class _AssignTrainingPageState extends State<AssignTrainingPage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // 🔎 Barra de búsqueda
             TextField(
               controller: searchController,
               decoration: InputDecoration(
@@ -126,15 +209,15 @@ class _AssignTrainingPageState extends State<AssignTrainingPage> {
               ),
               onChanged: _onSearchChanged,
             ),
-
             const SizedBox(height: 16),
-
-            // 🟢 Filtro de posición
             if (allTrainees.isNotEmpty)
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text('Filtrar por posición', style: TextStyle(fontWeight: FontWeight.bold)),
+                  Text(
+                    'Filtrar por posición',
+                    style: TextStyle(fontWeight: FontWeight.bold),
+                  ),
                   Wrap(
                     spacing: 8,
                     children: allPositions.map((pos) {
@@ -157,55 +240,85 @@ class _AssignTrainingPageState extends State<AssignTrainingPage> {
                   const SizedBox(height: 16),
                 ],
               ),
-
-            // ⏳ Loading / No jugadores / Lista
             if (isLoading)
               Center(child: CircularProgressIndicator())
             else if (!isLoading && visibles.isEmpty)
               Text('No hay jugadores para mostrar')
             else ...[
-                // ✅ Botón seleccionar/deseleccionar todos
                 Align(
                   alignment: Alignment.centerRight,
                   child: TextButton.icon(
-                    icon: Icon(allVisibleSelected ? Icons.remove_circle_outline : Icons.select_all),
-                    label: Text(allVisibleSelected ? 'Deseleccionar todos' : 'Seleccionar todos'),
-                    onPressed: _toggleSelectAllVisible,
+                    icon: Icon(
+                      allVisibleSelected ? Icons.remove_circle_outline : Icons.select_all,
+                    ),
+                    label: Text(
+                      allVisibleSelected ? 'Deseleccionar todos' : 'Seleccionar todos',
+                    ),
+                    onPressed: visiblesSeleccionables.isEmpty ? null : _toggleSelectAllVisible,
                   ),
                 ),
+              Expanded(
+                child: ListView.builder(
+                  itemCount: visibles.length,
+                  itemBuilder: (_, index) {
+                    final player = visibles[index];
+                    final playerId = player['id'].toString();
+                    final isSelected = selectedPlayers[playerId] ?? false;
+                    final alreadyHas = hasTraining[playerId] ?? false;
 
-                Expanded(
-                  child: ListView.builder(
-                    itemCount: visibles.length,
-                    itemBuilder: (_, index) {
-                      final player = visibles[index];
-                      final playerId = player['id'].toString();
-                      final isSelected = selectedPlayers[playerId] ?? false;
-
-                      return ListTile(
-                        leading: Icon(Icons.person),
-                        title: Text(player['name']),
-                        subtitle: Text(player['position'] ?? 'Sin posición'),
-                        trailing: Icon(
-                          isSelected ? Icons.check_circle : Icons.check_circle_outline,
-                          color: isSelected ? Colors.green : Colors.grey,
+                    return Container(
+                      color: alreadyHas ? Colors.grey[200] : null,
+                      child: ListTile(
+                        leading: Icon(
+                          Icons.person,
+                          color: alreadyHas ? Colors.grey : null,
                         ),
-                        onTap: () {
-                          setState(() {
-                            selectedPlayers[playerId] = !isSelected;
-                          });
-                        },
-                      );
-                    },
-                  ),
+                        title: Text(
+                          player['name'],
+                          style: TextStyle(
+                            color: alreadyHas ? Colors.grey : null,
+                          ),
+                        ),
+                        subtitle: Text(
+                          positionTranslations[player['position']] ??
+                              'Sin posición',
+                          style: TextStyle(
+                            color: alreadyHas ? Colors.grey : null,
+                          ),
+                        ),
+                        trailing: alreadyHas
+                            ? Text(
+                                'Ya tiene este entrenamiento',
+                                style: TextStyle(
+                                  color: Colors.grey,
+                                  fontStyle: FontStyle.italic,
+                                ),
+                              )
+                            : Icon(
+                                isSelected
+                                    ? Icons.check_circle
+                                    : Icons.check_circle_outline,
+                                color: isSelected ? Colors.green : Colors.grey,
+                              ),
+                        onTap: alreadyHas
+                            ? null
+                            : () {
+                                setState(() {
+                                  selectedPlayers[playerId] = !isSelected;
+                                });
+                              },
+                      ),
+                    );
+                  },
                 ),
-              ],
-
+              ),
+            ],
             const SizedBox(height: 16),
-
             Center(
               child: ElevatedButton(
-                onPressed: selectedPlayers.values.any((v) => v) ? _assignTraining : null,
+                onPressed: selectedPlayers.values.any((v) => v)
+                    ? _assignTraining
+                    : null,
                 child: Text('Asignar Entrenamiento'),
               ),
             ),
@@ -221,20 +334,18 @@ class _AssignTrainingPageState extends State<AssignTrainingPage> {
         .map((e) => int.tryParse(e.key))
         .whereType<int>()
         .toList();
-    print(selectedIds.toString());
-    final trainingId = int.tryParse(widget.training['id']);
-    if (trainingId is! int) {
-      print("ID del entrenamiento inválido: $trainingId");
-      return;
-    }
 
-    await UserService().assignTrainingToUsers(trainingId, selectedIds);
+    final success = await UserService().assignTrainingToUsers(
+      widget.trainingId,
+      selectedIds,
+    );
+
+    if (success) {
+      context.go('/trainings');
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('No se pudo asignar el entrenamiento')),
+      );
+    }
   }
 }
-
-
-
-
-
-
-

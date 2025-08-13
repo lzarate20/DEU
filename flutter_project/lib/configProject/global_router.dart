@@ -80,12 +80,18 @@ final GoRouter router = GoRouter(
           },
         ),
         GoRoute(
-          path: '/assign_training',
-          builder: (context, state) {
-            final training = state.extra as Map<String, dynamic>;
-            return AssignTrainingPage(training: training);
+          path: '/assign-training/:id',
+          pageBuilder: (context, state) {
+            final trainingId = int.tryParse(state.pathParameters['id'] ?? '');
+            if (trainingId == null) {
+              return MaterialPage(child: Scaffold(body: Center(child: Text('Entrenamiento inválido'))));
+            }
+            final training = state.extra as Map<String, dynamic>?; // extra opcional
+            return MaterialPage(
+              child: AssignTrainingPage(trainingId: trainingId, training: training),
+            );
           },
-        )
+        ),
       ],
     ),
   ],

@@ -116,7 +116,10 @@ class _TrainingDetailPageState extends State<TrainingDetailPage> {
             training: training!,
             onCopied: () {},
             onAssign: () {
-              context.go('/assign_training', extra: training);
+              context.go(
+                '/assign-training/${training?['id']}',
+                extra: training,
+              );
             },
             onDeleted: () {
               context.go('/trainings');

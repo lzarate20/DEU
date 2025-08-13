@@ -59,6 +59,7 @@ data class Training(
     val name: String,
     val description: String?,
     @ManyToOne
+    @JoinColumn(name = "trainer_id")
     val trainer: User,
     val date: LocalDate,
     @Enumerated(EnumType.STRING)
@@ -66,7 +67,14 @@ data class Training(
     @ManyToMany()
     val exercises: List<Exercise> = listOf(),
     @OneToMany(cascade = [CascadeType.ALL])
-    val comments: List<Comment> = listOf()
+    val comments: List<Comment> = listOf(),
+    @ManyToMany
+    @JoinTable(
+        name = "training_trainees",
+        joinColumns = [JoinColumn(name = "training_id")],
+        inverseJoinColumns = [JoinColumn(name = "user_id")]
+    )
+    val trainees: List<User> = listOf()
 )
 
 @Entity

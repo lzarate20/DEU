@@ -67,7 +67,7 @@ class UserService {
     }
   }
 
-  Future<void> assignTrainingToUsers(int trainingId, List<int> userIds) async {
+  Future<bool> assignTrainingToUsers(int trainingId, List<int> userIds) async {
     final url = Uri.parse('http://$host/user/training/$trainingId');
 
     try {
@@ -76,7 +76,7 @@ class UserService {
       final body = {
         "users": userIds,
       };
-      print(body.toString());
+
       final response = await client.post(
         url,
         headers: {
@@ -88,12 +88,15 @@ class UserService {
 
       if (response.statusCode == 200) {
         print('Entrenamiento asignado correctamente');
+        return true;
       } else {
         print('Error al asignar entrenamiento: ${response.statusCode}');
         print('Respuesta: ${response.body}');
+        return false;
       }
     } catch (e) {
       print('Error de red al asignar entrenamiento: $e');
+      return false;
     }
   }
 

@@ -8,6 +8,7 @@ import com.deu.deu.model.Team
 import com.deu.deu.model.Training
 import com.deu.deu.model.User
 import com.deu.deu.repository.NotificationRepository
+import com.deu.deu.repository.TrainingRepository
 import com.deu.deu.repository.UserRepository
 import com.deu.deu.utils.toDTO
 import com.deu.deu.utils.toTeamUserDTO
@@ -15,7 +16,6 @@ import com.deu.deu.utils.toTrainingDTOResponse
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
-import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDate
 import java.time.LocalDateTime
 
@@ -25,7 +25,8 @@ class UserService(
     private val userRepository: UserRepository,
     private val trainingService: TrainingService,
     private val notificationRepository: NotificationRepository,
-    private val passwordEncoder: PasswordEncoder
+    private val passwordEncoder: PasswordEncoder,
+    private val trainingRepository: TrainingRepository
 ) {
 
     fun findAllUsers(): List<UserDTOResponse> {
@@ -106,7 +107,9 @@ class UserService(
             val user = userRepository.findByIdOrNull(id) ?: throw UserNotFoundException()
             val training =
                 trainingService.getTraining(trainingId) ?: throw NotFoundException("No se encontro el entrenamiento")
-            userRepository.save(user.copy(trainings = listOf(training)))
+            training.trainees.plus(user)
+            trainingRepository.save(training.copy(trainees = training.trainees + user))
+            userRepository.save(user.copy(trainings = user.trainings + training))
         }
     }
 
