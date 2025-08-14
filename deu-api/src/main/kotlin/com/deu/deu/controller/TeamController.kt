@@ -6,6 +6,7 @@ import com.deu.deu.model.Training
 import com.deu.deu.service.TeamService
 import com.deu.deu.service.UserService
 import com.deu.deu.utils.toDTO
+import org.springframework.security.core.Authentication
 import org.springframework.web.bind.annotation.*
 
 @RestController
@@ -27,8 +28,12 @@ class TeamController(val teamService: TeamService) {
     }
 
     @PostMapping("/team")
-    fun postGroup(@RequestBody group: TeamDTO){
-        return teamService.persist(group)
+    fun postGroup(
+        @RequestBody group: TeamDTO,
+        authentication: Authentication
+    ) {
+        val username = authentication.name
+        return teamService.persist(group, username)
     }
 
     @PostMapping("/team/notify")

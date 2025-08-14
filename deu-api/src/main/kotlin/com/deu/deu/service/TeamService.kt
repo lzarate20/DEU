@@ -49,8 +49,11 @@ class TeamService(
         teamRepository.save(team)
     }
 
-    fun persist(team: TeamDTO) {
-        teamRepository.save(Team(name = team.name))
+    fun persist(team: TeamDTO, username: String) {
+        val user = userService.findUserByEmail(username) ?: throw UserNotFoundException()
+        val team = teamRepository.save(Team(name = team.name, users = listOf(user)))
+        val newUser = user.copy(teams = user.teams + team)
+        userRepository.save(newUser)
     }
 
     fun addUser(id: Int, user: User) {
@@ -65,9 +68,11 @@ class TeamService(
         }
     }
 
-    fun addTraining(id: Int,position: String?, training: TrainingTeamDTO) {
+    fun addTraining(id: Int, position: String?, training: TrainingTeamDTO) {
         val team = teamRepository.findByIdOrNull(id) ?: throw NotFoundException("No se encontro el grupo")
-        val users = if(position != null){team.users.filter{ it.position?.name == position }.toList()}else team.users
+        val users = if (position != null) {
+            team.users.filter { it.position?.name == position }.toList()
+        } else team.users
         users.forEach { it ->
             userService.addTraining(it.id, training.id)
         }

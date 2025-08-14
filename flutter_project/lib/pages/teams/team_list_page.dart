@@ -117,13 +117,45 @@ class _TeamListPageState extends State<TeamListPage> with RouteAware {
           ),
         ],
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          context.go('/team/new');
-        },
-        child: const Icon(Icons.add),
-        tooltip: 'Crear nuevo equipo',
-      ),
+        floatingActionButton: FloatingActionButton(
+          onPressed: () async {
+            final TextEditingController _controller = TextEditingController();
+
+            final result = await showDialog<String>(
+              context: context,
+              builder: (BuildContext context) {
+                return AlertDialog(
+                  title: const Text('Crear nuevo equipo'),
+                  content: TextField(
+                    controller: _controller,
+                    decoration: const InputDecoration(
+                      labelText: 'Nombre del equipo',
+                    ),
+                  ),
+                  actions: [
+                    TextButton(
+                      onPressed: () => Navigator.pop(context),
+                      child: const Text('Cancelar'),
+                    ),
+                    ElevatedButton(
+                      onPressed: () {
+                        Navigator.pop(context, _controller.text.trim());
+                      },
+                      child: const Text('Guardar'),
+                    ),
+                  ],
+                );
+              },
+            );
+
+            if (result != null && result.isNotEmpty) {
+              await TeamService().createTeam(result);
+              _loadData();
+            }
+          },
+          child: const Icon(Icons.add),
+          tooltip: 'Crear nuevo equipo',
+        )
     );
   }
 }

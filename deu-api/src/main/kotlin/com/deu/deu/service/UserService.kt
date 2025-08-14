@@ -38,6 +38,10 @@ class UserService(
         return userRepository.findByIdOrNull(id)
     }
 
+    fun findUserByEmail(email: String): User? {
+        return userRepository.findByEmail(email)
+    }
+
     fun persist(user: UserDTO) {
         val newUser = User(
             name = user.name,

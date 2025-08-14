@@ -54,4 +54,24 @@ class TeamService {
     return null;
   }
 
+  Future<void> createTeam(String name) async {
+    final url = Uri.parse('http://$host/team');
+    final token = await _storage.read(key: 'jwt_token');
+
+    final response = await client.post(
+      url,
+      headers: {
+        'Authorization': 'Bearer $token',
+        'Content-Type': 'application/json',
+      },
+      body: jsonEncode({'name': name}),
+    );
+
+    if (response.statusCode == 200 || response.statusCode == 201) {
+      return;
+    } else {
+      throw Exception('Error al crear el equipo: ${response.statusCode}');
+    }
+  }
+
 }
