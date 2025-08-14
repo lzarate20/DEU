@@ -10,6 +10,7 @@ class SearchFilters extends StatelessWidget {
   final VoidCallback? onPickEndDate;
   final ValueChanged<String> onSearch;
   final bool showDateFilters;
+  final String? hintText;
 
   const SearchFilters({
     super.key,
@@ -21,6 +22,7 @@ class SearchFilters extends StatelessWidget {
     this.onPickStartDate,
     this.onPickEndDate,
     this.onClearDates,
+    this.hintText
   });
 
   @override
@@ -33,10 +35,10 @@ class SearchFilters extends StatelessWidget {
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
           child: TextField(
             controller: controller,
-            decoration: const InputDecoration(
-              labelText: 'Buscar por nombre, tipo o entrenador',
-              prefixIcon: Icon(Icons.search),
-              border: OutlineInputBorder(),
+            decoration: InputDecoration(
+              labelText: hintText ?? 'Buscar por nombre, tipo o entrenador',
+              prefixIcon: const Icon(Icons.search),
+              border: const OutlineInputBorder(),
             ),
             onChanged: onSearch,
           ),

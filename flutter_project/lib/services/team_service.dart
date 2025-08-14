@@ -74,4 +74,23 @@ class TeamService {
     }
   }
 
+  Future<bool> addUserToTeam(String teamId, String userId) async {
+    final url = Uri.parse('http://$host/teams/$teamId/user/$userId');
+    final token = await _storage.read(key: 'jwt_token');
+
+    final response = await client.post(
+      url,
+      headers: {
+        'Authorization': 'Bearer $token',
+        'Content-Type': 'application/json',
+      },
+    );
+
+    if (response.statusCode == 200 || response.statusCode == 201) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
 }

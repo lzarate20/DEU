@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import '../../services/team_service.dart';
 
 class TeamDetailPage extends StatefulWidget {
@@ -31,12 +32,31 @@ class _TeamDetailPageState extends State<TeamDetailPage> {
   }
 
   Future<void> _fetchTeam() async {
-    final service = TeamService();
-    final data = await service.fetchTeamById(widget.teamId);
+    final data = await TeamService().fetchTeamById(widget.teamId);
     setState(() {
       _team = data;
       _loading = false;
     });
+  }
+
+  Future<void> _addCurrentUserToTeam() async {
+    final userId = await FlutterSecureStorage().read(key: 'user_id');
+    if (userId != null && _team != null) {
+      final success = await TeamService().addUserToTeam(
+        _team!['id'].toString(),
+        userId,
+      );
+      if (success) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Te sumaste al equipo!')),
+        );
+        _fetchTeam(); // recarga los datos
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('No se pudo sumar al equipo.')),
+        );
+      }
+    }
   }
 
   @override
@@ -95,19 +115,54 @@ class _TeamDetailPageState extends State<TeamDetailPage> {
                   ),
                   const SizedBox(height: 24),
 
-                  // El listado de jugadores con scroll ocupa el espacio restante
+                  // Listado de jugadores con botón sumarse
                   Expanded(
                     child: Card(
                       elevation: 3,
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8)),
                       child: Padding(
                         padding: const EdgeInsets.all(12.0),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            const Text(
-                              "Jugadores",
-                              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
+                            FutureBuilder<String?>(
+                              future:
+                              FlutterSecureStorage().read(key: 'user_id'),
+                              builder: (context, snapshot) {
+                                final currentUserId = snapshot.data;
+                                final alreadyInTeam = currentUserId != null &&
+                                    players.any((p) =>
+                                    p['id'].toString() ==
+                                        currentUserId);
+
+                                return Row(
+                                  mainAxisAlignment:
+                                  MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    const Text(
+                                      "Jugadores",
+                                      style: TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 20),
+                                    ),
+                                    IconButton(
+                                      icon: Icon(
+                                        Icons.person_add,
+                                        color: alreadyInTeam
+                                            ? Colors.grey
+                                            : Colors.green,
+                                      ),
+                                      tooltip: alreadyInTeam
+                                          ? 'Ya estás en el equipo'
+                                          : 'Sumarse al equipo',
+                                      onPressed: alreadyInTeam
+                                          ? null
+                                          : _addCurrentUserToTeam,
+                                    ),
+                                  ],
+                                );
+                              },
                             ),
                             const Divider(thickness: 2, height: 20),
                             Expanded(
@@ -119,7 +174,8 @@ class _TeamDetailPageState extends State<TeamDetailPage> {
                                   return ListTile(
                                     leading: const Icon(Icons.person),
                                     title: Text(player['name'] ?? 'Jugador'),
-                                    subtitle: Text(player['position'] ?? 'Sin posición'),
+                                    subtitle: Text(
+                                        player['position'] ?? 'Sin posición'),
                                   );
                                 },
                               )
@@ -138,11 +194,13 @@ class _TeamDetailPageState extends State<TeamDetailPage> {
 
             const SizedBox(width: 20),
 
+            // Columna derecha: entrenador
             Expanded(
               flex: 1,
               child: Card(
                 elevation: 3,
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8)),
                 child: Padding(
                   padding: const EdgeInsets.all(12.0),
                   child: Column(
@@ -150,7 +208,8 @@ class _TeamDetailPageState extends State<TeamDetailPage> {
                     children: [
                       const Text(
                         "Entrenador",
-                        style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
+                        style: TextStyle(
+                            fontWeight: FontWeight.bold, fontSize: 20),
                       ),
                       const Divider(thickness: 2, height: 20),
                       if (trainer != null)
@@ -170,8 +229,10 @@ class _TeamDetailPageState extends State<TeamDetailPage> {
           ],
         ),
       ),
-
     );
   }
 }
+
+
+
 

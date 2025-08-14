@@ -7,6 +7,7 @@ import '../../services/team_service.dart';
 import '../../services/user_service.dart';
 import '../../widgets/search_filter.dart';
 
+
 class TeamListPage extends StatefulWidget {
   const TeamListPage({super.key});
 
@@ -57,30 +58,27 @@ class _TeamListPageState extends State<TeamListPage> with RouteAware {
     });
   }
 
-
   @override
   Widget build(BuildContext context) {
     final filteredTeams = _teams.where((team) {
       final name = (team['name'] ?? '').toString().toLowerCase();
-      final coachId = team['coach']?['id'];
-      final coach = _users.firstWhere(
-        (user) => user['id'] == coachId,
+      final users = List<Map<String, dynamic>>.from(team['users'] ?? []);
+      final coach = users.firstWhere(
+            (user) => user['type'] == 'TRAINER',
         orElse: () => {'name': ''},
       );
       final coachName = (coach['name'] ?? '').toString().toLowerCase();
 
-      final matchesText =
-          _searchQuery.isEmpty ||
+      return _searchQuery.isEmpty ||
           name.contains(_searchQuery) ||
           coachName.contains(_searchQuery);
-
-      return matchesText;
     }).toList();
 
     return Scaffold(
       appBar: AppBar(title: const Text('Equipos')),
       body: Column(
         children: [
+          // Barra de búsqueda
           SearchFilters(
             controller: _searchController,
             onSearch: (value) {
@@ -89,6 +87,7 @@ class _TeamListPageState extends State<TeamListPage> with RouteAware {
               });
             },
             showDateFilters: false,
+            hintText: 'Buscar por nombre o entrenador',
           ),
           Expanded(
             child: _teams.isEmpty || _users.isEmpty
@@ -96,66 +95,67 @@ class _TeamListPageState extends State<TeamListPage> with RouteAware {
                 : filteredTeams.isEmpty
                 ? const Center(child: Text('No hay equipos disponibles.'))
                 : ListView.builder(
-                    itemCount: filteredTeams.length,
-                    itemBuilder: (context, index) {
-                      final team = filteredTeams[index];
-                      final List<dynamic> users = team['users'] ?? [];
-                      final coach = users.firstWhere(
-                        (user) => user['type'] == 'TRAINER',
-                        orElse: () => {'name': 'Desconocido'},
-                      );
+              itemCount: filteredTeams.length,
+              itemBuilder: (context, index) {
+                final team = filteredTeams[index];
+                final users = List<Map<String, dynamic>>.from(team['users'] ?? []);
+                final coach = users.firstWhere(
+                      (user) => user['type'] == 'TRAINER',
+                  orElse: () => {'name': 'Desconocido'},
+                );
 
-                      return TeamCard(
-                        team: team,
-                        coach: coach,
-                        onTap: () {
-                          context.go('/team/${team['id']}', extra: team);
-                        },
-                      );
-                    },
-                  ),
+                return TeamCard(
+                  team: team,
+                  coach: coach,
+                  onTap: () {
+                    context.go('/team/${team['id']}', extra: team);
+                  },
+                );
+              },
+            ),
           ),
         ],
       ),
-        floatingActionButton: FloatingActionButton(
-          onPressed: () async {
-            final TextEditingController _controller = TextEditingController();
+      floatingActionButton: FloatingActionButton(
+        onPressed: () async {
+          final TextEditingController _controller = TextEditingController();
 
-            final result = await showDialog<String>(
-              context: context,
-              builder: (BuildContext context) {
-                return AlertDialog(
-                  title: const Text('Crear nuevo equipo'),
-                  content: TextField(
-                    controller: _controller,
-                    decoration: const InputDecoration(
-                      labelText: 'Nombre del equipo',
-                    ),
+          final result = await showDialog<String>(
+            context: context,
+            builder: (BuildContext context) {
+              return AlertDialog(
+                title: const Text('Crear nuevo equipo'),
+                content: TextField(
+                  controller: _controller,
+                  decoration: const InputDecoration(
+                    labelText: 'Nombre del equipo',
                   ),
-                  actions: [
-                    TextButton(
-                      onPressed: () => Navigator.pop(context),
-                      child: const Text('Cancelar'),
-                    ),
-                    ElevatedButton(
-                      onPressed: () {
-                        Navigator.pop(context, _controller.text.trim());
-                      },
-                      child: const Text('Guardar'),
-                    ),
-                  ],
-                );
-              },
-            );
+                ),
+                actions: [
+                  TextButton(
+                    onPressed: () => Navigator.pop(context),
+                    child: const Text('Cancelar'),
+                  ),
+                  ElevatedButton(
+                    onPressed: () {
+                      Navigator.pop(context, _controller.text.trim());
+                    },
+                    child: const Text('Guardar'),
+                  ),
+                ],
+              );
+            },
+          );
 
-            if (result != null && result.isNotEmpty) {
-              await TeamService().createTeam(result);
-              _loadData();
-            }
-          },
-          child: const Icon(Icons.add),
-          tooltip: 'Crear nuevo equipo',
-        )
+          if (result != null && result.isNotEmpty) {
+            await TeamService().createTeam(result);
+            _loadData();
+          }
+        },
+        child: const Icon(Icons.add),
+        tooltip: 'Crear nuevo equipo',
+      ),
     );
   }
 }
+
