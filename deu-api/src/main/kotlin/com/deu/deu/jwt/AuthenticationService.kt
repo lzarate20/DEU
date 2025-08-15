@@ -18,7 +18,7 @@ import java.util.*
 @Service
 class AuthenticationService(
     private val authManager: AuthenticationManager,
-    private val userDetailsService: UserDetailsService,
+    private val userDetailsService: JwtUserDetailsService,
     private val userRepository: UserRepository,
     private val tokenService: TokenService,
     @Value("\${jwt.accessTokenExpiration}") private val accessTokenExpiration: Long,
@@ -48,12 +48,13 @@ class AuthenticationService(
     }
 
 
-    private fun createAccessToken(user: UserDetails): String {
+    private fun createAccessToken(user: JwtUserDetails): String {
         return tokenService.generateToken(
-            userId = user.username,
+            userId = user.id.toString(),
             expiration = Date.from(Instant.now().plusSeconds(accessTokenExpiration)),
             additionalClaims = mapOf(
-                "authorities" to user.authorities.map { it.authority }
+                "authorities" to user.authorities.map { it.authority },
+                "userId" to user.id
             )
         )
     }

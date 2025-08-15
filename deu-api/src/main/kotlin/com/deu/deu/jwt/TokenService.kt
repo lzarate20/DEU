@@ -32,7 +32,7 @@ class TokenService(
     }
 
     fun extractUserId(token: String): String {
-        return extractAllClaims(token).id
+        return extractAllClaims(token).subject
     }
 
     fun extractAllClaims(token: String): Claims {
