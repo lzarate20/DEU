@@ -13,7 +13,7 @@ class DashboardPage extends StatefulWidget {
 
 class _DashboardPageState extends State<DashboardPage> {
   final TeamService _teamService = TeamService();
-  List<Map<String, dynamic>>? _teams;
+  List<Map<String, dynamic>> _teams = []; // siempre inicializamos lista
   bool _loadingTeams = true;
 
   @override
@@ -23,9 +23,9 @@ class _DashboardPageState extends State<DashboardPage> {
   }
 
   Future<void> _loadTeams() async {
-    final teams = await _teamService.fetchTeams();
+    final teams = await _teamService.fetchMyTeams();
     setState(() {
-      _teams = teams;
+      _teams = teams ?? []; // si es null, asignamos lista vacía
       _loadingTeams = false;
     });
   }
@@ -60,15 +60,16 @@ class _DashboardPageState extends State<DashboardPage> {
 
             if (_loadingTeams)
               const Center(child: CircularProgressIndicator())
-            else if (_teams == null || _teams!.isEmpty)
+            else if (_teams.isEmpty)
               const Text('No estás en ningún equipo.')
             else
               ListView.builder(
                 shrinkWrap: true,
                 physics: const NeverScrollableScrollPhysics(),
-                itemCount: _teams!.length,
+                itemCount: _teams.length,
                 itemBuilder: (context, index) {
-                  final team = _teams![index];
+                  final team = _teams[index];
+                  final users = team['users'] as List<dynamic>? ?? [];
                   return Card(
                     margin: const EdgeInsets.symmetric(vertical: 8),
                     child: InkWell(
@@ -83,10 +84,9 @@ class _DashboardPageState extends State<DashboardPage> {
                           children: [
                             Text(
                               team['name'] ?? 'Equipo',
-                              style: const TextStyle(
-                                  fontWeight: FontWeight.bold),
+                              style: const TextStyle(fontWeight: FontWeight.bold),
                             ),
-                            Text('${(team['users'] as List).length} miembros'),
+                            Text('${users.length} miembros'),
                           ],
                         ),
                       ),
@@ -94,11 +94,11 @@ class _DashboardPageState extends State<DashboardPage> {
                   );
                 },
               ),
-
           ],
         ),
       ),
     );
   }
 }
+
 

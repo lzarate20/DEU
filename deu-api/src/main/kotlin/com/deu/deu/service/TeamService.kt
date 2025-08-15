@@ -5,6 +5,7 @@ import com.deu.deu.dto.TeamDTO
 import com.deu.deu.dto.TeamDTOResponse
 import com.deu.deu.dto.TrainingTeamDTO
 import com.deu.deu.exception.NotFoundException
+import com.deu.deu.exception.UserAlreadyAreInTeamException
 import com.deu.deu.exception.UserNotFoundException
 import com.deu.deu.model.Team
 import com.deu.deu.model.User
@@ -87,6 +88,7 @@ class TeamService(
 
     fun addUserToTeam(id: Int, idGroup: Int) {
         val user = userRepository.findByIdOrNull(id) ?: throw UserNotFoundException()
+        user.teams.find { it.id == idGroup }?.let { throw UserAlreadyAreInTeamException() }
         val team = this.findById(idGroup)
         this.addUser(team.id, user)
         userRepository.save(user.copy(teams = user.teams + team))
