@@ -38,10 +38,6 @@ class UserService(
         return userRepository.findByIdOrNull(id)
     }
 
-    fun findUserByEmail(email: String): User? {
-        return userRepository.findByEmail(email)
-    }
-
     fun persist(user: UserDTO) {
         val newUser = User(
             name = user.name,
@@ -53,14 +49,20 @@ class UserService(
         userRepository.save(newUser)
     }
 
-    fun update(user: UserDTO) {
-        val userOpt = userRepository.findByEmail(user.email) ?: throw UserNotFoundException(user.email)
+    fun update(userId: Int, updateUserDTO: UpdateUserDTO) {
+        val userOpt = this.findUserById(userId) ?: throw UserNotFoundException(userId.toString())
+        if (updateUserDTO.currentPassword != null && !passwordEncoder.matches(
+                updateUserDTO.currentPassword,
+                userOpt.password
+            )
+        ) {
+            throw RuntimeException("La contraseña actual es incorrecta")
+        }
         val newUser = userOpt.copy(
-            name = user.name,
-            email = user.email,
-            password = user.password,
-            type = user.type,
-            position = user.position
+            name = updateUserDTO.name ?: userOpt.name,
+            email = updateUserDTO.email ?: userOpt.email,
+            password = updateUserDTO.newPassword?.let { passwordEncoder.encode(it) } ?: userOpt.password,
+            position = updateUserDTO.position ?: userOpt.position
         )
         userRepository.save(newUser)
     }
@@ -75,12 +77,12 @@ class UserService(
         userRepository.delete(user)
     }
 
-    fun getNotifications(username:String): List<Notification> {
+    fun getNotifications(username: String): List<Notification> {
         val user = userRepository.findByEmail(username) ?: throw UserNotFoundException()
         return user.notifcations.sortedByDescending { it -> it.date }
     }
 
-    fun markNotificationsAsViewed(username:String){
+    fun markNotificationsAsViewed(username: String) {
         val user = userRepository.findByEmail(username) ?: throw UserNotFoundException()
         val notifications = user.notifcations.map { it -> it.copy(viewed = true) }
         notificationRepository.saveAll(notifications)
@@ -102,12 +104,13 @@ class UserService(
 
     fun getUserTrainingsByDate(date: LocalDate, id: Int): List<TrainingDTOResponse> {
         val user = userRepository.findByIdOrNull(id) ?: throw UserNotFoundException()
-        val filteredTrainings = user.trainings.filter { training -> training.date == date }.map { it -> it.toTrainingDTOResponse() }
+        val filteredTrainings =
+            user.trainings.filter { training -> training.date == date }.map { it -> it.toTrainingDTOResponse() }
         return filteredTrainings
     }
 
     fun addTraining(id: Int, trainingId: Int) {
-        if(!userRepository.existsTrainingForUser(id,trainingId)) {
+        if (!userRepository.existsTrainingForUser(id, trainingId)) {
             val user = userRepository.findByIdOrNull(id) ?: throw UserNotFoundException()
             val training =
                 trainingService.getTraining(trainingId) ?: throw NotFoundException("No se encontro el entrenamiento")

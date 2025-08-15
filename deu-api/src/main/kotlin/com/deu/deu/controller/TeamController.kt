@@ -1,6 +1,7 @@
 package com.deu.deu.controller
 
 import com.deu.deu.dto.*
+import com.deu.deu.jwt.JwtUserDetails
 import com.deu.deu.model.Team
 import com.deu.deu.model.Training
 import com.deu.deu.service.TeamService
@@ -32,8 +33,10 @@ class TeamController(val teamService: TeamService) {
         @RequestBody group: TeamDTO,
         authentication: Authentication
     ) {
-        val username = authentication.name
-        return teamService.persist(group, username)
+        val principal = authentication.principal as JwtUserDetails
+        val userId = principal.id
+
+        return teamService.persist(group, userId)
     }
 
     @PostMapping("/team/notify")

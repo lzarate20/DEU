@@ -21,3 +21,7 @@ class MissingParamException(
 class InvalidUserIdException(
     msg: String? = null
 ) : Exception(msg)
+
+class BadRequestException(
+    msg: String? = null
+) : Exception(msg)

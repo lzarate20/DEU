@@ -2,6 +2,7 @@ import 'package:flutter_project/pages/teams/team_list_page.dart';
 import 'package:go_router/go_router.dart';
 
 import '../pages/dashboard_page.dart';
+import '../pages/edit_profie_page.dart';
 import '../pages/error_page.dart';
 import '../pages/landing_page.dart';
 import '../pages/register.dart';
@@ -43,6 +44,10 @@ final GoRouter router = GoRouter(
         GoRoute(
           path: '/home',
           pageBuilder: (context, state) => NoTransitionPage(child: const DashboardPage()),
+        ),
+        GoRoute(
+          path: '/perfil',
+          pageBuilder: (context, state) => NoTransitionPage(child: const ProfileEditPage()),
         ),
         GoRoute(
           path: '/trainings',

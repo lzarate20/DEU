@@ -50,8 +50,8 @@ class TeamService(
         teamRepository.save(team)
     }
 
-    fun persist(team: TeamDTO, username: String) {
-        val user = userService.findUserByEmail(username) ?: throw UserNotFoundException()
+    fun persist(team: TeamDTO, userId: Int) {
+        val user = userService.findUserById(userId) ?: throw UserNotFoundException()
         val team = teamRepository.save(Team(name = team.name, users = listOf(user)))
         val newUser = user.copy(teams = user.teams + team)
         userRepository.save(newUser)

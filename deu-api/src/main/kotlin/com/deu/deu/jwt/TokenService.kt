@@ -17,18 +17,22 @@ class TokenService(
             return SecretKeySpec(keyBytes, 0, keyBytes.size, "HmacSHA256")
         }
 
-    fun generateToken(subject: String, expiration: Date, additionalClaims: Map<String, Any> = emptyMap()): String {
+    fun generateToken(
+        userId: String,
+        expiration: Date,
+        additionalClaims: Map<String, Any> = emptyMap()
+    ): String {
         return Jwts.builder()
             .setClaims(additionalClaims)
-            .setSubject(subject)
+            .setSubject(userId)
             .setIssuedAt(Date(System.currentTimeMillis()))
             .setExpiration(expiration)
             .signWith(signingKey)
             .compact()
     }
 
-    fun extractUsername(token: String): String {
-        return extractAllClaims(token).subject
+    fun extractUserId(token: String): String {
+        return extractAllClaims(token).id
     }
 
     fun extractAllClaims(token: String): Claims {

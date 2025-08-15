@@ -31,21 +31,26 @@ class AuthenticationService(
             )
         )
 
-        val user = userDetailsService.loadUserByUsername(authenticationRequest.email)
-        val accessToken = createAccessToken(user)
-        val userResponse = userRepository.findByEmail(authenticationRequest.email)?.toDTO() ?: throw UsernameNotFoundException("Usuario no encontrado")
+        val userEntity = userRepository.findByEmail(authenticationRequest.email)
+            ?: throw UsernameNotFoundException("Usuario no encontrado")
+
+        val userDetails = userDetailsService.loadUserByUsername(userEntity.email)
+
+        val accessToken = createAccessToken(userDetails)
+
+        val userResponse = userEntity.toDTO()
 
         return UserLoginResponse(
             token = accessToken,
             user = userResponse,
             expirationDate = LocalDateTime.now().plusSeconds(accessTokenExpiration)
-
         )
     }
 
+
     private fun createAccessToken(user: UserDetails): String {
         return tokenService.generateToken(
-            subject = user.username,
+            userId = user.username,
             expiration = Date.from(Instant.now().plusSeconds(accessTokenExpiration)),
             additionalClaims = mapOf(
                 "authorities" to user.authorities.map { it.authority }

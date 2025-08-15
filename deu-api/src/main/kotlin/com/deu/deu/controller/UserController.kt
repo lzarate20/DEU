@@ -1,15 +1,20 @@
 package com.deu.deu.controller
 
 import com.deu.deu.dto.*
+import com.deu.deu.exception.InvalidUserIdException
 import com.deu.deu.exception.UserNotFoundException
+import com.deu.deu.jwt.JwtUserDetails
 import com.deu.deu.model.Notification
 import com.deu.deu.service.UserService
 import com.deu.deu.utils.toDTO
 import org.springframework.format.annotation.DateTimeFormat
+import org.springframework.http.HttpStatus
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.security.core.annotation.AuthenticationPrincipal
+import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.security.core.userdetails.UserDetails
 import org.springframework.web.bind.annotation.*
+import org.springframework.web.server.ResponseStatusException
 import java.time.LocalDate
 
 @RestController
@@ -26,8 +31,23 @@ class UserController(val userService: UserService) {
     }
 
     @PutMapping("/user")
-    fun updateUser(@RequestBody user: UserDTO){
-        userService.update(user)
+    fun updateUser(@RequestBody user: UpdateUserDTO) {
+        if (user.currentPassword != null && user.newPassword == null) {
+            throw ResponseStatusException(
+                HttpStatus.BAD_REQUEST,
+                "Debe proporcionar la nueva contraseña si ingresa la contraseña actual"
+            )
+        }
+        if (user.currentPassword == null && user.newPassword != null) {
+            throw ResponseStatusException(
+                HttpStatus.BAD_REQUEST,
+                "Debe proporcionar la actual contraseña si ingresa una nueva contraseña"
+            )
+        }
+        val authentication = SecurityContextHolder.getContext().authentication
+        val principal = authentication.principal as JwtUserDetails
+        val userId = principal.id
+        userService.update(userId, user)
     }
 
     @DeleteMapping("/user/{id}")

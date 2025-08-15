@@ -39,6 +39,70 @@ class UserService {
     }
   }
 
+  Future<Map<String, dynamic>?> fetchUser(String id) async {
+    final url = Uri.parse('http://$host/users/$id');
+
+    try {
+      final token = await _storage.read(key: 'jwt_token');
+      final response = await client.get(
+        url,
+        headers: {
+          'Authorization': 'Bearer $token',
+          'Content-Type': 'application/json',
+        },
+      );
+
+      if (response.statusCode == 200) {
+        final Map<String, dynamic> userData = jsonDecode(response.body);
+        return userData;
+      } else {
+        print('Error al obtener usuario: ${response.statusCode}');
+        return null;
+      }
+    } catch (e) {
+      print('Error de red al obtener usuario: $e');
+      return null;
+    }
+  }
+
+  Future<bool> updateUser({
+    required String? name,
+    required String? email,
+    String? currentPassword,
+    String? newPassword,
+  }) async {
+    final url = Uri.parse('http://$host/user');
+
+    try {
+      final token = await _storage.read(key: 'jwt_token');
+
+      final body = <String, dynamic>{};
+      if (name != null) body['name'] = name;
+      if (email != null) body['email'] = email;
+      if (currentPassword != null) body['currentPassword'] = currentPassword;
+      if (newPassword != null) body['newPassword'] = newPassword;
+
+      final response = await client.put(
+        url,
+        headers: {
+          'Authorization': 'Bearer $token',
+          'Content-Type': 'application/json',
+        },
+        body: jsonEncode(body),
+      );
+
+      if (response.statusCode == 200) {
+        return true;
+      } else {
+        print('Error al actualizar usuario: ${response.statusCode}');
+        return false;
+      }
+    } catch (e) {
+      print('Error de red al actualizar usuario: $e');
+      return false;
+    }
+  }
+
   Future<List<Map<String, dynamic>>> fetchUserTeams(String userId) async {
     final url = Uri.parse('http://$host/user/$userId/teams');
 

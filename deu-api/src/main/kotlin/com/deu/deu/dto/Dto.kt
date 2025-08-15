@@ -13,6 +13,14 @@ data class UserDTO(
     val position: Position?
 )
 
+data class UpdateUserDTO(
+    val name: String?,
+    val email: String?,
+    val currentPassword: String?,
+    val newPassword: String?,
+    val position: Position?
+)
+
 data class TrainerDTO(
     val id: Int
 )

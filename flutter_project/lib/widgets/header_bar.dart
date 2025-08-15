@@ -14,6 +14,7 @@ class HeaderBar extends StatelessWidget {
   Future<void> _handleMenuSelect(BuildContext context, String value) async {
     switch (value) {
       case 'perfil':
+        context.go('/perfil');
         break;
       case 'configuracion':
         showModalBottomSheet(
