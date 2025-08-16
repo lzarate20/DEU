@@ -23,10 +23,9 @@ class BaseLayout extends StatelessWidget {
         return Scaffold(
           body: Row(
             children: [
-              // Sidebar
               AnimatedContainer(
                 duration: const Duration(milliseconds: 300),
-                width: isCompact ? 60 : 200, // ancho reducido o normal
+                width: isCompact ? 60 : 200,
                 color: Colors.blue.shade700,
                 child: Column(
                   children: [

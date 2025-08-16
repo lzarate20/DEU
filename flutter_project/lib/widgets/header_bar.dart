@@ -53,11 +53,11 @@ class HeaderBar extends StatelessWidget {
               onPressed: () => Navigator.of(context).pop(),
             )
           else
-            const SizedBox(width: 48), // mismo ancho para evitar salto
+            const SizedBox(width: 48),
 
           Expanded(
             child: Text(
-              'Mi Aplicación',
+              'TeamUp',
               style: Theme.of(context).textTheme.titleLarge?.copyWith(color: Colors.white),
               overflow: TextOverflow.ellipsis,
             ),
