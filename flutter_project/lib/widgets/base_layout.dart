@@ -26,13 +26,13 @@ class BaseLayout extends StatelessWidget {
               AnimatedContainer(
                 duration: const Duration(milliseconds: 300),
                 width: isCompact ? 60 : 200,
-                color: Colors.blue.shade700,
+                color: Colors.blue.shade900,
                 child: Column(
                   children: [
                     const SizedBox(height: 40),
-                    Icon(Icons.dashboard,
-                        size: isCompact ? 30 : 50,
-                        color: Colors.white),
+                    Image.asset(
+                      'web/icons/logo2.png',
+                    ),
                     const SizedBox(height: 20),
                     // Nav buttons
                     _NavButton(

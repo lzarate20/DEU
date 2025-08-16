@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../selectable_card.dart';
+
 class ExerciseList extends StatelessWidget {
   final List<dynamic> exercises;
   final int selectedIndex;
@@ -19,28 +21,32 @@ class ExerciseList extends StatelessWidget {
       itemCount: exercises.length,
       itemBuilder: (context, index) {
         final e = exercises[index];
-        return GestureDetector(
+        final selected = index == selectedIndex;
+
+        return SelectableCard(
+          selected: selected,
           onTap: () => onSelect(index),
-          child: Card(
-            color: index == selectedIndex ? Colors.blue.shade50 : null,
-            margin: const EdgeInsets.symmetric(vertical: 8),
-            child: Padding(
-              padding: const EdgeInsets.all(12),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(e['name'] ?? '', style: const TextStyle(fontWeight: FontWeight.bold)),
-                  const SizedBox(height: 4),
-                  Text(e['description'] ?? '', maxLines: 2, overflow: TextOverflow.ellipsis),
-                  const SizedBox(height: 4),
-                  Text('${e['count']} ${e['units']}'),
-                ],
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                e['name'] ?? '',
+                style: const TextStyle(fontWeight: FontWeight.bold),
               ),
-            ),
+              const SizedBox(height: 4),
+              Text(
+                e['description'] ?? '',
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+              ),
+              const SizedBox(height: 4),
+              Text('${e['count']} ${e['units']}'),
+            ],
           ),
         );
       },
     );
   }
+
 }
 
