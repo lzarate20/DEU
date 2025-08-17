@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:flutter_project/configProject/api_config.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:http/http.dart' as http;
 
@@ -6,13 +7,11 @@ import 'api_service.dart' show AuthHttpClient;
 
 class TeamService {
   static const _storage = FlutterSecureStorage();
-  final String host;
+  final String host = ApiConfig.host;
   static final client = AuthHttpClient();
 
-  TeamService({this.host = 'localhost:8080'});
-
   Future<List<Map<String, dynamic>>?> fetchTeams() async {
-    final url = Uri.parse('http://$host/teams');
+    final url = Uri.parse('$host/teams');
 
     try {
       final token = await _storage.read(key: 'jwt_token');
@@ -49,7 +48,7 @@ class TeamService {
         return null;
       }
 
-      final url = Uri.parse('http://$host/user/$userId/teams');
+      final url = Uri.parse('$host/user/$userId/teams');
 
       final response = await client.get(
         url,
@@ -75,7 +74,7 @@ class TeamService {
   }
 
   Future<Map<String, dynamic>?> fetchTeamById(String id) async {
-    final url = Uri.parse('http://$host/teams/$id');
+    final url = Uri.parse('$host/teams/$id');
     final token = await _storage.read(key: 'jwt_token');
     final response = await client.get(url, headers: {
       'Authorization': 'Bearer $token',
@@ -89,7 +88,7 @@ class TeamService {
   }
 
   Future<void> createTeam(String name) async {
-    final url = Uri.parse('http://$host/team');
+    final url = Uri.parse('$host/team');
     final token = await _storage.read(key: 'jwt_token');
 
     final response = await client.post(
@@ -109,7 +108,7 @@ class TeamService {
   }
 
   Future<bool> addUserToTeam(String teamId, String userId) async {
-    final url = Uri.parse('http://$host/teams/$teamId/user/$userId');
+    final url = Uri.parse('$host/teams/$teamId/user/$userId');
     final token = await _storage.read(key: 'jwt_token');
 
     final response = await client.post(

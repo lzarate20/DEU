@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter_project/configProject/api_config.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:http/http.dart' as http;
 
@@ -8,15 +9,14 @@ import 'api_service.dart' show AuthHttpClient;
 
 class TrainingService {
   static const _storage = FlutterSecureStorage();
-  final String host;
+  final String host = ApiConfig.host;
   static final client = AuthHttpClient();
 
-  TrainingService({this.host = 'localhost:8080'});
 
   Future<List<Map<String, dynamic>>?> fetchTraining(DateTime date) async {
     final userId = await _storage.read(key: 'user_id');
     final formattedDate = date.toIso8601String().split('T').first;
-    final url = Uri.parse('http://$host/user/trainings?id=$userId&date=$formattedDate');
+    final url = Uri.parse('$host/user/trainings?id=$userId&date=$formattedDate');
 
     try {
       final token = await _storage.read(key: 'jwt_token');
@@ -42,7 +42,7 @@ class TrainingService {
   }
 
   Future<Map<String, dynamic>?> fetchTrainingById(String trainingId) async {
-    final url = Uri.parse('http://$host/training/$trainingId');
+    final url = Uri.parse('$host/training/$trainingId');
 
     try {
       final token = await _storage.read(key: 'jwt_token');
@@ -68,7 +68,7 @@ class TrainingService {
   }
 
   Future<List<Map<String, dynamic>>?> fetchTrainings() async {
-    final url = Uri.parse('http://$host/trainings');
+    final url = Uri.parse('$host/trainings');
 
     try {
       final token = await _storage.read(key: 'jwt_token');
@@ -94,7 +94,7 @@ class TrainingService {
   }
 
   Future<bool> createTraining(Map<String, dynamic> trainingData) async {
-    final url = Uri.parse('http://$host/training');
+    final url = Uri.parse('$host/training');
     try {
       final token = await _storage.read(key: 'jwt_token');
       final response = await client.post(
@@ -125,7 +125,7 @@ class TrainingService {
   }
 
   Future<bool> removeTraining(String id) async {
-    final url = Uri.parse('http://$host/training/$id');
+    final url = Uri.parse('$host/training/$id');
 
     try {
       final token = await _storage.read(key: 'jwt_token');
@@ -156,7 +156,7 @@ class TrainingService {
     final userId = await _storage.read(key: 'user_id');
     if (userId == null) return null;
 
-    final url = Uri.parse('http://$host/training/comment/$idTeam');
+    final url = Uri.parse('$host/training/comment/$idTeam');
 
     final Map<String, dynamic> body = {
       'userId': userId,

@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:flutter_project/configProject/api_config.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:http/http.dart' as http;
 
@@ -6,13 +7,12 @@ import 'api_service.dart' show AuthHttpClient;
 
 class UserService {
   static const _storage = FlutterSecureStorage();
-  final String host;
+  final String host = ApiConfig.host;
   static final client = AuthHttpClient();
 
-  UserService({this.host = 'localhost:8080'});
 
   Future<List<Map<String, dynamic>>> fetchUsers() async {
-    final url = Uri.parse('http://$host/users');
+    final url = Uri.parse('$host/users');
 
     try {
       final token = await _storage.read(key: 'jwt_token');
@@ -40,7 +40,7 @@ class UserService {
   }
 
   Future<Map<String, dynamic>?> fetchUser(String id) async {
-    final url = Uri.parse('http://$host/users/$id');
+    final url = Uri.parse('$host/users/$id');
 
     try {
       final token = await _storage.read(key: 'jwt_token');
@@ -71,7 +71,7 @@ class UserService {
     String? currentPassword,
     String? newPassword,
   }) async {
-    final url = Uri.parse('http://$host/user');
+    final url = Uri.parse('$host/user');
 
     try {
       final token = await _storage.read(key: 'jwt_token');
@@ -104,7 +104,7 @@ class UserService {
   }
 
   Future<List<Map<String, dynamic>>> fetchUserTeams(String userId) async {
-    final url = Uri.parse('http://$host/user/$userId/teams');
+    final url = Uri.parse('$host/user/$userId/teams');
 
     try {
       final token = await _storage.read(key: 'jwt_token');
@@ -132,7 +132,7 @@ class UserService {
   }
 
   Future<bool> assignTrainingToUsers(int trainingId, List<int> userIds) async {
-    final url = Uri.parse('http://$host/user/training/$trainingId');
+    final url = Uri.parse('$host/user/training/$trainingId');
 
     try {
       final token = await _storage.read(key: 'jwt_token');
@@ -172,7 +172,7 @@ class UserService {
       return [];
     }
 
-    final url = Uri.parse('http://$host/user/notifications');
+    final url = Uri.parse('$host/user/notifications');
     final response = await client.get(
       url,
       headers: {
@@ -194,7 +194,7 @@ class UserService {
     final token = await _storage.read(key: 'jwt_token');
     if (token == null) return false;
 
-    final url = Uri.parse('http://$host/user/notifications/viewed'); // endpoint que maneja el POST
+    final url = Uri.parse('$host/user/notifications/viewed');
 
     final response = await client.post(
       url,

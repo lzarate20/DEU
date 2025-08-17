@@ -33,7 +33,7 @@ class _CommentsPanelState extends State<CommentsPanel> {
     final updatedTraining = await widget.onSendComment(text);
 
     if (updatedTraining != null) {
-      if (!mounted) return; // <-- Evita setState si el widget ya no está
+      if (!mounted) return;
       setState(() {
         comments = List.from(updatedTraining['comments'] ?? []);
         _controller.clear();
@@ -46,9 +46,10 @@ class _CommentsPanelState extends State<CommentsPanel> {
     }
   }
 
-
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
     return Positioned(
       bottom: 0,
       left: 0,
@@ -56,23 +57,31 @@ class _CommentsPanelState extends State<CommentsPanel> {
       height: MediaQuery.of(context).size.height * 0.45,
       child: Material(
         elevation: 8,
-        color: Colors.white,
+        color: theme.colorScheme.surface, // fondo adaptativo
         child: Column(
           children: [
+            // Encabezado
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-              color: Colors.blueGrey.shade700,
+              color: theme.colorScheme.primary, // barra adaptativa
               child: Row(
                 children: [
-                  const Text('Comentarios', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+                  Text(
+                    'Comentarios',
+                    style: TextStyle(
+                      color: theme.colorScheme.onPrimary, // texto legible
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
                   const Spacer(),
                   IconButton(
-                    icon: const Icon(Icons.close, color: Colors.white),
+                    icon: Icon(Icons.close, color: theme.colorScheme.onPrimary),
                     onPressed: widget.onClose,
                   ),
                 ],
               ),
             ),
+            // Lista de comentarios
             Expanded(
               child: ListView(
                 padding: const EdgeInsets.symmetric(horizontal: 8),
@@ -80,26 +89,38 @@ class _CommentsPanelState extends State<CommentsPanel> {
                   final userName = c['user'] != null ? c['user']['name'] ?? 'Anónimo' : 'Anónimo';
                   final commentText = c['comment'] ?? '';
 
-                  return ListTile(
-                    leading: const Icon(Icons.comment),
-                    title: Text(userName),
-                    subtitle: Text(commentText),
+                  return Card(
+                    color: theme.cardColor, // adaptativo
+                    margin: const EdgeInsets.symmetric(vertical: 4, horizontal: 4),
+                    child: ListTile(
+                      leading: Icon(Icons.comment, color: theme.colorScheme.secondary),
+                      title: Text(userName, style: TextStyle(color: theme.textTheme.bodyMedium!.color)),
+                      subtitle: Text(commentText, style: TextStyle(color: theme.textTheme.bodySmall!.color)),
+                    ),
                   );
                 }).toList(),
               ),
             ),
+            // Campo de texto para nuevo comentario
             Padding(
               padding: const EdgeInsets.all(8),
               child: TextField(
                 controller: _controller,
                 decoration: InputDecoration(
                   labelText: 'Agregar comentario...',
-                  border: const OutlineInputBorder(),
+                  labelStyle: TextStyle(color: theme.textTheme.bodyMedium!.color),
+                  border: OutlineInputBorder(
+                    borderSide: BorderSide(color: theme.dividerColor),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderSide: BorderSide(color: theme.colorScheme.primary),
+                  ),
                   suffixIcon: IconButton(
-                    icon: const Icon(Icons.send),
+                    icon: Icon(Icons.send, color: theme.colorScheme.primary),
                     onPressed: _submitComment,
                   ),
                 ),
+                style: TextStyle(color: theme.textTheme.bodyMedium!.color),
                 onSubmitted: (_) => _submitComment(),
               ),
             ),
@@ -110,3 +131,4 @@ class _CommentsPanelState extends State<CommentsPanel> {
     );
   }
 }
+

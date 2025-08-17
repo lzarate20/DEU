@@ -1,18 +1,17 @@
 import 'dart:convert';
+
+import 'package:flutter_project/configProject/api_config.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:http/http.dart' as http;
 
 import 'api_service.dart' show AuthHttpClient;
 
 class ExerciseService {
   static const _storage = FlutterSecureStorage();
-  final String host;
+  final String host = ApiConfig.host;
   static final client = AuthHttpClient();
 
-  ExerciseService({this.host = 'localhost:8080'});
-
   Future<List<Map<String, dynamic>>?> fetchExercises() async {
-    final url = Uri.parse('http://$host/exercises');
+    final url = Uri.parse('$host/exercises');
 
     try {
       final token = await _storage.read(key: 'jwt_token');
