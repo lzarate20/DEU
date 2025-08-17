@@ -1,0 +1,41 @@
+version: '3.3'
+
+services:
+  db:
+    image: lzarate2o/sql:latest
+    ports:
+      - "3306:3306"
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_USER: tpdeu
+      MYSQL_PASSWORD: tpdeu
+      MYSQL_DATABASE: tpdeu  
+  api:
+    image: lzarate2o/api:latest
+    restart: always
+    depends_on:
+      - db
+    links:
+      - db
+    ports:
+      - "4000:4000"
+  cli-web:
+    image: lzarate2o/web:latest
+    restart: always
+    environment:
+      - api:api
+    depends_on:
+      - api
+    links:
+      - api
+    ports:
+      - "80:8080"
+  phpmyadmin:
+    image: phpmyadmin:5.2.1-fpm-alpine
+    restart: always
+    environment:
+        PMA_HOST: db
+        PMA_PORT: 3306
+    ports:
+      - 90:80

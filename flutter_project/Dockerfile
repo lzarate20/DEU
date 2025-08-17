@@ -28,6 +28,9 @@ FROM nginx:alpine AS runtime
 # Copiar build resultante al root de Nginx
 COPY --from=build /app/build/web /usr/share/nginx/html
 
+# Copiar config custom de Nginx
+COPY nginx.conf /etc/nginx/conf.d/default.conf
+
 # Configuración custom de Nginx (opcional)
 # COPY nginx.conf /etc/nginx/conf.d/default.conf
 
