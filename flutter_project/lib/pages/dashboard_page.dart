@@ -13,7 +13,7 @@ class DashboardPage extends StatefulWidget {
 
 class _DashboardPageState extends State<DashboardPage> {
   final TeamService _teamService = TeamService();
-  List<Map<String, dynamic>> _teams = []; // siempre inicializamos lista
+  List<Map<String, dynamic>> _teams = [];
   bool _loadingTeams = true;
 
   @override
@@ -25,7 +25,7 @@ class _DashboardPageState extends State<DashboardPage> {
   Future<void> _loadTeams() async {
     final teams = await _teamService.fetchMyTeams();
     setState(() {
-      _teams = teams ?? []; // si es null, asignamos lista vacía
+      _teams = teams ?? [];
       _loadingTeams = false;
     });
   }

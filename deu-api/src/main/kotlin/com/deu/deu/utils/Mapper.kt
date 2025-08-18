@@ -25,7 +25,8 @@ fun Team.toDTO(): TeamDTOResponse {
 fun Team.toTeamUserDTO(): TeamUserDTOResponse {
     return TeamUserDTOResponse(
         id = this.id,
-        name = this.name
+        name = this.name,
+        users = this.users.map { it.id }
     )
 }
 

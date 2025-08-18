@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_project/widgets/theme_provider.dart';
 import 'package:go_router/go_router.dart';
+import 'package:provider/provider.dart';
 
 import '../configProject/global_router.dart';
-import '../services/auth_service.dart';
 import 'header_bar.dart';
 
 class BaseLayout extends StatelessWidget {
@@ -16,25 +17,29 @@ class BaseLayout extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final themeProvider = Provider.of<ThemeProvider>(context);
+
     return LayoutBuilder(
       builder: (context, constraints) {
         final bool isCompact = constraints.maxWidth < 780;
+
+        final baseCompactWidth = 60.0;
+        final baseExpandedWidth = 200.0;
+        final navWidth = (isCompact ? baseCompactWidth : baseExpandedWidth) *
+            themeProvider.navSizeFactor;
 
         return Scaffold(
           body: Row(
             children: [
               AnimatedContainer(
                 duration: const Duration(milliseconds: 300),
-                width: isCompact ? 60 : 200,
+                width: navWidth,
                 color: Colors.blue.shade900,
                 child: Column(
                   children: [
                     const SizedBox(height: 40),
-                    Image.asset(
-                      'web/icons/logo2.png',
-                    ),
+                    Image.asset('web/icons/logo2.png'),
                     const SizedBox(height: 20),
-                    // Nav buttons
                     _NavButton(
                       icon: Icons.home,
                       label: 'Home',
@@ -96,7 +101,7 @@ class _NavButton extends StatelessWidget {
         foregroundColor: Colors.white,
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         alignment: compact ? Alignment.center : Alignment.centerLeft,
-        minimumSize: Size(double.infinity, 48),
+        minimumSize: const Size(double.infinity, 48),
       ),
       onPressed: () {
         final route = labelToRoute[label] ?? '/${label.toLowerCase()}';

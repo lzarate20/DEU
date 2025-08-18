@@ -21,6 +21,7 @@ class HeaderBar extends StatelessWidget {
           context: context,
           isScrollControlled: true,
           showDragHandle: true,
+          useSafeArea: true,
           builder: (_) => const SettingsModalContent(),
         );
         break;
@@ -38,8 +39,7 @@ class HeaderBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final themeProvider = Provider.of<ThemeProvider>(context);
-
-    final canPop = Navigator.of(context).canPop();
+    
 
     return Container(
       color: Colors.blue,
@@ -47,12 +47,6 @@ class HeaderBar extends StatelessWidget {
       height: 60,
       child: Row(
         children: [
-          if (canPop)
-            IconButton(
-              icon: const Icon(Icons.arrow_back, color: Colors.white),
-              onPressed: () => Navigator.of(context).pop(),
-            )
-          else
             const SizedBox(width: 48),
 
           Expanded(

@@ -23,45 +23,58 @@ class _TeamDetailPageState extends State<TeamDetailPage> {
   @override
   void initState() {
     super.initState();
+
+    // Si vino un team incompleto desde el listado → lo muestro rápido,
+    // pero igualmente hago un fetch para traer la versión completa.
     if (widget.team != null) {
       _team = widget.team;
       _loading = false;
-    } else {
-      _fetchTeam();
     }
+
+    _fetchTeam();
   }
 
   Future<void> _fetchTeam() async {
-    final data = await TeamService().fetchTeamById(widget.teamId);
-    setState(() {
-      _team = data;
-      _loading = false;
-    });
+    try {
+      final data = await TeamService().fetchTeamById(widget.teamId);
+      setState(() {
+        _team = data;
+        _loading = false;
+      });
+    } catch (e) {
+      setState(() {
+        _loading = false;
+      });
+    }
   }
 
   Future<void> _addCurrentUserToTeam() async {
-    final userId = await FlutterSecureStorage().read(key: 'user_id');
+    final userId = await const FlutterSecureStorage().read(key: 'user_id');
     if (userId != null && _team != null) {
       final success = await TeamService().addUserToTeam(
         _team!['id'].toString(),
         userId,
       );
       if (success) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Te sumaste al equipo!')),
-        );
-        _fetchTeam(); // recarga los datos
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Te sumaste al equipo!')),
+          );
+        }
+        _fetchTeam(); // recarga datos del backend
       } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('No se pudo sumar al equipo.')),
-        );
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('No se pudo sumar al equipo.')),
+          );
+        }
       }
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    if (_loading) {
+    if (_loading && _team == null) {
       return const Scaffold(
         body: Center(child: CircularProgressIndicator()),
       );
@@ -127,18 +140,15 @@ class _TeamDetailPageState extends State<TeamDetailPage> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             FutureBuilder<String?>(
-                              future:
-                              FlutterSecureStorage().read(key: 'user_id'),
+                              future: const FlutterSecureStorage().read(key: 'user_id'),
                               builder: (context, snapshot) {
                                 final currentUserId = snapshot.data;
                                 final alreadyInTeam = currentUserId != null &&
                                     players.any((p) =>
-                                    p['id'].toString() ==
-                                        currentUserId);
+                                    p['id'].toString() == currentUserId);
 
                                 return Row(
-                                  mainAxisAlignment:
-                                  MainAxisAlignment.spaceBetween,
+                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                   children: [
                                     const Text(
                                       "Jugadores",
@@ -232,7 +242,3 @@ class _TeamDetailPageState extends State<TeamDetailPage> {
     );
   }
 }
-
-
-
-

@@ -13,6 +13,9 @@ class ThemeProvider extends ChangeNotifier {
 
   ThemeMode get currentTheme => isDarkMode ? ThemeMode.dark : ThemeMode.light;
 
+  // navSizeFactor siempre depende de fontSizeFactor
+  double get navSizeFactor => 1.0 + (fontSizeFactor - 1.0) * 0.4;
+
   void toggleTheme() {
     isDarkMode = !isDarkMode;
     notifyListeners();
@@ -33,7 +36,7 @@ class ThemeProvider extends ChangeNotifier {
   Future<void> _saveConfig() async {
     try {
       final theme = isDarkMode ? 'NIGHT' : 'DAY';
-      final size = _mapFontSizeToLabel(fontSizeFactor); // SMALL, MEDIUM, LARGE
+      final size = _mapFontSizeToLabel(fontSizeFactor);
 
       await ConfigService.saveUserConfig(
         theme: theme,
@@ -53,7 +56,7 @@ class ThemeProvider extends ChangeNotifier {
   Future<void> initFromConfig(UserConfig config) async {
     isDarkMode = config.theme == ThemeType.dark;
     fontSizeFactor = _mapLetterSizeToFactor(config.letterSize);
-    debugPrint('Init desde backend: ${isDarkMode}, ${fontSizeFactor}');
+    debugPrint('Init desde backend: $isDarkMode, $fontSizeFactor');
     fontFamily = 'Roboto';
     notifyListeners();
   }
@@ -68,7 +71,6 @@ class ThemeProvider extends ChangeNotifier {
         return 1.7;
     }
   }
-
 }
 
 ThemeData buildTheme(

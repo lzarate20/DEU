@@ -38,7 +38,8 @@ data class UserDTOResponse(
 @JsonInclude(JsonInclude.Include.NON_NULL)
 data class TeamUserDTOResponse(
     val id: Int,
-    val name: String
+    val name: String,
+    val users: List<Int> = listOf()
 )
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
