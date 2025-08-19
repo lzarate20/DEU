@@ -13,8 +13,11 @@ class ThemeProvider extends ChangeNotifier {
 
   ThemeMode get currentTheme => isDarkMode ? ThemeMode.dark : ThemeMode.light;
 
-  // navSizeFactor siempre depende de fontSizeFactor
+
   double get navSizeFactor => 1.0 + (fontSizeFactor - 1.0) * 0.4;
+
+  Color get textColor => isDarkMode ? Colors.white : Colors.black;
+
 
   void toggleTheme() {
     isDarkMode = !isDarkMode;

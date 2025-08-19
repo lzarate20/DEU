@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_project/pages/training_page.dart';
 import 'package:go_router/go_router.dart';
+import 'package:provider/provider.dart';
 
 import '../services/team_service.dart';
 import '../widgets/accesible_list.dart';
+import '../widgets/theme_provider.dart';
 
 class DashboardPage extends StatefulWidget {
   const DashboardPage({super.key});
@@ -91,9 +93,9 @@ class _DashboardPageState extends State<DashboardPage> {
                       children: [
                         Text(
                           team['name'] ?? 'Equipo',
-                          style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.black),
+                          style:  TextStyle(fontWeight: FontWeight.bold, color:  context.watch<ThemeProvider>().textColor),
                         ),
-                        Text('${users.length} miembros', style: const TextStyle(color: Colors.black)),
+                        Text('${users.length} miembros', style: TextStyle(color:  context.watch<ThemeProvider>().textColor)),
                       ],
                     );
                   }).toList(),
