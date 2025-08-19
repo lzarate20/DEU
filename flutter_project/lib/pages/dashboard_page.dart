@@ -3,6 +3,7 @@ import 'package:flutter_project/pages/training_page.dart';
 import 'package:go_router/go_router.dart';
 
 import '../services/team_service.dart';
+import '../widgets/accesible_list.dart';
 
 class DashboardPage extends StatefulWidget {
   const DashboardPage({super.key});
@@ -35,70 +36,80 @@ class _DashboardPageState extends State<DashboardPage> {
     return Scaffold(
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text(
-              'Mis Entrenamientos',
-              style: TextStyle(fontWeight: FontWeight.bold),
-            ),
-            const Divider(thickness: 2),
-            const SizedBox(height: 8),
-
-            SizedBox(
-              height: 560,
-              child: const TrainingPage(),
-            ),
-
-            const SizedBox(height: 24),
-
-            const Text(
-              'Mis Equipos',
-              style: TextStyle(fontWeight: FontWeight.bold),
-            ),
-            const Divider(thickness: 2),
-
-            if (_loadingTeams)
-              const Center(child: CircularProgressIndicator())
-            else if (_teams.isEmpty)
-              const Text('No estás en ningún equipo.')
-            else
-              ListView.builder(
-                shrinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(),
-                itemCount: _teams.length,
-                itemBuilder: (context, index) {
-                  final team = _teams[index];
-                  final users = team['users'] as List<dynamic>? ?? [];
-                  return Card(
-                    margin: const EdgeInsets.symmetric(vertical: 8),
-                    child: InkWell(
-                      mouseCursor: SystemMouseCursors.click,
-                      onTap: () {
-                        context.go('/team/${team['id']}', extra: team);
-                      },
-                      child: Padding(
-                        padding: const EdgeInsets.all(12.0),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text(
-                              team['name'] ?? 'Equipo',
-                              style: const TextStyle(fontWeight: FontWeight.bold),
-                            ),
-                            Text('${users.length} miembros'),
-                          ],
-                        ),
-                      ),
-                    ),
-                  );
-                },
+        child: Semantics(
+          container: true,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Semantics(
+                header: true,
+                child: const Text(
+                  'Mis Entrenamientos',
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
               ),
-          ],
+              const Divider(thickness: 2),
+              const SizedBox(height: 8),
+
+              Semantics(
+                container: true,
+                label: 'Sección de entrenamientos',
+                child: SizedBox(
+                  height: 560,
+                  child: const TrainingPage(),
+                ),
+              ),
+
+              const SizedBox(height: 24),
+
+              Semantics(
+                header: true,
+                child: const Text(
+                  'Mis Equipos',
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+              ),
+              const Divider(thickness: 2),
+
+              if (_loadingTeams)
+                Semantics(
+                  label: 'Cargando equipos',
+                  child: const Center(child: CircularProgressIndicator()),
+                )
+              else if (_teams.isEmpty)
+                Semantics(
+                  label: 'No estás en ningún equipo',
+                  child: const Text('No estás en ningún equipo.'),
+                )
+              else
+                AccessibleList(
+                  semanticsLabel: 'Lista de mis equipos',
+                  buttons: _teams.map((team) {
+                    final users = team['users'] as List<dynamic>? ?? [];
+                    return Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          team['name'] ?? 'Equipo',
+                          style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.black),
+                        ),
+                        Text('${users.length} miembros', style: const TextStyle(color: Colors.black)),
+                      ],
+                    );
+                  }).toList(),
+                  onPressedCallbacks: _teams.map((team) {
+                    return () {
+                      context.go('/team/${team['id']}', extra: team);
+                    };
+                  }).toList(),
+                )
+            ],
+          ),
         ),
       ),
     );
   }
 }
+
 
 

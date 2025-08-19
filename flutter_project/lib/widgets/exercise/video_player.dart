@@ -87,24 +87,30 @@ class _VideoPlayerAreaState extends State<VideoPlayerArea> {
       flex: 3,
       child: Padding(
         padding: const EdgeInsets.all(16),
-        child: AspectRatio(
-          aspectRatio: _videoPlayerController!.value.aspectRatio,
-          child: Stack(
-            children: [
-              Chewie(controller: _chewieController!),
-              if (widget.showComments)
-                Positioned.fill(
-                  child: AbsorbPointer(
-                    absorbing: true,
-                    child: Container(color: Colors.transparent),
+        child: Semantics(
+          label: 'Video de entrenamiento',
+          hint: 'Reproductor de video, puedes reproducir, pausar o ir a pantalla completa',
+          enabled: true,
+          child: AspectRatio(
+            aspectRatio: _videoPlayerController!.value.aspectRatio,
+            child: Stack(
+              children: [
+                Chewie(controller: _chewieController!),
+                if (widget.showComments)
+                  Positioned.fill(
+                    child: AbsorbPointer(
+                      absorbing: true,
+                      child: Container(color: Colors.transparent),
+                    ),
                   ),
-                ),
-            ],
+              ],
+            ),
           ),
         ),
       ),
     );
   }
+
 }
 
 

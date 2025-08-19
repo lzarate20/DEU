@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+
 import '../services/user_service.dart';
 
 class ProfileEditPage extends StatefulWidget {
@@ -63,7 +64,9 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
       final success = await userService.updateUser(
         name: _editMode ? _nameController.text : null,
         email: _editMode ? _emailController.text : null,
-        currentPassword: _changePassword ? _currentPasswordController.text : null,
+        currentPassword: _changePassword
+            ? _currentPasswordController.text
+            : null,
         newPassword: _changePassword ? _newPasswordController.text : null,
       );
 
@@ -168,7 +171,13 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Perfil'),
+        title: Semantics(
+          header: true,
+          child: Text(
+            'Perfil',
+            style: Theme.of(context).textTheme.headlineMedium,
+          ),
+        ),
         actions: [
           IconButton(
             icon: const Icon(Icons.edit),
@@ -195,72 +204,66 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
       body: _loading
           ? const Center(child: CircularProgressIndicator())
           : Padding(
-        padding: const EdgeInsets.all(16),
-        child: ListView(
-          children: [
-            Form(
-              key: _formKey,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+              padding: const EdgeInsets.all(16),
+              child: ListView(
                 children: [
-                  _buildCompactField(
-                    label: 'Nombre y apellido',
-                    controller: _nameController,
-                    editable: _editMode,
-                  ),
-                  _buildCompactField(
-                    label: 'Email',
-                    controller: _emailController,
-                    keyboardType: TextInputType.emailAddress,
-                    editable: _editMode,
-                  ),
-                  _buildCompactField(
-                    label: 'Tipo de usuario',
-                    controller: _userTypeController,
-                    editable: false,
-                  ),
-                  if (_changePassword) ...[
-                    const Divider(),
-                    _passwordFields(),
-                  ],
-                  if (showActions) ...[
-                    const SizedBox(height: 20),
-                    Row(
+                  Form(
+                    key: _formKey,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        ConstrainedBox(
-                          constraints:
-                          const BoxConstraints(maxWidth: 150),
-                          child: ElevatedButton(
-                            onPressed: _saveProfile,
-                            child: const Text('Confirmar'),
-                          ),
+                        _buildCompactField(
+                          label: 'Nombre y apellido',
+                          controller: _nameController,
+                          editable: _editMode,
                         ),
-                        const SizedBox(width: 12),
-                        ConstrainedBox(
-                          constraints:
-                          const BoxConstraints(maxWidth: 150),
-                          child: OutlinedButton(
-                            onPressed: _cancelChanges,
-                            child: const Text('Cancelar'),
-                          ),
+                        _buildCompactField(
+                          label: 'Email',
+                          controller: _emailController,
+                          keyboardType: TextInputType.emailAddress,
+                          editable: _editMode,
                         ),
+                        _buildCompactField(
+                          label: 'Tipo de usuario',
+                          controller: _userTypeController,
+                          editable: false,
+                        ),
+                        if (_changePassword) ...[
+                          const Divider(),
+                          _passwordFields(),
+                        ],
+                        if (showActions) ...[
+                          const SizedBox(height: 20),
+                          Row(
+                            children: [
+                              ConstrainedBox(
+                                constraints: const BoxConstraints(
+                                  maxWidth: 150,
+                                ),
+                                child: ElevatedButton(
+                                  onPressed: _saveProfile,
+                                  child: const Text('Confirmar'),
+                                ),
+                              ),
+                              const SizedBox(width: 12),
+                              ConstrainedBox(
+                                constraints: const BoxConstraints(
+                                  maxWidth: 150,
+                                ),
+                                child: OutlinedButton(
+                                  onPressed: _cancelChanges,
+                                  child: const Text('Cancelar'),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
                       ],
                     ),
-                  ]
+                  ),
                 ],
               ),
             ),
-          ],
-        ),
-      ),
     );
   }
 }
-
-
-
-
-
-
-
-

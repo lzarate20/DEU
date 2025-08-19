@@ -194,7 +194,7 @@ class _AssignTrainingPageState extends State<AssignTrainingPage> {
 
 
     return Scaffold(
-      appBar: AppBar(title: Text('Asignar Entrenamiento')),
+      appBar: AppBar(title: Semantics( header: true, child: Text( 'Asignar entrenamiento', style: Theme.of(context).textTheme.headlineMedium, ), )),
       body: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(

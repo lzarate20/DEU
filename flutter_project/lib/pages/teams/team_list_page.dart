@@ -124,7 +124,7 @@ class _TeamListPageState extends State<TeamListPage> with RouteAware {
             context: context,
             builder: (BuildContext context) {
               return AlertDialog(
-                title: const Text('Crear nuevo equipo'),
+                title: Semantics( header: true, child: Text( 'Crear nuevo equipo', style: Theme.of(context).textTheme.headlineMedium, ), ),
                 content: TextField(
                   controller: _controller,
                   decoration: const InputDecoration(

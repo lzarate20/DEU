@@ -52,7 +52,7 @@ class _RegisterPageState extends State<RegisterPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text("Registro")),
+      appBar: AppBar(title: Semantics( header: true, child: Text( 'Registro', style: Theme.of(context).textTheme.headlineMedium, ), )),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Form(

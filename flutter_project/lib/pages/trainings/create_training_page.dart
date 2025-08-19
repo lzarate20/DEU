@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:go_router/go_router.dart';
+
 import '../../services/training_service.dart';
 import '../../widgets/forms/exercise_form.dart';
 import '../../widgets/forms/exercise_list_form.dart';
@@ -71,9 +72,13 @@ class _CreateTrainingPageState extends State<CreateTrainingPage> {
       }
     }
 
-    if (!allValid || !_formKey.currentState!.validate() || _selectedDate == null) {
+    if (!allValid ||
+        !_formKey.currentState!.validate() ||
+        _selectedDate == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Revisá los campos del entrenamiento y los ejercicios')),
+        const SnackBar(
+          content: Text('Revisá los campos del entrenamiento y los ejercicios'),
+        ),
       );
       return;
     }
@@ -88,9 +93,9 @@ class _CreateTrainingPageState extends State<CreateTrainingPage> {
     final userIdStr = await _secureStorage.read(key: 'user_id');
     final userId = int.tryParse(userIdStr ?? '');
     if (userId == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('ID de usuario inválido')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('ID de usuario inválido')));
       return;
     }
 
@@ -105,9 +110,9 @@ class _CreateTrainingPageState extends State<CreateTrainingPage> {
 
     final success = await TrainingService().createTraining(training);
     if (success) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Entrenamiento creado')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('Entrenamiento creado')));
       context.go('/trainings');
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -119,7 +124,15 @@ class _CreateTrainingPageState extends State<CreateTrainingPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text("Nuevo Entrenamiento")),
+      appBar: AppBar(
+        title: Semantics(
+          header: true,
+          child: Text(
+            'Nuevo entrenamiento',
+            style: Theme.of(context).textTheme.headlineMedium,
+          ),
+        ),
+      ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: ListView(
@@ -131,9 +144,10 @@ class _CreateTrainingPageState extends State<CreateTrainingPage> {
               selectedDate: _selectedDate,
               onPickDate: _pickDate,
               trainingType: _trainingType,
-              onTrainingTypeChanged: (val) => setState(() => _trainingType = val),
+              onTrainingTypeChanged: (val) =>
+                  setState(() => _trainingType = val),
               trainingTypes: _trainingTypes,
-              trainingTypeLabels: trainingTypeLabels,  // nuevo parámetro
+              trainingTypeLabels: trainingTypeLabels, // nuevo parámetro
             ),
             const SizedBox(height: 24),
             ExerciseListForm(
@@ -158,9 +172,3 @@ class _CreateTrainingPageState extends State<CreateTrainingPage> {
     );
   }
 }
-
-
-
-
-
-

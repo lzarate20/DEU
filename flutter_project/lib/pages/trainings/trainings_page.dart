@@ -130,7 +130,7 @@ class _TrainingPageState extends State<TrainingListPage> with RouteAware {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Entrenamientos'),
+        title: Semantics( header: true, child: Text( 'Entrenamientos', style: Theme.of(context).textTheme.headlineMedium, ), ),
       ),
       body: Column(
         children: [
