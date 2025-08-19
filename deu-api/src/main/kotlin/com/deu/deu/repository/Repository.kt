@@ -5,7 +5,7 @@ import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor
 import org.springframework.data.jpa.repository.Query
 import org.springframework.data.repository.CrudRepository
-import java.time.LocalDate
+
 
 
 interface UserRepository : CrudRepository<User, Int> {
@@ -26,3 +26,8 @@ interface ConfigRepository : CrudRepository<Config, Int> {
 
 interface TeamRepository : CrudRepository<Team, Int>
 interface NotificationRepository : CrudRepository<Notification, Int>
+interface EvaluationRepository : CrudRepository<Evaluation, Int>{
+    fun findByTrainingIdAndTargetUserId(trainingId: Int, targetUserId: Int): Evaluation?
+    fun findAllByTrainingIdAndTargetUserId(trainingId: Int, targetUserId: Int): List<Evaluation>?
+    fun findByTrainingIdAndEvaluatorAndTargetUserId(trainingId: Int, evaluator: User, targetUserId: Int): Evaluation?
+}

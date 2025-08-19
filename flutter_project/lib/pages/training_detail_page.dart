@@ -1,13 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+
 import '../services/training_service.dart';
 import '../widgets/exercise/comment_panel.dart';
-import 'package:flutter/material.dart';
 import '../widgets/exercise/comment_toggle.dart';
 import '../widgets/exercise/exercise_list.dart';
 import '../widgets/exercise/training_actions.dart';
 import '../widgets/exercise/video_player.dart';
-import '../services/training_service.dart';
 
 class TrainingDetailPage extends StatefulWidget {
   final String trainingId;
@@ -50,7 +49,9 @@ class _TrainingDetailPageState extends State<TrainingDetailPage> {
 
   Future<void> _fetchTraining() async {
     try {
-      final fetched = await TrainingService().fetchTrainingById(widget.trainingId);
+      final fetched = await TrainingService().fetchTrainingById(
+        widget.trainingId,
+      );
       if (mounted) {
         setState(() {
           if (fetched != null) {
@@ -66,9 +67,9 @@ class _TrainingDetailPageState extends State<TrainingDetailPage> {
           _loading = false;
         });
       }
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error al cargar: $e')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Error al cargar: $e')));
     }
   }
 
@@ -95,9 +96,7 @@ class _TrainingDetailPageState extends State<TrainingDetailPage> {
   @override
   Widget build(BuildContext context) {
     if (_loading) {
-      return const Scaffold(
-        body: Center(child: CircularProgressIndicator()),
-      );
+      return const Scaffold(body: Center(child: CircularProgressIndicator()));
     }
 
     if (training == null) {
@@ -110,20 +109,27 @@ class _TrainingDetailPageState extends State<TrainingDetailPage> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(training!['name'] ?? 'Detalle'),
+        title: Semantics(
+          header: true,
+          label: training!['name'] ?? 'Detalle del entrenamiento',
+          child: Text(training!['name'] ?? 'Detalle',style: const TextStyle(
+            fontWeight: FontWeight.bold,
+          )),
+        ),
         actions: [
-          TrainingActions(
-            training: training!,
-            onCopied: () {},
-            onAssign: () {
-              context.go(
-                '/assign-training/${training?['id']}',
-                extra: training,
-              );
-            },
-            onDeleted: () {
-              context.go('/trainings');
-            },
+          Semantics(
+            button: true,
+            label: 'Opciones del entrenamiento',
+            child: TrainingActions(
+              training: training!,
+              onCopied: () {},
+              onAssign: () {
+                context.go('/assign-training/${training?['id']}', extra: training);
+              },
+              onDeleted: () {
+                context.go('/trainings');
+              },
+            ),
           ),
         ],
       ),
@@ -136,25 +142,37 @@ class _TrainingDetailPageState extends State<TrainingDetailPage> {
                   children: [
                     Expanded(
                       flex: 1,
-                      child: ExerciseList(
-                        exercises: exercises,
-                        selectedIndex: _selectedIndex,
-                        onSelect: _onExerciseSelected,
+                      child: Semantics(
+                        container: true,
+                        label: 'Lista de ejercicios',
+                        child: ExerciseList(
+                          exercises: exercises,
+                          selectedIndex: _selectedIndex,
+                          onSelect: _onExerciseSelected,
+                        ),
                       ),
                     ),
                     Expanded(
                       flex: 3,
-                      child: VideoPlayerArea(
-                        videoUrl: videoUrl,
-                        showComments: _showComments,
+                      child: Semantics(
+                        container: true,
+                        label: 'Reproductor de video',
+                        child: VideoPlayerArea(
+                          videoUrl: videoUrl,
+                          showComments: _showComments,
+                        ),
                       ),
                     ),
                   ],
                 ),
               ),
-              CommentToggleBar(
-                showComments: _showComments,
-                onTap: _toggleComments,
+              Semantics(
+                button: true,
+                label: _showComments ? 'Cerrar comentarios' : 'Abrir comentarios',
+                child: CommentToggleBar(
+                  showComments: _showComments,
+                  onTap: _toggleComments,
+                ),
               ),
             ],
           ),
@@ -164,27 +182,32 @@ class _TrainingDetailPageState extends State<TrainingDetailPage> {
               dismissible: true,
               onDismiss: _closeComments,
             ),
-            CommentsPanel(
-              initialComments: comments,
-              onClose: _closeComments,
-              onSendComment: (text) async {
-                final updated = await TrainingService().addCommentToTraining(
-                  idTeam: training!['id'],
-                  comment: text,
-                );
+            Semantics(
+              container: true,
+              label: 'Panel de comentarios',
+              child: CommentsPanel(
+                initialComments: comments,
+                onClose: _closeComments,
+                onSendComment: (text) async {
+                  final updated = await TrainingService().addCommentToTraining(
+                    idTeam: training!['id'],
+                    comment: text,
+                  );
 
-                if (updated != null) {
-                  setState(() {
-                    _initWithData(updated);
-                  });
-                }
+                  if (updated != null) {
+                    setState(() {
+                      _initWithData(updated);
+                    });
+                  }
 
-                return updated;
-              },
+                  return updated;
+                },
+              ),
             ),
           ],
         ],
       ),
     );
+
   }
 }

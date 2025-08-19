@@ -1,6 +1,8 @@
+// TrainingActions.dart
 import 'package:flutter/material.dart';
 import 'package:flutter_project/services/training_service.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import '../../pages/trainings/rate_trainees_dialog.dart';
 
 class TrainingActions extends StatefulWidget {
   final Map<String, dynamic> training;
@@ -74,12 +76,20 @@ class _TrainingActionsState extends State<TrainingActions> {
 
   Future<void> _deleteTraining() async {
     await TrainingService().removeTraining(widget.training["id"].toString());
-
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(content: Text('Entrenamiento eliminado')),
     );
-
     widget.onDeleted?.call();
+  }
+
+  void _rateStudents() async {
+    await showDialog(
+      context: context,
+      builder: (_) => RateStudentsDialog(
+        trainingId: int.tryParse(widget.training['id'].toString()) ?? 0,
+        trainees:  List<int>.from(widget.training['trainees']),
+      ),
+    );
   }
 
   @override
@@ -87,15 +97,21 @@ class _TrainingActionsState extends State<TrainingActions> {
     return Row(
       children: [
         if (_isOwner) ...[
-        IconButton(
-          icon: const Icon(Icons.list_alt),
-          onPressed: _assignTraining,
-          tooltip: 'Asignar entrenamiento',
-        ),        ],
+          IconButton(
+            icon: const Icon(Icons.list_alt),
+            onPressed: _assignTraining,
+            tooltip: 'Asignar entrenamiento',
+          ),
+        ],
         IconButton(
           icon: const Icon(Icons.copy),
           onPressed: _copyTraining,
           tooltip: 'Copiar entrenamiento',
+        ),
+        IconButton(
+          icon: const Icon(Icons.star),
+          onPressed: _rateStudents,
+          tooltip: 'Puntuar alumnos',
         ),
         if (_isOwner) ...[
           IconButton(
@@ -108,3 +124,4 @@ class _TrainingActionsState extends State<TrainingActions> {
     );
   }
 }
+

@@ -134,3 +134,9 @@ data class CommentDTO(
 data class UserListRequest(
     val users: List<Int>,
 )
+
+data class EvaluationDTO(
+    val userId:Int,
+    val trainingId:Int,
+    val score:Double
+)

@@ -128,3 +128,17 @@ data class NotificationContext(
     val type: String,
     val contextId: String,
 )
+
+@Entity
+data class Evaluation(
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    val id: Int = 0,
+    @ManyToOne
+    val evaluator: User,
+    @ManyToOne
+    val targetUser: User? = null,
+    @ManyToOne
+    val training: Training? = null,
+    val score: Double,
+    val date: LocalDateTime = LocalDateTime.now()
+)

@@ -78,3 +78,19 @@ fun Comment.toCommentDTO(): CommentDTO{
         comment = this.comment,
     )
 }
+
+fun Evaluation.toEvaluationDTO(): EvaluationDTO {
+    return EvaluationDTO(
+        userId = this.evaluator.id,
+        trainingId = this.training?.id ?: 0,
+        score = this.score,
+    )
+}
+
+fun Evaluation.toEvaluationTrainer(): EvaluationDTO {
+    return EvaluationDTO(
+        userId = this.targetUser?.id ?: 0,
+        trainingId = this.training?.id ?: 0,
+        score = this.score,
+    )
+}

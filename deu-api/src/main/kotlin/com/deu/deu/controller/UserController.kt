@@ -72,8 +72,8 @@ class UserController(val userService: UserService) {
     }
 
     @GetMapping("/user/notifications")
-    fun getNotifications(@AuthenticationPrincipal userDetails: UserDetails):List<Notification>{
-        return userService.getNotifications(userDetails.username)
+    fun getNotifications(@AuthenticationPrincipal userDetails: JwtUserDetails):List<Notification>{
+        return userService.getNotifications(userDetails.id)
     }
 
     @PostMapping("/user/notifications/viewed")

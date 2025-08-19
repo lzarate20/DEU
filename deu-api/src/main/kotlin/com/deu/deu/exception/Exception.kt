@@ -1,5 +1,8 @@
 package com.deu.deu.exception
 
+import org.springframework.http.HttpStatus
+import org.springframework.web.bind.annotation.ResponseStatus
+
 class UserNotFoundException(
     email: String? = null
 ) : Exception("No se encontro el usuario $email")
@@ -22,6 +25,11 @@ class InvalidUserIdException(
     msg: String? = null
 ) : Exception(msg)
 
-class BadRequestException(
-    msg: String? = null
-) : Exception(msg)
+@ResponseStatus(HttpStatus.BAD_REQUEST)
+class InvalidTrainingDateException(message: String) : BadRequest(message)
+
+@ResponseStatus(HttpStatus.BAD_REQUEST)
+class InvalidEvaluationScore(message: String) : BadRequest(message)
+
+@ResponseStatus(HttpStatus.BAD_REQUEST)
+open class BadRequest(message: String) : RuntimeException(message)
