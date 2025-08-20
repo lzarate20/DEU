@@ -8,6 +8,8 @@ class TrainerCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
     return Card(
       elevation: 3,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
@@ -16,17 +18,29 @@ class TrainerCard extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text("Entrenador", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20)),
+            Text(
+              "Entrenador",
+              style: theme.textTheme.titleMedium,
+            ),
             const Divider(thickness: 2, height: 20),
             if (trainer != null)
               ListTile(
                 leading: const Icon(Icons.sports),
-                title: Text(trainer['name'] ?? 'Desconocido'),
-                subtitle: Text(trainer['email'] ?? ''),
+                title: Text(
+                  trainer['name'] ?? 'Desconocido',
+                  style: theme.textTheme.bodyLarge,
+                ),
+                subtitle: Text(
+                  trainer['email'] ?? '',
+                  style: theme.textTheme.bodyMedium,
+                ),
               )
             else
-              const Text("No se encontró entrenador asignado."),
-            Expanded(child: Container()),
+              Text(
+                "No se encontró entrenador asignado.",
+                style: theme.textTheme.bodyMedium,
+              ),
+            const SizedBox(height: 8),
           ],
         ),
       ),

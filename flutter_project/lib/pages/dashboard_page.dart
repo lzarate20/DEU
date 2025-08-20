@@ -35,6 +35,9 @@ class _DashboardPageState extends State<DashboardPage> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context).textTheme;
+    final color = context.watch<ThemeProvider>().textColor;
+
     return Scaffold(
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
@@ -43,11 +46,12 @@ class _DashboardPageState extends State<DashboardPage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              /// --- Sección Entrenamientos ---
               Semantics(
                 header: true,
-                child: const Text(
+                child: Text(
                   'Mis Entrenamientos',
-                  style: TextStyle(fontWeight: FontWeight.bold),
+                  style: theme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
                 ),
               ),
               const Divider(thickness: 2),
@@ -56,9 +60,9 @@ class _DashboardPageState extends State<DashboardPage> {
               Semantics(
                 container: true,
                 label: 'Sección de entrenamientos',
-                child: SizedBox(
+                child: const SizedBox(
                   height: 560,
-                  child: const TrainingPage(),
+                  child: TrainingPage(),
                 ),
               ),
 
@@ -66,9 +70,9 @@ class _DashboardPageState extends State<DashboardPage> {
 
               Semantics(
                 header: true,
-                child: const Text(
+                child: Text(
                   'Mis Equipos',
-                  style: TextStyle(fontWeight: FontWeight.bold),
+                  style: theme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
                 ),
               ),
               const Divider(thickness: 2),
@@ -81,7 +85,10 @@ class _DashboardPageState extends State<DashboardPage> {
               else if (_teams.isEmpty)
                 Semantics(
                   label: 'No estás en ningún equipo',
-                  child: const Text('No estás en ningún equipo.'),
+                  child: Text(
+                    'No estás en ningún equipo.',
+                    style: theme.bodyMedium,
+                  ),
                 )
               else
                 AccessibleList(
@@ -93,9 +100,14 @@ class _DashboardPageState extends State<DashboardPage> {
                       children: [
                         Text(
                           team['name'] ?? 'Equipo',
-                          style:  TextStyle(fontWeight: FontWeight.bold, color:  context.watch<ThemeProvider>().textColor),
+                          style: theme.bodySmall?.copyWith(
+                            color: color
+                          ),
                         ),
-                        Text('${users.length} miembros', style: TextStyle(color:  context.watch<ThemeProvider>().textColor)),
+                        Text(
+                          '${users.length} miembros',
+                          style: theme.bodyMedium?.copyWith(color: color),
+                        ),
                       ],
                     );
                   }).toList(),
@@ -104,7 +116,7 @@ class _DashboardPageState extends State<DashboardPage> {
                       context.go('/team/${team['id']}', extra: team);
                     };
                   }).toList(),
-                )
+                ),
             ],
           ),
         ),
@@ -112,6 +124,7 @@ class _DashboardPageState extends State<DashboardPage> {
     );
   }
 }
+
 
 
 

@@ -31,9 +31,17 @@ class TeamDetailPage extends StatelessWidget {
           final _team = controller.team;
           if (_team == null) {
             return Scaffold(
-              appBar: AppBar(title: const Text("Equipo no encontrado")),
-              body: const Center(
-                child: Text("No se encontró la información del equipo."),
+              appBar: AppBar(
+                title: Text(
+                  "Equipo no encontrado",
+                  style: Theme.of(context).textTheme.titleLarge,
+                ),
+              ),
+              body: Center(
+                child: Text(
+                  "No se encontró la información del equipo.",
+                  style: Theme.of(context).textTheme.bodyMedium,
+                ),
               ),
             );
           }
@@ -43,7 +51,8 @@ class TeamDetailPage extends StatelessWidget {
                 (user) => user['type'] == 'TRAINER',
             orElse: () => null,
           );
-          final players = users.where((u) => u['type'] == 'TRAINEE').toList();
+          final players =
+          users.where((u) => u['type'] == 'TRAINEE').toList();
 
           return Scaffold(
             appBar: AppBar(
@@ -51,7 +60,7 @@ class TeamDetailPage extends StatelessWidget {
                 padding: const EdgeInsets.symmetric(vertical: 8),
                 child: Text(
                   _team['name'] ?? 'Equipo',
-                  style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 24),
+                  style: Theme.of(context).textTheme.headlineSmall, // antes displaySmall
                 ),
               ),
               toolbarHeight: 80,
@@ -61,7 +70,14 @@ class TeamDetailPage extends StatelessWidget {
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Expanded(flex: 2, child: TeamInfoSection(team: _team, players: players, controller: controller)),
+                  Expanded(
+                    flex: 2,
+                    child: TeamInfoSection(
+                      team: _team,
+                      players: players,
+                      controller: controller,
+                    ),
+                  ),
                   const SizedBox(width: 20),
                   Expanded(flex: 1, child: TrainerCard(trainer: trainer)),
                 ],
@@ -73,4 +89,5 @@ class TeamDetailPage extends StatelessWidget {
     );
   }
 }
+
 

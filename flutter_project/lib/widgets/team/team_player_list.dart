@@ -11,11 +11,21 @@ class PlayersList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
+    // Mapa para traducir posiciones
+    final Map<String, String> positionMap = {
+      'DEFENCE': 'Defensa',
+      'MIDFIELD': 'Mediocampo',
+      'FORWARD': 'Delantero',
+    };
+
     return FutureBuilder<String?>(
       future: const FlutterSecureStorage().read(key: 'user_id'),
       builder: (context, snapshot) {
         final currentUserId = snapshot.data;
-        final alreadyInTeam = currentUserId != null && players.any((p) => p['id'].toString() == currentUserId);
+        final alreadyInTeam =
+            currentUserId != null && players.any((p) => p['id'].toString() == currentUserId);
 
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -23,17 +33,20 @@ class PlayersList extends StatelessWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const Text("Jugadores", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20)),
+                Text(
+                  "Jugadores",
+                  style: theme.textTheme.titleMedium,
+                ),
                 FutureBuilder<bool?>(
                   future: AuthService.isTrainee(),
                   builder: (context, snapshot) {
                     if (snapshot.connectionState == ConnectionState.waiting) {
-                      return SizedBox.shrink();
+                      return const SizedBox.shrink();
                     }
                     final isTrainee = snapshot.data ?? false;
 
                     if (!isTrainee) {
-                      return SizedBox.shrink();
+                      return const SizedBox.shrink();
                     }
 
                     return IconButton(
@@ -47,7 +60,8 @@ class PlayersList extends StatelessWidget {
                       onPressed: alreadyInTeam
                           ? null
                           : () async {
-                        final success = await controller.addCurrentUserToTeam(currentUserId!);
+                        final success =
+                        await controller.addCurrentUserToTeam(currentUserId!);
                         if (context.mounted) {
                           ScaffoldMessenger.of(context).showSnackBar(
                             SnackBar(
@@ -74,12 +88,23 @@ class PlayersList extends StatelessWidget {
                   final player = players[index];
                   return ListTile(
                     leading: const Icon(Icons.person),
-                    title: Text(player['name'] ?? 'Jugador'),
-                    subtitle: Text(player['position'] ?? 'Sin posición'),
+                    title: Text(
+                      player['name'] ?? 'Jugador',
+                      style: theme.textTheme.bodyLarge,
+                    ),
+                    subtitle: Text(
+                      positionMap[player['position']] ?? 'Sin posición',
+                      style: theme.textTheme.bodyMedium,
+                    ),
                   );
                 },
               )
-                  : const Center(child: Text('No hay jugadores asignados.')),
+                  : Center(
+                child: Text(
+                  'No hay jugadores asignados.',
+                  style: theme.textTheme.bodyMedium,
+                ),
+              ),
             ),
           ],
         );
@@ -87,3 +112,4 @@ class PlayersList extends StatelessWidget {
     );
   }
 }
+

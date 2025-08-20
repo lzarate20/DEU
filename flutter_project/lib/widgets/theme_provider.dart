@@ -110,32 +110,41 @@ ThemeData buildTheme(
   );
 }
 
-TextTheme applyFontSizeFactor(TextTheme textTheme, double factor) {
+
+
+TextTheme applyFontSizeFactor(TextTheme base, double factor) {
   return TextTheme(
-    displayLarge: _scale(textTheme.displayLarge, factor),
-    displayMedium: _scale(textTheme.displayMedium, factor),
-    displaySmall: _scale(textTheme.displaySmall, factor),
-    headlineLarge: _scale(textTheme.headlineLarge, factor),
-    headlineMedium: _scale(textTheme.headlineMedium, factor),
-    headlineSmall: _scale(textTheme.headlineSmall, factor),
-    titleLarge: _scale(textTheme.titleLarge, factor),
-    titleMedium: _scale(textTheme.titleMedium, factor),
-    titleSmall: _scale(textTheme.titleSmall, factor),
-    bodyLarge: _scale(textTheme.bodyLarge, factor),
-    bodyMedium: _scale(textTheme.bodyMedium, factor),
-    bodySmall: _scale(textTheme.bodySmall, factor),
-    labelLarge: _scale(textTheme.labelLarge, factor),
-    labelMedium: _scale(textTheme.labelMedium, factor),
-    labelSmall: _scale(textTheme.labelSmall, factor),
+    // Títulos principales (grandes)
+    displayLarge: _scale(base.displayLarge, 32 * factor, FontWeight.bold),
+    displayMedium: _scale(base.displayMedium, 28 * factor, FontWeight.bold),
+    displaySmall: _scale(base.displaySmall, 24 * factor, FontWeight.bold),
+
+    // Encabezados / Secciones
+    headlineLarge: _scale(base.headlineLarge, 22 * factor, FontWeight.w600),
+    headlineMedium: _scale(base.headlineMedium, 20 * factor, FontWeight.w600),
+    headlineSmall: _scale(base.headlineSmall, 18 * factor, FontWeight.w600),
+
+    // Títulos dentro del contenido
+    titleLarge: _scale(base.titleLarge, 18 * factor, FontWeight.bold),
+    titleMedium: _scale(base.titleMedium, 16 * factor, FontWeight.w600),
+    titleSmall: _scale(base.titleSmall, 14 * factor, FontWeight.w600),
+
+    // Texto de cuerpo
+    bodyLarge: _scale(base.bodyLarge, 16 * factor, FontWeight.normal),
+    bodyMedium: _scale(base.bodyMedium, 14 * factor, FontWeight.normal),
+    bodySmall: _scale(base.bodySmall, 12 * factor, FontWeight.normal),
+
+    // Labels / botones
+    labelLarge: _scale(base.labelLarge, 14 * factor, FontWeight.w600),
+    labelMedium: _scale(base.labelMedium, 12 * factor, FontWeight.w500),
+    labelSmall: _scale(base.labelSmall, 11 * factor, FontWeight.w400),
   );
 }
 
-TextStyle? _scale(TextStyle? style, double factor) {
-  if (style == null) return null;
-
-  final fontSize = style.fontSize ?? 16.0;
-
-  return style.copyWith(fontSize: fontSize * factor);
+TextStyle? _scale(TextStyle? style, double size, FontWeight weight) {
+  return style?.copyWith(fontSize: size, fontWeight: weight) ??
+      TextStyle(fontSize: size, fontWeight: weight);
 }
+
 
 

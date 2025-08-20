@@ -26,6 +26,9 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
   bool _editMode = false;
   bool _changePassword = false;
 
+  late String _originalName;
+  late String _originalEmail;
+
   @override
   void initState() {
     super.initState();
@@ -41,7 +44,13 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
       if (userData != null) {
         _nameController.text = userData['name'] ?? '';
         _emailController.text = userData['email'] ?? '';
-        _userTypeController.text = userData['type'] ?? '';
+        _userTypeController.text = (userData['type'] ?? '').toLowerCase() == 'trainer'
+            ? 'Entrenador'
+            : 'Jugador';
+
+        // Guardamos valores originales
+        _originalName = _nameController.text;
+        _originalEmail = _emailController.text;
       }
     } finally {
       setState(() => _loading = false);
@@ -53,9 +62,7 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
 
     if (_changePassword &&
         _newPasswordController.text != _confirmPasswordController.text) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Las contraseñas no coinciden')),
-      );
+      _showSnackBar('Las contraseñas no coinciden');
       return;
     }
 
@@ -64,25 +71,21 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
       final success = await userService.updateUser(
         name: _editMode ? _nameController.text : null,
         email: _editMode ? _emailController.text : null,
-        currentPassword: _changePassword
-            ? _currentPasswordController.text
-            : null,
+        currentPassword: _changePassword ? _currentPasswordController.text : null,
         newPassword: _changePassword ? _newPasswordController.text : null,
       );
 
       if (success) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Perfil actualizado con éxito')),
-        );
+        _showSnackBar('Perfil actualizado con éxito');
         setState(() {
           _editMode = false;
           _changePassword = false;
+          // Actualizamos valores originales
+          _originalName = _nameController.text;
+          _originalEmail = _emailController.text;
         });
-        _loadUserData();
       } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Error al actualizar el perfil')),
-        );
+        _showSnackBar('Error al actualizar el perfil');
       }
     } finally {
       setState(() => _loading = false);
@@ -93,35 +96,79 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
     setState(() {
       _editMode = false;
       _changePassword = false;
+      _nameController.text = _originalName;
+      _emailController.text = _originalEmail;
     });
-    _loadUserData(); // vuelve a cargar datos originales
     _currentPasswordController.clear();
     _newPasswordController.clear();
     _confirmPasswordController.clear();
   }
 
-  Widget _buildCompactField({
+  void _showSnackBar(String msg) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(msg)),
+    );
+  }
+
+
+  Widget _buildTextField({
     required String label,
     required TextEditingController controller,
-    bool editable = true,
+    bool readOnly = false,
     TextInputType keyboardType = TextInputType.text,
     bool obscureText = false,
   }) {
+    if (readOnly) {
+      // Mostrar como campo no editable
+      return Padding(
+        padding: const EdgeInsets.symmetric(vertical: 10),
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 400),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                label,
+                style: Theme.of(context).textTheme.bodyMedium,
+              ),
+              const SizedBox(height: 4),
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 8),
+                decoration: BoxDecoration(
+                  border: Border(
+                    bottom: BorderSide(
+                      color: Theme.of(context).dividerColor,
+                      width: 1,
+                    ),
+                  ),
+                ),
+                child: Text(
+                  controller.text,
+                  style: Theme.of(context).textTheme.bodyLarge,
+                ),
+              ),
+            ],
+          ),
+        ),
+      );
+    }
+
+    // Campo editable normal
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8),
+      padding: const EdgeInsets.symmetric(vertical: 10),
       child: ConstrainedBox(
         constraints: const BoxConstraints(maxWidth: 400),
         child: TextFormField(
           controller: controller,
-          enabled: editable,
-          decoration: const InputDecoration(
-            border: UnderlineInputBorder(),
-            disabledBorder: UnderlineInputBorder(),
-          ).copyWith(labelText: label),
-          keyboardType: keyboardType,
           obscureText: obscureText,
+          keyboardType: keyboardType,
+          decoration: InputDecoration(
+            labelText: label,
+            labelStyle: Theme.of(context).textTheme.bodyMedium,
+            border: const UnderlineInputBorder(),
+          ),
           validator: (value) {
-            if (!editable) return null;
             if (value == null || value.isEmpty) {
               return 'Este campo es requerido';
             }
@@ -132,38 +179,63 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
     );
   }
 
-  Widget _passwordFields() {
+
+  Widget _buildPasswordSection() {
     return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _buildCompactField(
+        Text("Cambiar contraseña",
+            style: Theme.of(context)
+                .textTheme
+                .titleLarge
+                ?.copyWith(fontWeight: FontWeight.bold)),
+        const SizedBox(height: 8),
+        _buildTextField(
           label: 'Contraseña actual',
           controller: _currentPasswordController,
+          readOnly: false,
           obscureText: true,
         ),
-        _buildCompactField(
+        _buildTextField(
           label: 'Nueva contraseña',
           controller: _newPasswordController,
+          readOnly: false,
           obscureText: true,
         ),
-        _buildCompactField(
+        _buildTextField(
           label: 'Confirmar nueva contraseña',
           controller: _confirmPasswordController,
+          readOnly: false,
           obscureText: true,
         ),
       ],
     );
   }
 
-  @override
-  void dispose() {
-    _nameController.dispose();
-    _emailController.dispose();
-    _currentPasswordController.dispose();
-    _newPasswordController.dispose();
-    _confirmPasswordController.dispose();
-    _userTypeController.dispose();
-    super.dispose();
+  Widget _buildActionButtons() {
+    return Row(
+      children: [
+        ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 150),
+          child: ElevatedButton.icon(
+            onPressed: _saveProfile,
+            icon: const Icon(Icons.check),
+            label: const Text('Confirmar'),
+          ),
+        ),
+        const SizedBox(width: 12),
+        ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 150),
+          child: OutlinedButton.icon(
+            onPressed: _cancelChanges,
+            icon: const Icon(Icons.close),
+            label: const Text('Cancelar'),
+          ),
+        ),
+      ],
+    );
   }
+
 
   @override
   Widget build(BuildContext context) {
@@ -180,10 +252,16 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
         ),
         actions: [
           IconButton(
-            icon: const Icon(Icons.edit),
-            tooltip: 'Editar perfil',
+            icon: Icon(_editMode ? Icons.close : Icons.edit),
+            tooltip: _editMode ? 'Cancelar edición' : 'Editar perfil',
             onPressed: () {
-              setState(() => _editMode = true);
+              setState(() {
+                if (_editMode) {
+                  _cancelChanges();
+                } else {
+                  _editMode = true;
+                }
+              });
             },
           ),
           IconButton(
@@ -192,7 +270,6 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
             onPressed: () {
               setState(() => _changePassword = !_changePassword);
               if (!_changePassword) {
-                // si cierra la sección, limpiar campos
                 _currentPasswordController.clear();
                 _newPasswordController.clear();
                 _confirmPasswordController.clear();
@@ -204,66 +281,63 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
       body: _loading
           ? const Center(child: CircularProgressIndicator())
           : Padding(
-              padding: const EdgeInsets.all(16),
-              child: ListView(
+        padding: const EdgeInsets.all(16),
+        child: ListView(
+          children: [
+            Form(
+              key: _formKey,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Form(
-                    key: _formKey,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        _buildCompactField(
-                          label: 'Nombre y apellido',
-                          controller: _nameController,
-                          editable: _editMode,
-                        ),
-                        _buildCompactField(
-                          label: 'Email',
-                          controller: _emailController,
-                          keyboardType: TextInputType.emailAddress,
-                          editable: _editMode,
-                        ),
-                        _buildCompactField(
-                          label: 'Tipo de usuario',
-                          controller: _userTypeController,
-                          editable: false,
-                        ),
-                        if (_changePassword) ...[
-                          const Divider(),
-                          _passwordFields(),
-                        ],
-                        if (showActions) ...[
-                          const SizedBox(height: 20),
-                          Row(
-                            children: [
-                              ConstrainedBox(
-                                constraints: const BoxConstraints(
-                                  maxWidth: 150,
-                                ),
-                                child: ElevatedButton(
-                                  onPressed: _saveProfile,
-                                  child: const Text('Confirmar'),
-                                ),
-                              ),
-                              const SizedBox(width: 12),
-                              ConstrainedBox(
-                                constraints: const BoxConstraints(
-                                  maxWidth: 150,
-                                ),
-                                child: OutlinedButton(
-                                  onPressed: _cancelChanges,
-                                  child: const Text('Cancelar'),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ],
-                      ],
-                    ),
+                  Text("Información de perfil",
+                      style: Theme.of(context)
+                          .textTheme
+                          .titleLarge
+                          ?.copyWith(fontWeight: FontWeight.bold)),
+                  const SizedBox(height: 8),
+                  _buildTextField(
+                    label: 'Nombre y apellido',
+                    controller: _nameController,
+                    readOnly: !_editMode,
                   ),
+                  _buildTextField(
+                    label: 'Email',
+                    controller: _emailController,
+                    readOnly: !_editMode,
+                    keyboardType: TextInputType.emailAddress,
+                  ),
+                  _buildTextField(
+                    label: 'Tipo de usuario',
+                    controller: _userTypeController,
+                    readOnly: true,
+                  ),
+                  if (_changePassword) ...[
+                    const Divider(height: 32),
+                    _buildPasswordSection(),
+                  ],
+                  if (showActions) ...[
+                    const SizedBox(height: 20),
+                    _buildActionButtons(),
+                  ],
                 ],
               ),
             ),
+          ],
+        ),
+      ),
     );
   }
+
+  @override
+  void dispose() {
+    _nameController.dispose();
+    _emailController.dispose();
+    _currentPasswordController.dispose();
+    _newPasswordController.dispose();
+    _confirmPasswordController.dispose();
+    _userTypeController.dispose();
+    super.dispose();
+  }
 }
+
+

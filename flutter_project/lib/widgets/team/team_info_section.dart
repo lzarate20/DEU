@@ -19,23 +19,28 @@ class TeamInfoSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
-          "Descripción del equipo",
-          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
-        ),
-        const SizedBox(height: 8),
         Text(
-          team['description'] ?? 'Este es un gran equipo comprometido con el entrenamiento y la mejora continua.',
-          style: const TextStyle(fontSize: 16),
+          "Descripción del equipo",
+          style: theme.textTheme.titleSmall
         ),
-        const SizedBox(height: 24),
+        const SizedBox(height: 10),
+        Text(
+          team['description'] ??
+              'Este es un gran equipo comprometido con el entrenamiento y la mejora continua.',
+          style: theme.textTheme.bodyMedium
+        ),
+        const SizedBox(height: 20),
         Expanded(
           child: Card(
             elevation: 3,
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(8),
+            ),
             child: Padding(
               padding: const EdgeInsets.all(12.0),
               child: PlayersList(players: players, controller: controller),
