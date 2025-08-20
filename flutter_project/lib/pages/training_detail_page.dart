@@ -1,12 +1,13 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
+import 'package:provider/provider.dart';
 
 import '../services/training_service.dart';
-import '../widgets/exercise/comment_panel.dart';
 import '../widgets/exercise/comment_toggle.dart';
-import '../widgets/exercise/exercise_list.dart';
-import '../widgets/exercise/training_actions.dart';
-import '../widgets/exercise/video_player.dart';
+import '../widgets/training/comments_overlay.dart';
+import '../widgets/training/training_content.dart';
+import '../widgets/training/training_detail_appbar.dart';
+import '../widgets/training/training_detail_controller.dart';
 
 class TrainingDetailPage extends StatefulWidget {
   final String trainingId;
@@ -23,191 +24,86 @@ class TrainingDetailPage extends StatefulWidget {
 }
 
 class _TrainingDetailPageState extends State<TrainingDetailPage> {
-  Map<String, dynamic>? training;
-  List<dynamic> exercises = [];
   int _selectedIndex = 0;
   bool _showComments = false;
   String videoUrl = '';
-  bool _loading = true;
 
   @override
   void initState() {
     super.initState();
-    if (widget.training != null) {
-      _initWithData(widget.training!);
-    } else {
-      _fetchTraining();
-    }
-  }
-
-  void _initWithData(Map<String, dynamic> data) {
-    training = data;
-    exercises = data['exercises'] ?? [];
-    videoUrl = exercises.isNotEmpty ? exercises[0]['url'] ?? '' : '';
-    _loading = false;
-  }
-
-  Future<void> _fetchTraining() async {
-    try {
-      final fetched = await TrainingService().fetchTrainingById(
-        widget.trainingId,
-      );
-      if (mounted) {
-        setState(() {
-          if (fetched != null) {
-            _initWithData(fetched);
-          } else {
-            _loading = false;
-          }
-        });
-      }
-    } catch (e) {
-      if (mounted) {
-        setState(() {
-          _loading = false;
-        });
-      }
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text('Error al cargar: $e')));
-    }
-  }
-
-  void _onExerciseSelected(int index) {
-    setState(() {
-      videoUrl = exercises[index]['url'] ?? '';
-      _selectedIndex = index;
-      _showComments = false;
-    });
-  }
-
-  void _toggleComments() {
-    setState(() {
-      _showComments = !_showComments;
-    });
-  }
-
-  void _closeComments() {
-    setState(() {
-      _showComments = false;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      context
+          .read<TrainingDetailController>()
+          .loadTraining(widget.trainingId, initial: widget.training);
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    if (_loading) {
+    final controller = context.watch<TrainingDetailController>();
+
+    if (controller.loading) {
       return const Scaffold(body: Center(child: CircularProgressIndicator()));
     }
 
-    if (training == null) {
-      return const Scaffold(
-        body: Center(child: Text('Entrenamiento no encontrado')),
-      );
+    if (controller.training == null) {
+      return const Scaffold(body: Center(child: Text('Entrenamiento no encontrado')));
     }
 
-    final comments = training!['comments'] ?? [];
+    final training = controller.training!;
+    final exercises = controller.exercises;
+
+    if (videoUrl.isEmpty && exercises.isNotEmpty) {
+      videoUrl = exercises[0]['url'] ?? '';
+    }
+
+    final comments = training['comments'] ?? [];
 
     return Scaffold(
-      appBar: AppBar(
-        title: Semantics(
-          header: true,
-          label: training!['name'] ?? 'Detalle del entrenamiento',
-          child: Text(training!['name'] ?? 'Detalle',style: const TextStyle(
-            fontWeight: FontWeight.bold,
-          )),
-        ),
-        actions: [
-          Semantics(
-            button: true,
-            label: 'Opciones del entrenamiento',
-            child: TrainingActions(
-              training: training!,
-              onCopied: () {},
-              onAssign: () {
-                context.go('/assign-training/${training?['id']}', extra: training);
-              },
-              onDeleted: () {
-                context.go('/trainings');
-              },
-            ),
-          ),
-        ],
-      ),
+      appBar: TrainingDetailAppBar(training: training),
       body: Stack(
         children: [
           Column(
             children: [
               Expanded(
-                child: Row(
-                  children: [
-                    Expanded(
-                      flex: 1,
-                      child: Semantics(
-                        container: true,
-                        label: 'Lista de ejercicios',
-                        child: ExerciseList(
-                          exercises: exercises,
-                          selectedIndex: _selectedIndex,
-                          onSelect: _onExerciseSelected,
-                        ),
-                      ),
-                    ),
-                    Expanded(
-                      flex: 3,
-                      child: Semantics(
-                        container: true,
-                        label: 'Reproductor de video',
-                        child: VideoPlayerArea(
-                          videoUrl: videoUrl,
-                          showComments: _showComments,
-                        ),
-                      ),
-                    ),
-                  ],
+                child: TrainingContent(
+                  exercises: exercises,
+                  selectedIndex: _selectedIndex,
+                  videoUrl: videoUrl,
+                  onExerciseSelected: (i) {
+                    setState(() {
+                      videoUrl = exercises[i]['url'] ?? '';
+                      _selectedIndex = i;
+                      _showComments = false;
+                    });
+                  },
                 ),
               ),
-              Semantics(
-                button: true,
-                label: _showComments ? 'Cerrar comentarios' : 'Abrir comentarios',
-                child: CommentToggleBar(
-                  showComments: _showComments,
-                  onTap: _toggleComments,
-                ),
+              CommentToggleBar(
+                showComments: _showComments,
+                onTap: () => setState(() => _showComments = !_showComments),
               ),
             ],
           ),
-          if (_showComments) ...[
-            ModalBarrier(
-              color: Colors.black54,
-              dismissible: true,
-              onDismiss: _closeComments,
+          if (_showComments)
+            CommentsOverlay(
+              comments: comments,
+              onClose: () => setState(() => _showComments = false),
+              onSendComment: (text) async {
+                final updated = await TrainingService().addCommentToTraining(
+                  idTeam: training['id'],
+                  comment: text,
+                );
+                if (updated != null) {
+                  controller.loadTraining(widget.trainingId, initial: updated);
+                }
+                return updated;
+              },
             ),
-            Semantics(
-              container: true,
-              label: 'Panel de comentarios',
-              child: CommentsPanel(
-                initialComments: comments,
-                onClose: _closeComments,
-                onSendComment: (text) async {
-                  final updated = await TrainingService().addCommentToTraining(
-                    idTeam: training!['id'],
-                    comment: text,
-                  );
-
-                  if (updated != null) {
-                    setState(() {
-                      _initWithData(updated);
-                    });
-                  }
-
-                  return updated;
-                },
-              ),
-            ),
-          ],
         ],
       ),
     );
-
   }
 }
+
+

@@ -1,5 +1,6 @@
 import 'package:flutter_project/pages/teams/team_list_page.dart';
 import 'package:go_router/go_router.dart';
+import 'package:provider/provider.dart';
 
 import '../pages/dashboard_page.dart';
 import '../pages/edit_profie_page.dart';
@@ -13,6 +14,8 @@ import '../pages/trainings/create_training_page.dart';
 import '../pages/trainings/trainings_page.dart';
 import '../widgets/base_layout.dart';
 import 'package:flutter/material.dart';
+
+import '../widgets/training/training_detail_controller.dart';
 
 class NoTransitionPage extends CustomTransitionPage {
   NoTransitionPage({required Widget child})
@@ -60,12 +63,17 @@ final GoRouter router = GoRouter(
         GoRoute(
           path: '/training/:id',
           pageBuilder: (context, state) {
-            final id = state.pathParameters['id']!;
+            final trainingId = state.pathParameters['id']!;
             final training = state.extra as Map<String, dynamic>?;
-            return NoTransitionPage(
-              child: TrainingDetailPage(
-                trainingId: id,
-                training: training,
+
+            return MaterialPage(
+              child: ChangeNotifierProvider(
+                create: (_) {
+                  final controller = TrainingDetailController();
+                  controller.loadTraining(trainingId, initial: training);
+                  return controller;
+                },
+                child: TrainingDetailPage(trainingId: trainingId),
               ),
             );
           },
