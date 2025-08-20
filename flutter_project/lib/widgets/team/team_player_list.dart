@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_project/services/auth_service.dart';
 import 'package:flutter_project/widgets/team/team_detail_controller.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
@@ -23,20 +24,45 @@ class PlayersList extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 const Text("Jugadores", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20)),
-                IconButton(
-                  icon: Icon(Icons.person_add, color: alreadyInTeam ? Colors.grey : Colors.green),
-                  tooltip: alreadyInTeam ? 'Ya estás en el equipo' : 'Sumarse al equipo',
-                  onPressed: alreadyInTeam
-                      ? null
-                      : () async {
-                    final success = await controller.addCurrentUserToTeam(currentUserId!);
-                    if (context.mounted) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text(success ? 'Te sumaste al equipo!' : 'No se pudo sumar al equipo.')),
-                      );
+                FutureBuilder<bool?>(
+                  future: AuthService.isTrainee(),
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return SizedBox.shrink();
                     }
+                    final isTrainee = snapshot.data ?? false;
+
+                    if (!isTrainee) {
+                      return SizedBox.shrink();
+                    }
+
+                    return IconButton(
+                      icon: Icon(
+                        Icons.person_add,
+                        color: alreadyInTeam ? Colors.grey : Colors.green,
+                      ),
+                      tooltip: alreadyInTeam
+                          ? 'Ya estás en el equipo'
+                          : 'Sumarse al equipo',
+                      onPressed: alreadyInTeam
+                          ? null
+                          : () async {
+                        final success = await controller.addCurrentUserToTeam(currentUserId!);
+                        if (context.mounted) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text(
+                                success
+                                    ? 'Te sumaste al equipo!'
+                                    : 'No se pudo sumar al equipo.',
+                              ),
+                            ),
+                          );
+                        }
+                      },
+                    );
                   },
-                ),
+                )
               ],
             ),
             const Divider(thickness: 2, height: 20),

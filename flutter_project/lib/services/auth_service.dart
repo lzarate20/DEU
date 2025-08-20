@@ -21,9 +21,11 @@ class AuthService {
       final data = jsonDecode(response.body);
       final token = data['token'];
       final userId = data['user']['id'].toString();
+      final userType = data['user']['type'].toString();
 
       await _storage.write(key: 'jwt_token', value: token);
       await _storage.write(key: 'user_id', value: userId);
+      await _storage.write(key: 'user_type', value: userType);
 
       return true;
     } else {
@@ -50,8 +52,23 @@ class AuthService {
     return await _storage.read(key: 'jwt_token');
   }
 
+  static Future<String?> getLoggedUserId() async {
+    return await _storage.read(key: 'user_id');
+  }
+
+  static Future<bool?> isTrainer() async {
+    final userType = await _storage.read(key: 'user_type');
+    return userType == "TRAINER";
+  }
+
+  static Future<bool?> isTrainee() async {
+    final userType = await _storage.read(key: 'user_type');
+    return userType == "TRAINEE";
+  }
+
   static Future<void> logout() async {
     await _storage.delete(key: 'jwt_token');
     await _storage.delete(key: 'user_id');
+    await _storage.delete(key: 'user_type');
   }
 }
