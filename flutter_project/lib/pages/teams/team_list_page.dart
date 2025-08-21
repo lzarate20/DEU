@@ -7,7 +7,6 @@ import '../../services/team_service.dart';
 import '../../services/user_service.dart';
 import '../../widgets/search_filter.dart';
 
-
 class TeamListPage extends StatefulWidget {
   const TeamListPage({super.key});
 
@@ -78,7 +77,6 @@ class _TeamListPageState extends State<TeamListPage> with RouteAware {
       appBar: AppBar(title: const Text('Equipos')),
       body: Column(
         children: [
-          // Barra de búsqueda
           SearchFilters(
             controller: _searchController,
             onSearch: (value) {
@@ -98,7 +96,8 @@ class _TeamListPageState extends State<TeamListPage> with RouteAware {
               itemCount: filteredTeams.length,
               itemBuilder: (context, index) {
                 final team = filteredTeams[index];
-                final users = List<Map<String, dynamic>>.from(team['users'] ?? []);
+                final users =
+                List<Map<String, dynamic>>.from(team['users'] ?? []);
                 final coach = users.firstWhere(
                       (user) => user['type'] == 'TRAINER',
                   orElse: () => {'name': 'Desconocido'},
@@ -123,24 +122,32 @@ class _TeamListPageState extends State<TeamListPage> with RouteAware {
           final result = await showDialog<String>(
             context: context,
             builder: (BuildContext context) {
+              final theme = Theme.of(context);
               return AlertDialog(
-                title: Semantics( header: true, child: Text( 'Crear nuevo equipo', style: Theme.of(context).textTheme.headlineMedium, ), ),
+                title: Semantics(
+                  header: true,
+                  child: Text(
+                    'Crear nuevo equipo',
+                    style: theme.textTheme.headlineMedium,
+                  ),
+                ),
                 content: TextField(
                   controller: _controller,
-                  decoration: const InputDecoration(
+                  decoration: InputDecoration(
                     labelText: 'Nombre del equipo',
+                    labelStyle: theme.textTheme.bodyMedium,
                   ),
                 ),
                 actions: [
                   TextButton(
                     onPressed: () => Navigator.pop(context),
-                    child: const Text('Cancelar'),
+                    child: Text('Cancelar', style: theme.textTheme.bodyMedium),
                   ),
                   ElevatedButton(
                     onPressed: () {
                       Navigator.pop(context, _controller.text.trim());
                     },
-                    child: const Text('Guardar'),
+                    child: Text('Guardar', style: theme.textTheme.bodyMedium),
                   ),
                 ],
               );
@@ -158,4 +165,5 @@ class _TeamListPageState extends State<TeamListPage> with RouteAware {
     );
   }
 }
+
 

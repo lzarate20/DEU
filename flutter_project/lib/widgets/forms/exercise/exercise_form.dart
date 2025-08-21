@@ -38,7 +38,7 @@ class ExerciseFormState extends State<ExerciseForm> {
     'Recuperación',
   ];
 
-  final List<String> _types = ['REPETITION', 'DURATION'];
+  final List<String> _types = ['REPETITION', 'TIME'];
 
   final List<Map<String, String>> _unitOptions = [
     {'label': 'Segundos', 'value': 'SEC'},
@@ -51,50 +51,54 @@ class ExerciseFormState extends State<ExerciseForm> {
     if (_useExisting) {
       final id = int.tryParse(_existingIdCtrl.text);
       if (id != null) {
-        return {"id": id}; // Devuelve como ExerciseTrainingSaveDTO con solo ID
+        return {"id": id}; // ya está bien
       } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("Debés seleccionar un ejercicio existente.")),
+        );
         return null;
       }
     }
 
-    if (_formKey.currentState!.validate()) {
-      final exercise = {
-        "name": _nameCtrl.text,
-        "description": _descCtrl.text,
-        "type": _type,
-        "category": _categoryMap[_category],
-        "isVisible": true,
-        "count": _type == 'REPETITION'
-            ? int.tryParse(_countCtrl.text) ?? 1
-            : 1,
-      };
-
-      if (_type == 'DURATION') {
-        exercise["time"] = int.tryParse(_timeCtrl.text) ?? 0;
-        exercise["units"] = _units;
-      }
-
-      if (_urlCtrl.text.isNotEmpty) {
-        exercise["url"] = _urlCtrl.text;
-      }
-
-      return {
-        "exercise": exercise  // Devuelve como ExerciseTrainingSaveDTO con el campo "exercise"
-      };
+    if (!_formKey.currentState!.validate()) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Por favor completá todos los campos requeridos.")),
+      );
+      return null;
     }
 
-    return null;
+    final exercise = {
+      "name": _nameCtrl.text,
+      "description": _descCtrl.text,
+      "type": _type,
+      "category": _categoryMap[_category],
+      "isVisible": true,
+      "count": _type == 'REPETITION' ? int.tryParse(_countCtrl.text) ?? 1 : 1,
+    };
+
+    if (_type == 'TIME') {
+      exercise["time"] = int.tryParse(_timeCtrl.text) ?? 0;
+      exercise["units"] = _units;
+    }
+
+    if (_urlCtrl.text.isNotEmpty) {
+      exercise["url"] = _urlCtrl.text;
+    }
+
+    // devolvemos directo, sin anidarlo en "exercise"
+    return exercise;
   }
+
 
   void _openVideoSelectorModal() {
     showDialog(
       context: context,
-      builder: (_) => AlertDialog(
+      builder: (dialogContext) => AlertDialog(
         title: const Text("Seleccionar video"),
         content: const Text("Aquí se mostraría un listado de videos cargados"),
         actions: [
           TextButton(
-            onPressed: () => Navigator.pop(context),
+            onPressed: () => Navigator.of(dialogContext).pop(),
             child: const Text("Cerrar"),
           ),
         ],
@@ -109,45 +113,11 @@ class ExerciseFormState extends State<ExerciseForm> {
     );
   }
 
-  void _openExistingExerciseModal() async {
-
-    final selectedId = await showDialog<int>(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text("Elegí un ejercicio existente"),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            ListTile(
-              title: const Text("Push-ups (ID: 1)"),
-              onTap: () => Navigator.pop(context, 1),
-            ),
-            ListTile(
-              title: const Text("Squats (ID: 2)"),
-              onTap: () => Navigator.pop(context, 2),
-            ),
-            ListTile(
-              title: const Text("Sit-ups (ID: 3)"),
-              onTap: () => Navigator.pop(context, 3),
-            ),
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text("Cancelar"),
-          ),
-        ],
-      ),
-    );
-
-    if (selectedId != null) {
-      setState(() => _existingIdCtrl.text = selectedId.toString());
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final textTheme = theme.textTheme;
+
     return Card(
       margin: const EdgeInsets.symmetric(vertical: 10),
       child: Padding(
@@ -160,7 +130,10 @@ class ExerciseFormState extends State<ExerciseForm> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  const Text("Nuevo ejercicio", style: TextStyle(fontWeight: FontWeight.bold)),
+                  Text(
+                    "Nuevo ejercicio",
+                    style: textTheme.titleSmall,
+                  ),
                   if (widget.onRemove != null)
                     IconButton(
                       icon: const Icon(Icons.delete, color: Colors.red),
@@ -171,13 +144,13 @@ class ExerciseFormState extends State<ExerciseForm> {
               Row(
                 children: [
                   ChoiceChip(
-                    label: const Text("Usar existente"),
+                    label: Text("Usar existente", style: textTheme.bodyMedium),
                     selected: _useExisting,
                     onSelected: (_) => setState(() => _useExisting = true),
                   ),
                   const SizedBox(width: 10),
                   ChoiceChip(
-                    label: const Text("Crear nuevo"),
+                    label: Text("Crear nuevo", style: textTheme.bodyMedium),
                     selected: !_useExisting,
                     onSelected: (_) => setState(() => _useExisting = false),
                   ),
@@ -191,7 +164,6 @@ class ExerciseFormState extends State<ExerciseForm> {
                     setState(() {
                       if (exercise != null) {
                         _existingIdCtrl.text = exercise['id'].toString();
-                        // Opcional: guardar también otros campos para mostrar en el form, pero solo lectura
                         _nameCtrl.text = exercise['name'] ?? '';
                         _descCtrl.text = exercise['description'] ?? '';
                       } else {
@@ -203,12 +175,15 @@ class ExerciseFormState extends State<ExerciseForm> {
                   },
                 ),
 
-              // Modo: Crear nuevo
               if (!_useExisting) ...[
                 _buildCompactField(
                   child: TextFormField(
                     controller: _nameCtrl,
-                    decoration: const InputDecoration(labelText: "Nombre"),
+                    decoration: InputDecoration(
+                      labelText: "Nombre",
+                      labelStyle: textTheme.bodyMedium,
+                    ),
+                    style: textTheme.bodyLarge,
                     validator: _required,
                   ),
                 ),
@@ -217,41 +192,49 @@ class ExerciseFormState extends State<ExerciseForm> {
                   child: TextFormField(
                     controller: _descCtrl,
                     maxLines: 3,
-                    decoration: const InputDecoration(labelText: "Descripción"),
+                    decoration: InputDecoration(
+                      labelText: "Descripción",
+                      labelStyle: textTheme.bodyMedium,
+                    ),
+                    style: textTheme.bodyLarge,
                     validator: _required,
                   ),
                 ),
                 const SizedBox(height: 10),
 
-                const Text("Tipo", style: TextStyle(fontWeight: FontWeight.w500)),
+                Text("Tipo", style: textTheme.titleMedium),
                 Wrap(
                   spacing: 8,
                   children: _types.map((t) {
                     final label = t == 'REPETITION' ? 'Repeticiones' : 'Duración';
                     return ChoiceChip(
-                      label: Text(label),
+                      label: Text(label, style: textTheme.bodyMedium),
                       selected: _type == t,
                       onSelected: (_) => setState(() => _type = t),
                     );
                   }).toList(),
                 ),
 
-                if (_type == 'DURATION') ...[
+                if (_type == 'TIME') ...[
                   const SizedBox(height: 12),
                   _buildCompactField(
                     child: TextFormField(
                       controller: _timeCtrl,
-                      decoration: const InputDecoration(labelText: "Tiempo"),
+                      decoration: InputDecoration(
+                        labelText: "Tiempo",
+                        labelStyle: textTheme.bodyMedium,
+                      ),
+                      style: textTheme.bodyLarge,
                       keyboardType: TextInputType.number,
                     ),
                   ),
                   const SizedBox(height: 10),
-                  const Text("Unidad", style: TextStyle(fontWeight: FontWeight.w500)),
+                  Text("Unidad", style: textTheme.titleMedium),
                   Wrap(
                     spacing: 8,
                     children: _unitOptions.map((u) {
                       return ChoiceChip(
-                        label: Text(u['label']!),
+                        label: Text(u['label']!, style: textTheme.bodyMedium),
                         selected: _units == u['value'],
                         onSelected: (_) => setState(() => _units = u['value']!),
                       );
@@ -264,19 +247,23 @@ class ExerciseFormState extends State<ExerciseForm> {
                   _buildCompactField(
                     child: TextFormField(
                       controller: _countCtrl,
-                      decoration: const InputDecoration(labelText: "Cantidad de veces a realizar"),
+                      decoration: InputDecoration(
+                        labelText: "Cantidad de veces a realizar",
+                        labelStyle: textTheme.bodyMedium,
+                      ),
+                      style: textTheme.bodyLarge,
                       keyboardType: TextInputType.number,
                     ),
                   ),
                 ],
 
                 const SizedBox(height: 12),
-                const Text("Categoría", style: TextStyle(fontWeight: FontWeight.w500)),
+                Text("Categoría", style: textTheme.titleMedium),
                 Wrap(
                   spacing: 8,
                   children: _categories.map((cat) {
                     return ChoiceChip(
-                      label: Text(cat),
+                      label: Text(cat, style: textTheme.bodyMedium),
                       selected: _category == cat,
                       onSelected: (_) => setState(() => _category = cat),
                     );
@@ -287,7 +274,11 @@ class ExerciseFormState extends State<ExerciseForm> {
                 _buildCompactField(
                   child: TextFormField(
                     controller: _urlCtrl,
-                    decoration: const InputDecoration(labelText: "URL del video (opcional)"),
+                    decoration: InputDecoration(
+                      labelText: "URL del video (opcional)",
+                      labelStyle: textTheme.bodyMedium,
+                    ),
+                    style: textTheme.bodyLarge,
                   ),
                 ),
 
@@ -297,7 +288,7 @@ class ExerciseFormState extends State<ExerciseForm> {
                   child: ElevatedButton.icon(
                     onPressed: _openVideoSelectorModal,
                     icon: const Icon(Icons.video_library),
-                    label: const Text("Importar desde biblioteca"),
+                    label: Text("Importar video", style: textTheme.labelLarge),
                   ),
                 ),
               ],
@@ -309,6 +300,7 @@ class ExerciseFormState extends State<ExerciseForm> {
       ),
     );
   }
+
 
   String? _required(String? value) =>
       value == null || value.isEmpty ? 'Campo obligatorio' : null;

@@ -3,8 +3,8 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../services/training_service.dart';
-import '../../widgets/forms/exercise_form.dart';
-import '../../widgets/forms/exercise_list_form.dart';
+import '../../widgets/forms/exercise/exercise_form.dart';
+import '../../widgets/forms/exercise/exercise_list_form.dart';
 import '../../widgets/forms/training_form.dart';
 
 class CreateTrainingPage extends StatefulWidget {
@@ -20,6 +20,7 @@ class _CreateTrainingPageState extends State<CreateTrainingPage> {
   final _formKey = GlobalKey<FormState>();
   final _nameCtrl = TextEditingController();
   final _descCtrl = TextEditingController();
+  final _dateCtrl = TextEditingController();
   DateTime? _selectedDate;
   String _trainingType = 'DRIBBLING';
 
@@ -30,7 +31,6 @@ class _CreateTrainingPageState extends State<CreateTrainingPage> {
     'STRENGTH': 'Fuerza',
   };
 
-  final List<Map<String, dynamic>> _exerciseData = [];
   final List<GlobalKey<ExerciseFormState>> _exerciseFormKeys = [];
 
   Future<void> _pickDate() async {
@@ -46,56 +46,51 @@ class _CreateTrainingPageState extends State<CreateTrainingPage> {
   }
 
   void _addExerciseForm() {
-    final key = GlobalKey<ExerciseFormState>();
-    setState(() {
-      _exerciseFormKeys.add(key);
-    });
+    setState(() => _exerciseFormKeys.add(GlobalKey<ExerciseFormState>()));
   }
 
   void _removeExerciseForm(GlobalKey<ExerciseFormState> key) {
-    setState(() {
-      _exerciseFormKeys.remove(key);
-    });
+    setState(() => _exerciseFormKeys.remove(key));
   }
 
   Future<void> _submit() async {
-    _exerciseData.clear();
-    bool allValid = true;
+    print(_formKey.currentState);
+    if (!(_formKey.currentState?.validate() ?? false)) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Revisá los campos del entrenamiento.')),
+      );
+      return;
+    }
+
+    if (_selectedDate == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Seleccioná una fecha para el entrenamiento.')),
+      );
+      return;
+    }
+
+    if (_exerciseFormKeys.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Agregá al menos un ejercicio.')),
+      );
+      return;
+    }
+
+    List<Map<String, dynamic>> exercisesData = [];
 
     for (final key in _exerciseFormKeys) {
-      final state = key.currentState;
-      final data = state?.saveIfValid();
-      if (data != null) {
-        _exerciseData.add(data);
-      } else {
-        allValid = false;
+      final data = key.currentState?.saveIfValid();
+      if (data != null && data['exercise'] != null) {
+        exercisesData.add(data['exercise']);
       }
-    }
-
-    if (!allValid ||
-        !_formKey.currentState!.validate() ||
-        _selectedDate == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Revisá los campos del entrenamiento y los ejercicios'),
-        ),
-      );
-      return;
-    }
-
-    if (_exerciseData.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Agrega al menos un ejercicio')),
-      );
-      return;
     }
 
     final userIdStr = await _secureStorage.read(key: 'user_id');
     final userId = int.tryParse(userIdStr ?? '');
     if (userId == null) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text('ID de usuario inválido')));
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('ID de usuario inválido')),
+      );
       return;
     }
 
@@ -105,15 +100,16 @@ class _CreateTrainingPageState extends State<CreateTrainingPage> {
       "trainer": {"id": userId},
       "date": _selectedDate!.toIso8601String().split("T").first,
       "trainingType": _trainingType,
-      "exercises": _exerciseData,
+      "exercises": exercisesData,
     };
 
     final success = await TrainingService().createTraining(training);
+
     if (success) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text('Entrenamiento creado')));
-      context.go('/trainings');
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Entrenamiento creado')),
+      );
+      if (context.mounted) context.go('/trainings');
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Error al crear entrenamiento')),
@@ -129,7 +125,7 @@ class _CreateTrainingPageState extends State<CreateTrainingPage> {
           header: true,
           child: Text(
             'Nuevo entrenamiento',
-            style: Theme.of(context).textTheme.headlineMedium,
+            style: Theme.of(context).textTheme.titleLarge,
           ),
         ),
       ),
@@ -141,13 +137,13 @@ class _CreateTrainingPageState extends State<CreateTrainingPage> {
               formKey: _formKey,
               nameCtrl: _nameCtrl,
               descCtrl: _descCtrl,
+              dateCtrl: _dateCtrl,
               selectedDate: _selectedDate,
               onPickDate: _pickDate,
               trainingType: _trainingType,
-              onTrainingTypeChanged: (val) =>
-                  setState(() => _trainingType = val),
+              onTrainingTypeChanged: (val) => setState(() => _trainingType = val),
               trainingTypes: _trainingTypes,
-              trainingTypeLabels: trainingTypeLabels, // nuevo parámetro
+              trainingTypeLabels: trainingTypeLabels,
             ),
             const SizedBox(height: 24),
             ExerciseListForm(
@@ -172,3 +168,5 @@ class _CreateTrainingPageState extends State<CreateTrainingPage> {
     );
   }
 }
+
+

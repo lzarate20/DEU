@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 
+
 class TrainingForm extends StatelessWidget {
   final GlobalKey<FormState> formKey;
   final TextEditingController nameCtrl;
   final TextEditingController descCtrl;
+  final TextEditingController dateCtrl;
   final DateTime? selectedDate;
   final VoidCallback onPickDate;
   final String trainingType;
@@ -16,13 +18,13 @@ class TrainingForm extends StatelessWidget {
     required this.formKey,
     required this.nameCtrl,
     required this.descCtrl,
+    required this.dateCtrl,
     required this.selectedDate,
     required this.onPickDate,
     required this.trainingType,
     required this.onTrainingTypeChanged,
     required this.trainingTypes,
-    required this.trainingTypeLabels
-
+    required this.trainingTypeLabels,
   });
 
   Widget _buildCompactField({required Widget child}) {
@@ -40,6 +42,12 @@ class TrainingForm extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    if (selectedDate != null) {
+      dateCtrl.text = selectedDate!.toIso8601String().split("T").first;
+    } else {
+      dateCtrl.text = '';
+    }
+
     return Form(
       key: formKey,
       child: Column(
@@ -61,6 +69,7 @@ class TrainingForm extends StatelessWidget {
           ),
           _buildCompactField(
             child: TextFormField(
+              controller: dateCtrl,
               readOnly: true,
               decoration: InputDecoration(
                 labelText: "Fecha del entrenamiento",
@@ -68,12 +77,8 @@ class TrainingForm extends StatelessWidget {
                 border: const UnderlineInputBorder(),
                 hintText: "Seleccioná una fecha",
               ),
-              controller: TextEditingController(
-                text: selectedDate == null
-                    ? ''
-                    : selectedDate!.toIso8601String().split("T").first,
-              ),
               onTap: onPickDate,
+              onFieldSubmitted: (_) => onPickDate(),
               validator: (_) =>
               selectedDate == null ? "Seleccioná una fecha" : null,
             ),
@@ -82,7 +87,10 @@ class TrainingForm extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text("Tipo de entrenamiento:", style: TextStyle(fontWeight: FontWeight.bold)),
+                const Text(
+                  "Tipo de entrenamiento:",
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
                 const SizedBox(height: 8),
                 Wrap(
                   spacing: 8,
@@ -103,3 +111,4 @@ class TrainingForm extends StatelessWidget {
     );
   }
 }
+
