@@ -228,6 +228,7 @@ class ExerciseFormState extends State<ExerciseForm> {
                       ),
                       style: textTheme.bodyLarge,
                       keyboardType: TextInputType.number,
+                      validator: _limitTime,
                     ),
                   ),
                   const SizedBox(height: 10),
@@ -255,6 +256,7 @@ class ExerciseFormState extends State<ExerciseForm> {
                       ),
                       style: textTheme.bodyLarge,
                       keyboardType: TextInputType.number,
+                      validator: _limitRep,
                     ),
                   ),
                 ],
@@ -277,7 +279,7 @@ class ExerciseFormState extends State<ExerciseForm> {
                   child: TextFormField(
                     controller: _urlCtrl,
                     decoration: InputDecoration(
-                      labelText: "URL del video (opcional)",
+                      labelText: "URL del video",
                       labelStyle: textTheme.bodyMedium,
                     ),
                     style: textTheme.bodyLarge,
@@ -304,8 +306,26 @@ class ExerciseFormState extends State<ExerciseForm> {
   }
 
 
-  String? _required(String? value) =>
-      value == null || value.isEmpty ? 'Campo obligatorio' : null;
+  String? _required(String? value) {
+    if (value == null || value.trim().isEmpty) {
+      return 'Campo obligatorio';
+    }
+    return null;
+  }
+
+  String? _limitRep(String? value) {
+    if (value == null) return "Campo obligatorio";
+    final intValue = int.tryParse(value);
+    if (intValue == null) return "Debe ser un número";
+    return (intValue > 0 && intValue < 10) ? null : "El valor debe estar entre 1 y 9";
+  }
+
+  String? _limitTime(String? value) {
+    if (value == null) return "Campo obligatorio";
+    final intValue = int.tryParse(value);
+    if (intValue == null) return "Debe ser un número";
+    return (intValue > 0 && intValue < 60) ? null : "El valor debe estar entre 1 y 59";
+  }
 }
 
 

@@ -55,7 +55,6 @@ class _TrainingPageState extends State<TrainingListPage> with RouteAware {
   Future<void> _loadData() async {
     final trainings = await _service.fetchTrainings() ?? [];
     final users = await _userService.fetchUsers();
-    print(trainings);
     setState(() {
       _trainings = trainings;
       _users = users;

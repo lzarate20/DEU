@@ -54,7 +54,6 @@ class _CreateTrainingPageState extends State<CreateTrainingPage> {
   }
 
   Future<void> _submit() async {
-    print(_formKey.currentState);
     if (!(_formKey.currentState?.validate() ?? false)) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Revisá los campos del entrenamiento.')),
@@ -78,11 +77,32 @@ class _CreateTrainingPageState extends State<CreateTrainingPage> {
 
     List<Map<String, dynamic>> exercisesData = [];
 
+
+    bool hasInvalidExercise = false;
+
     for (final key in _exerciseFormKeys) {
       final data = key.currentState?.saveIfValid();
-      if (data != null && data['exercise'] != null) {
-        exercisesData.add(data);
+      if (data != null) {
+        final hasId = data['id'] != null;
+        final exercise = data['exercise'];
+        final hasValidExercise = exercise != null && (exercise['name']?.isNotEmpty ?? false);
+
+        if (hasId || hasValidExercise) {
+          exercisesData.add(data);
+        } else {
+          hasInvalidExercise = true;
+        }
       }
+      else{
+        hasInvalidExercise = true;
+      }
+    }
+
+    if (hasInvalidExercise) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Revisá los ejercicios: alguno está vacío o incompleto.")),
+      );
+      return;
     }
 
     final userIdStr = await _secureStorage.read(key: 'user_id');
@@ -103,7 +123,6 @@ class _CreateTrainingPageState extends State<CreateTrainingPage> {
       "exercises": exercisesData,
     };
 
-    print(training);
     final success = await TrainingService().createTraining(training);
 
     if (success) {

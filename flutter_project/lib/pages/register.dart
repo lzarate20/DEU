@@ -35,7 +35,6 @@ class _RegisterPageState extends State<RegisterPage> {
       }
 
       final success = await AuthService.register(requestBody);
-      print(success);
       if (success) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Registro exitoso')),
