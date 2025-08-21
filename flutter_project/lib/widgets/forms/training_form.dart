@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 
-
 class TrainingForm extends StatelessWidget {
   final GlobalKey<FormState> formKey;
   final TextEditingController nameCtrl;
@@ -42,29 +41,27 @@ class TrainingForm extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    if (selectedDate != null) {
+    if (selectedDate != null && dateCtrl.text != selectedDate!.toIso8601String().split("T").first) {
       dateCtrl.text = selectedDate!.toIso8601String().split("T").first;
-    } else {
+    } else if (selectedDate == null && dateCtrl.text.isNotEmpty) {
       dateCtrl.text = '';
     }
 
-    return Form(
-      key: formKey,
-      child: Column(
+    return Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           _buildCompactField(
             child: TextFormField(
               controller: nameCtrl,
               decoration: const InputDecoration(labelText: "Nombre del entrenamiento"),
-              validator: (v) => v!.isEmpty ? "Campo obligatorio" : null,
+              validator: (v) => (v == null || v.isEmpty) ? "Campo obligatorio" : null,
             ),
           ),
           _buildCompactField(
             child: TextFormField(
               controller: descCtrl,
               decoration: const InputDecoration(labelText: "Descripción"),
-              validator: (v) => v!.isEmpty ? "Campo obligatorio" : null,
+              validator: (v) => (v == null || v.isEmpty) ? "Campo obligatorio" : null,
             ),
           ),
           _buildCompactField(
@@ -79,8 +76,7 @@ class TrainingForm extends StatelessWidget {
               ),
               onTap: onPickDate,
               onFieldSubmitted: (_) => onPickDate(),
-              validator: (_) =>
-              selectedDate == null ? "Seleccioná una fecha" : null,
+              validator: (_) => selectedDate == null ? "Seleccioná una fecha" : null,
             ),
           ),
           _buildCompactField(
@@ -103,12 +99,20 @@ class TrainingForm extends StatelessWidget {
                     );
                   }).toList(),
                 ),
+                if (trainingType.isEmpty)
+                  const Padding(
+                    padding: EdgeInsets.only(top: 4.0),
+                    child: Text(
+                      "Seleccioná un tipo de entrenamiento",
+                      style: TextStyle(color: Colors.red, fontSize: 12),
+                    ),
+                  ),
               ],
             ),
           ),
         ],
-      ),
-    );
+      );
   }
 }
+
 

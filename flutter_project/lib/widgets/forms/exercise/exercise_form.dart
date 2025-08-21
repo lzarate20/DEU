@@ -51,7 +51,7 @@ class ExerciseFormState extends State<ExerciseForm> {
     if (_useExisting) {
       final id = int.tryParse(_existingIdCtrl.text);
       if (id != null) {
-        return {"id": id}; // ya está bien
+        return {"id": id};
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text("Debés seleccionar un ejercicio existente.")),
@@ -66,6 +66,8 @@ class ExerciseFormState extends State<ExerciseForm> {
       );
       return null;
     }
+
+    _formKey.currentState!.save();
 
     final exercise = {
       "name": _nameCtrl.text,
@@ -85,9 +87,9 @@ class ExerciseFormState extends State<ExerciseForm> {
       exercise["url"] = _urlCtrl.text;
     }
 
-    // devolvemos directo, sin anidarlo en "exercise"
-    return exercise;
+    return {"exercise": exercise};
   }
+
 
 
   void _openVideoSelectorModal() {

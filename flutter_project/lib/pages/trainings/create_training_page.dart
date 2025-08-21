@@ -81,7 +81,7 @@ class _CreateTrainingPageState extends State<CreateTrainingPage> {
     for (final key in _exerciseFormKeys) {
       final data = key.currentState?.saveIfValid();
       if (data != null && data['exercise'] != null) {
-        exercisesData.add(data['exercise']);
+        exercisesData.add(data);
       }
     }
 
@@ -103,6 +103,7 @@ class _CreateTrainingPageState extends State<CreateTrainingPage> {
       "exercises": exercisesData,
     };
 
+    print(training);
     final success = await TrainingService().createTraining(training);
 
     if (success) {
@@ -131,42 +132,46 @@ class _CreateTrainingPageState extends State<CreateTrainingPage> {
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
-        child: ListView(
-          children: [
-            TrainingForm(
-              formKey: _formKey,
-              nameCtrl: _nameCtrl,
-              descCtrl: _descCtrl,
-              dateCtrl: _dateCtrl,
-              selectedDate: _selectedDate,
-              onPickDate: _pickDate,
-              trainingType: _trainingType,
-              onTrainingTypeChanged: (val) => setState(() => _trainingType = val),
-              trainingTypes: _trainingTypes,
-              trainingTypeLabels: trainingTypeLabels,
-            ),
-            const SizedBox(height: 24),
-            ExerciseListForm(
-              exerciseFormKeys: _exerciseFormKeys,
-              onRemove: _removeExerciseForm,
-              onAdd: _addExerciseForm,
-            ),
-            const SizedBox(height: 24),
-            Align(
-              alignment: Alignment.centerLeft,
-              child: ConstrainedBox(
-                constraints: const BoxConstraints(maxWidth: 500),
-                child: ElevatedButton(
-                  onPressed: _submit,
-                  child: const Text("Crear entrenamiento"),
+        child: Form( // 👈 un solo Form global
+          key: _formKey,
+          child: ListView(
+            children: [
+              TrainingForm(
+                formKey: _formKey,
+                nameCtrl: _nameCtrl,
+                descCtrl: _descCtrl,
+                dateCtrl: _dateCtrl,
+                selectedDate: _selectedDate,
+                onPickDate: _pickDate,
+                trainingType: _trainingType,
+                onTrainingTypeChanged: (val) => setState(() => _trainingType = val),
+                trainingTypes: _trainingTypes,
+                trainingTypeLabels: trainingTypeLabels,
+              ),
+              const SizedBox(height: 24),
+              ExerciseListForm(
+                exerciseFormKeys: _exerciseFormKeys,
+                onRemove: _removeExerciseForm,
+                onAdd: _addExerciseForm,
+              ),
+              const SizedBox(height: 24),
+              Align(
+                alignment: Alignment.centerLeft,
+                child: ConstrainedBox(
+                  constraints: const BoxConstraints(maxWidth: 500),
+                  child: ElevatedButton(
+                    onPressed: _submit,
+                    child: const Text("Crear entrenamiento"),
+                  ),
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
   }
+
 }
 
 
