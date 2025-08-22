@@ -4,6 +4,7 @@ import com.deu.deu.dto.CommentRequest
 import com.deu.deu.dto.ExerciseDTO
 import com.deu.deu.dto.ExerciseTrainingSaveDTO
 import com.deu.deu.dto.TrainingDTO
+import com.deu.deu.exception.BadRequestException
 import com.deu.deu.exception.InvalidUserIdException
 import com.deu.deu.exception.NotFoundException
 import com.deu.deu.model.*
@@ -13,6 +14,7 @@ import com.deu.deu.repository.TrainingRepository
 import com.deu.deu.repository.UserRepository
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
+import java.time.LocalDate
 import java.time.LocalDateTime
 
 @Service
@@ -37,6 +39,12 @@ class TrainingService(
         val trainer = userRepository.findByIdOrNull(trainingDTO.trainer.id) ?: throw InvalidUserIdException()
         if (trainer.type != UserType.TRAINER) {
             throw InvalidUserIdException("El id no corresponde a un entrenador válido")
+        }
+        if(trainingDTO.exercises.isEmpty()){
+            throw BadRequestException("No se puede crear un entrenamiento sin ejercicios")
+        }
+        if(trainingDTO.date.isBefore(LocalDate.now())){
+            throw BadRequestException("La fecha del entrenamiento debe ser posterior al dia actual")
         }
         val exercises =
             trainingDTO.exercises.map { getExercise(it) }

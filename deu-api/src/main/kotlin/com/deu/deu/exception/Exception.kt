@@ -26,10 +26,10 @@ class InvalidUserIdException(
 ) : Exception(msg)
 
 @ResponseStatus(HttpStatus.BAD_REQUEST)
-class InvalidTrainingDateException(message: String) : BadRequest(message)
+class InvalidTrainingDateException(message: String) : BadRequestException(message)
 
 @ResponseStatus(HttpStatus.BAD_REQUEST)
-class InvalidEvaluationScore(message: String) : BadRequest(message)
+class InvalidEvaluationScore(message: String) : BadRequestException(message)
 
 @ResponseStatus(HttpStatus.BAD_REQUEST)
-open class BadRequest(message: String) : RuntimeException(message)
+open class BadRequestException(message: String) : RuntimeException(message)

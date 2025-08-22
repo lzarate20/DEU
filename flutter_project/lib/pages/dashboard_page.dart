@@ -100,7 +100,7 @@ class _DashboardPageState extends State<DashboardPage> {
                       children: [
                         Text(
                           team['name'] ?? 'Equipo',
-                          style: theme.bodySmall?.copyWith(
+                          style: theme.bodyLarge?.copyWith(
                             color: color
                           ),
                         ),
