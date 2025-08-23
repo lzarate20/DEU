@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_project/pages/training_page.dart';
+import 'package:flutter_project/pages/training_by_day_page.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
 import '../services/team_service.dart';
 import '../widgets/accesible_list.dart';
+import '../widgets/selectable_card.dart';
 import '../widgets/theme_provider.dart';
 
 class DashboardPage extends StatefulWidget {
@@ -91,32 +92,42 @@ class _DashboardPageState extends State<DashboardPage> {
                   ),
                 )
               else
-                AccessibleList(
-                  semanticsLabel: 'Lista de mis equipos',
-                  buttons: _teams.map((team) {
+                Wrap(
+                  spacing: 12,
+                  runSpacing: 12,
+                  children: _teams.map((team) {
                     final users = team['users'] as List<dynamic>? ?? [];
-                    return Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          team['name'] ?? 'Equipo',
-                          style: theme.bodyLarge?.copyWith(
-                            color: color
-                          ),
+
+                    return SizedBox(
+                      width: 160,
+                      height: 120,
+                      child: SelectableCard(
+                        selected: false,
+                        onTap: () => context.go('/team/${team['id']}', extra: team),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              team['name'] ?? 'Equipo',
+                              style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                                fontWeight: FontWeight.bold,
+                              ),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                            const Spacer(),
+                            Text(
+                              '${users.length} miembros',
+                              style: Theme.of(context).textTheme.bodyMedium,
+                            ),
+                          ],
                         ),
-                        Text(
-                          '${users.length} miembros',
-                          style: theme.bodyMedium?.copyWith(color: color),
-                        ),
-                      ],
+                      ),
                     );
                   }).toList(),
-                  onPressedCallbacks: _teams.map((team) {
-                    return () {
-                      context.go('/team/${team['id']}', extra: team);
-                    };
-                  }).toList(),
-                ),
+                )
+
+
             ],
           ),
         ),

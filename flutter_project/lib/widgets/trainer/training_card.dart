@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 
+import '../training/training_icon.dart';
+
+
 class TrainingCard extends StatelessWidget {
   final Map<String, dynamic> training;
   final Map<String, dynamic> trainer;
@@ -19,33 +22,12 @@ class TrainingCard extends StatelessWidget {
     final name = training['name'] ?? 'Sin nombre';
     final description = training['description'] ?? '';
     final date = training['date'] ?? '';
-    final trainingType = training['trainingType'] ?? 'Sin tipo';
+    final trainingType = (training['trainingType'] ?? 'Sin tipo').toString();
 
     final exercises = training['exercises'];
     final exercisesCount = exercises is List ? exercises.length : 0;
 
     final trainerName = trainer['name'] ?? 'Desconocido';
-
-    IconData icon;
-    Color iconColor;
-
-    switch (trainingType.toUpperCase()) {
-      case 'STRENGTH':
-        icon = Icons.fitness_center;
-        iconColor = Colors.redAccent;
-        break;
-      case 'SPEED':
-        icon = Icons.directions_run;
-        iconColor = Colors.blueAccent;
-        break;
-      case 'DRIBBLING':
-        icon = Icons.sports_football;
-        iconColor = Colors.green;
-        break;
-      default:
-        icon = Icons.fitness_center;
-        iconColor = Colors.grey;
-    }
 
     return Card(
       margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
@@ -53,7 +35,11 @@ class TrainingCard extends StatelessWidget {
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       child: ListTile(
         contentPadding: const EdgeInsets.all(12),
-        leading: Icon(icon, size: 32, color: iconColor),
+        leading: Icon(
+          getTrainingIcon(trainingType),
+          size: 32,
+          color: getTrainingIconColor(trainingType),
+        ),
         title: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -91,3 +77,4 @@ class TrainingCard extends StatelessWidget {
     );
   }
 }
+

@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 import 'adaptative_colors.dart';
@@ -21,18 +20,24 @@ class SelectableCard extends StatelessWidget {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
 
-    return GestureDetector(
-      onTap: onTap,
-      child: Card(
-        color: colors.card,
-        shape: RoundedRectangleBorder(
-          side: BorderSide(
-            color: isDark ? Colors.grey.shade600 : Colors.grey.shade300,
-            width: 1.2,
-          ),
-          borderRadius: BorderRadius.circular(8),
+    return Card(
+      color: colors.card,
+      shape: RoundedRectangleBorder(
+        side: BorderSide(
+          color: selected
+              ? theme.colorScheme.primary
+              : (isDark ? Colors.grey.shade600 : Colors.grey.shade300),
+          width: selected ? 2 : 1.2,
         ),
-        margin: const EdgeInsets.symmetric(vertical: 8),
+        borderRadius: BorderRadius.circular(8),
+      ),
+      margin: const EdgeInsets.symmetric(vertical: 8),
+      child: InkWell(
+        borderRadius: BorderRadius.circular(8),
+        onTap: onTap,
+        focusColor: theme.colorScheme.primary.withOpacity(0.2),
+        hoverColor: theme.colorScheme.primary.withOpacity(0.1),
+        splashColor: theme.colorScheme.primary.withOpacity(0.3),
         child: Padding(
           padding: const EdgeInsets.all(12),
           child: DefaultTextStyle(
@@ -44,4 +49,5 @@ class SelectableCard extends StatelessWidget {
     );
   }
 }
+
 
