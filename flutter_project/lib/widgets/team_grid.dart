@@ -17,38 +17,43 @@ class TeamsGrid extends StatelessWidget {
     );
     final textStyleSubtitle = Theme.of(context).textTheme.bodyMedium;
 
+    const double maxTitleWidth = 220; // ancho máximo que puede ocupar un título
 
+    // 🔹 1) Medimos todos los títulos y subtítulos
     for (var team in teams) {
       final name = team['name'] ?? 'Equipo';
       final users = team['users'] as List<dynamic>? ?? [];
 
-      const double maxTitleWidth = 200;
-
+      // Medimos título (máximo 2 líneas, ancho limitado)
       final textPainterTitle = TextPainter(
         text: TextSpan(text: name, style: textStyleTitle),
         textDirection: TextDirection.ltr,
         maxLines: 2,
       )..layout(maxWidth: maxTitleWidth);
 
+      // Medimos subtítulo
       final textPainterSubtitle = TextPainter(
         text: TextSpan(text: '${users.length} miembros', style: textStyleSubtitle),
         textDirection: TextDirection.ltr,
       )..layout();
 
+      // Tomamos el mayor ancho entre título y subtítulo
       final cardWidth = textPainterTitle.width > textPainterSubtitle.width
           ? textPainterTitle.width
           : textPainterSubtitle.width;
 
-      final cardHeight = textPainterTitle.height + textPainterSubtitle.height + 24; // padding interno
+      // Alto = título (2 líneas posibles) + subtítulo + padding
+      final cardHeight = textPainterTitle.height + textPainterSubtitle.height + 32;
 
       if (cardWidth > maxWidth) maxWidth = cardWidth;
       if (cardHeight > maxHeight) maxHeight = cardHeight;
     }
 
-    // Agregamos un poco de padding
-    maxWidth += 16;
-    maxHeight += 16;
+    // Agregamos márgenes internos
+    maxWidth += 24;
+    maxHeight += 24;
 
+    // 🔹 2) Renderizamos todas las tarjetas con el mismo tamaño calculado
     return Wrap(
       spacing: 12,
       runSpacing: 12,
@@ -64,16 +69,14 @@ class TeamsGrid extends StatelessWidget {
             onTap: () => context.go('/team/${team['id']}', extra: team),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Flexible(
-                  child: Text(
-                    name,
-                    style: textStyleTitle,
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                  ),
+                Text(
+                  name,
+                  style: textStyleTitle,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
                 ),
-                const SizedBox(height: 8),
                 Text(
                   '${users.length} miembros',
                   style: textStyleSubtitle,
@@ -86,4 +89,5 @@ class TeamsGrid extends StatelessWidget {
     );
   }
 }
+
 
