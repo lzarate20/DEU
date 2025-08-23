@@ -6,6 +6,7 @@ import 'package:provider/provider.dart';
 import '../services/team_service.dart';
 import '../widgets/accesible_list.dart';
 import '../widgets/selectable_card.dart';
+import '../widgets/team_grid.dart';
 import '../widgets/theme_provider.dart';
 
 class DashboardPage extends StatefulWidget {
@@ -92,42 +93,7 @@ class _DashboardPageState extends State<DashboardPage> {
                   ),
                 )
               else
-                Wrap(
-                  spacing: 12,
-                  runSpacing: 12,
-                  children: _teams.map((team) {
-                    final users = team['users'] as List<dynamic>? ?? [];
-
-                    return SizedBox(
-                      width: 160,
-                      height: 120,
-                      child: SelectableCard(
-                        selected: false,
-                        onTap: () => context.go('/team/${team['id']}', extra: team),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              team['name'] ?? 'Equipo',
-                              style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                                fontWeight: FontWeight.bold,
-                              ),
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                            const Spacer(),
-                            Text(
-                              '${users.length} miembros',
-                              style: Theme.of(context).textTheme.bodyMedium,
-                            ),
-                          ],
-                        ),
-                      ),
-                    );
-                  }).toList(),
-                )
-
-
+                TeamsGrid(teams: _teams),
             ],
           ),
         ),
