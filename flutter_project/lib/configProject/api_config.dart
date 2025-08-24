@@ -1,6 +1,7 @@
 class ApiConfig {
-  static const String host = String.fromEnvironment(
-    'API_HOST',
-    defaultValue: 'http://localhost:8080',
-  );
+  static late String host;
+
+  static void initialize(String hostUrl) {
+    host = hostUrl;
+  }
 }
