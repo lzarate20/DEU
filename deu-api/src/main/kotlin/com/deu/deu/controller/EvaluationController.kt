@@ -39,10 +39,8 @@ class EvaluationController(
         return evaluationService.getMyEvaluationToUser(trainingId, user,userTarget)?.toEvaluationDTO()
     }
 
-    @PreAuthorize("hasRole('TRAINER')")
     @GetMapping("/evaluations/{trainingId}")
     fun getMyEvaluations(@AuthenticationPrincipal userDetails: JwtUserDetails, @PathVariable("trainingId") trainingId: Int): EvaluationDTO {
-        val user = userService.findUserById(userDetails.id) ?: throw InvalidUserIdException()
-        return evaluationService.getAverageEvaluation(trainingId, user)
+        return evaluationService.getAverageEvaluation(trainingId)
     }
 }

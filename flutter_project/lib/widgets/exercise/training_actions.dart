@@ -1,7 +1,9 @@
-// TrainingActions.dart
 import 'package:flutter/material.dart';
+import 'package:flutter_project/services/auth_service.dart';
+import 'package:flutter_project/services/evaluation_service.dart';
 import 'package:flutter_project/services/training_service.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import '../../models/evaluation.dart';
 import '../../pages/trainings/rate_trainees_dialog.dart';
 
 class TrainingActions extends StatefulWidget {
@@ -25,17 +27,48 @@ class TrainingActions extends StatefulWidget {
 class _TrainingActionsState extends State<TrainingActions> {
   final FlutterSecureStorage _secureStorage = const FlutterSecureStorage();
   bool _isOwner = false;
+  bool _isTrainer = false;
+  bool _hasRated = false; // <- Nueva variable para controlar si ya calificó
 
   @override
   void initState() {
     super.initState();
     _checkOwnership();
+    _checkIsTrainer();
+    _checkIfRated(); // <- verificamos si ya calificó
   }
 
   Future<void> _checkOwnership() async {
-    final userId = await _secureStorage.read(key: 'user_id');
+    final userIdStr = await _secureStorage.read(key: 'user_id');
+    final userId = int.tryParse(userIdStr ?? '');
+    final trainerId = widget.training['trainer']?['id'];
     setState(() {
-      _isOwner = userId == widget.training['trainer']['id'].toString();
+      _isOwner = trainerId != null && userId != null && trainerId == userId;
+    });
+  }
+
+  Future<void> _checkIsTrainer() async {
+    final isTrainer = await AuthService.isTrainer();
+    setState(() {
+      _isTrainer = isTrainer;
+    });
+  }
+
+  Future<void> _checkIfRated() async {
+    final userIdStr = await AuthService.getLoggedUserId();
+    final userId = int.tryParse(userIdStr ?? '');
+    final trainingId = int.tryParse(widget.training['id'].toString()) ?? 0;
+
+    if (userId == null) return;
+
+    final existingEvaluation = await EvaluationService().getUserEvaluation(
+      userId: userId,
+      trainingId: trainingId,
+    );
+
+    setState(() {
+      _hasRated = existingEvaluation != null && existingEvaluation.score > 0;
+      widget.training['userRated'] = _hasRated; // actualizamos también el training
     });
   }
 
@@ -75,7 +108,9 @@ class _TrainingActionsState extends State<TrainingActions> {
   }
 
   Future<void> _deleteTraining() async {
-    await TrainingService().removeTraining(widget.training["id"].toString());
+    final trainingId = widget.training["id"];
+    if (trainingId == null) return;
+    await TrainingService().removeTraining(trainingId.toString());
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(content: Text('Entrenamiento eliminado')),
     );
@@ -83,17 +118,129 @@ class _TrainingActionsState extends State<TrainingActions> {
   }
 
   void _rateStudents() async {
+    final traineesList = widget.training['trainees'] as List?;
+    if (traineesList == null) return;
+    final trainees = traineesList.map((e) => int.tryParse(e.toString()) ?? 0).toList();
+
     await showDialog(
       context: context,
       builder: (_) => RateStudentsDialog(
         trainingId: int.tryParse(widget.training['id'].toString()) ?? 0,
-        trainees:  List<int>.from(widget.training['trainees']),
+        trainees: trainees,
       ),
     );
   }
 
+  void _rateTraining() async {
+    final userIdStr = await AuthService.getLoggedUserId();
+    final userId = int.tryParse(userIdStr ?? '');
+    final trainingId = int.tryParse(widget.training['id'].toString()) ?? 0;
+
+    if (userId == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Error: usuario inválido")),
+      );
+      return;
+    }
+
+    final existingEvaluation = await EvaluationService().getUserEvaluation(
+      userId: userId,
+      trainingId: trainingId,
+    );
+
+    final bool hasRated = existingEvaluation != null && existingEvaluation.score > 0;
+
+    if (hasRated) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Ya calificaste este entrenamiento.")),
+      );
+      setState(() {
+        _hasRated = true;
+        widget.training['userRated'] = true;
+      });
+      return;
+    }
+
+    int selectedRating = 0;
+
+    final rating = await showDialog<int>(
+      context: context,
+      builder: (_) => StatefulBuilder(
+        builder: (context, setState) {
+          return AlertDialog(
+            title: const Text("Puntuar entrenamiento"),
+            content: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: List.generate(5, (index) {
+                final starIndex = index + 1;
+                return IconButton(
+                  icon: Icon(
+                    starIndex <= selectedRating ? Icons.star : Icons.star_border,
+                    color: Colors.amber,
+                    size: 40,
+                  ),
+                  onPressed: () => setState(() => selectedRating = starIndex),
+                );
+              }),
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: const Text("Cancelar"),
+              ),
+              ElevatedButton(
+                onPressed: () => Navigator.pop(context, selectedRating),
+                child: const Text("Guardar"),
+              ),
+            ],
+          );
+        },
+      ),
+    );
+
+    if (rating != null && rating > 0) {
+      final evaluation = EvaluationDTO(
+        userId: userId,
+        trainingId: trainingId,
+        score: rating.toDouble(),
+      );
+
+      final result = await EvaluationService().postEvaluation(evaluation);
+
+      if (result != null) {
+        setState(() {
+          _hasRated = true;
+          widget.training['userRated'] = true;
+        });
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text("Calificación guardada: ${result.score} estrellas")),
+        );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("Error al guardar la calificación")),
+        );
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
+    if (!_isTrainer) {
+      if (_hasRated) {
+        return const SizedBox.shrink();
+      }
+      return Row(
+        children: [
+          IconButton(
+            icon: const Icon(Icons.star),
+            onPressed: _rateTraining,
+            tooltip: 'Puntuar entrenamiento',
+          ),
+        ],
+      );
+    }
+
     return Row(
       children: [
         if (_isOwner) ...[
@@ -124,4 +271,6 @@ class _TrainingActionsState extends State<TrainingActions> {
     );
   }
 }
+
+
 

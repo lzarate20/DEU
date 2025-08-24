@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import '../../configProject/global_config.dart';
 import '../../services/team_service.dart';
 import '../../services/user_service.dart';
+import '../../services/auth_service.dart';
 import '../../widgets/search_filter.dart';
 
 class TeamListPage extends StatefulWidget {
@@ -24,10 +25,13 @@ class _TeamListPageState extends State<TeamListPage> with RouteAware {
   List<Map<String, dynamic>> _teams = [];
   List<Map<String, dynamic>> _users = [];
 
+  bool _isTrainer = false;
+
   @override
   void initState() {
     super.initState();
     _loadData();
+    _checkIsTrainer();
   }
 
   @override
@@ -46,6 +50,13 @@ class _TeamListPageState extends State<TeamListPage> with RouteAware {
   @override
   void didPopNext() {
     _loadData();
+  }
+
+  Future<void> _checkIsTrainer() async {
+    final isTrainer = await AuthService.isTrainer();
+    setState(() {
+      _isTrainer = isTrainer;
+    });
   }
 
   Future<void> _loadData() async {
@@ -115,7 +126,8 @@ class _TeamListPageState extends State<TeamListPage> with RouteAware {
           ),
         ],
       ),
-      floatingActionButton: FloatingActionButton(
+      floatingActionButton: _isTrainer
+          ? FloatingActionButton(
         onPressed: () async {
           final TextEditingController _controller = TextEditingController();
 
@@ -161,9 +173,11 @@ class _TeamListPageState extends State<TeamListPage> with RouteAware {
         },
         child: const Icon(Icons.add),
         tooltip: 'Crear nuevo equipo',
-      ),
+      )
+          : null,
     );
   }
 }
+
 
 

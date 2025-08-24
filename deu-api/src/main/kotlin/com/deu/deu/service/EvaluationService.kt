@@ -22,7 +22,7 @@ class EvaluationService(
 
 
     fun addEvaluation(evaluationDTO: EvaluationDTO, user: User): EvaluationDTO {
-        val targetUser = userService.findUserById(evaluationDTO.userId) ?: throw UserNotFoundException()
+        val targetUser = evaluationDTO.userId.let { userService.findUserById(it) } ?: throw UserNotFoundException()
         val training = trainingService.getTraining(evaluationDTO.trainingId) ?: throw NotFoundException()
         if (training.date.isAfter(ChronoLocalDate.from(LocalDate.now()))) {
             throw InvalidTrainingDateException("El entrenamiento todavía no se realizó")
@@ -49,11 +49,12 @@ class EvaluationService(
         return evaluationRepository.findByTrainingIdAndEvaluatorAndTargetUserId(training.id, user, target.id)
     }
 
-    fun getAverageEvaluation(trainingId: Int, user: User): EvaluationDTO {
+    fun getAverageEvaluation(trainingId: Int): EvaluationDTO {
         val training = trainingService.getTraining(trainingId) ?: throw NotFoundException()
+        val targetUser = training.trainer
         val averageScore: Double =
-            evaluationRepository.findAllByTrainingIdAndTargetUserId(training.id, user.id)?.map { it.score }?.average()
+            evaluationRepository.findAllByTrainingIdAndTargetUserId(training.id, targetUser.id)?.map { it.score }?.average()
                 ?: 0.0
-        return EvaluationDTO(userId = user.id, trainingId = trainingId, score = averageScore)
+        return EvaluationDTO(userId =  targetUser.id, trainingId = trainingId, score = averageScore)
     }
 }

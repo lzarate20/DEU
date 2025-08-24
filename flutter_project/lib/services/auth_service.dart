@@ -56,12 +56,12 @@ class AuthService {
     return await _storage.read(key: 'user_id');
   }
 
-  static Future<bool?> isTrainer() async {
+  static Future<bool> isTrainer() async {
     final userType = await _storage.read(key: 'user_type');
     return userType == "TRAINER";
   }
 
-  static Future<bool?> isTrainee() async {
+  static Future<bool> isTrainee() async {
     final userType = await _storage.read(key: 'user_type');
     return userType == "TRAINEE";
   }

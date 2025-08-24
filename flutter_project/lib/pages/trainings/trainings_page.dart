@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../configProject/global_config.dart';
+import '../../services/auth_service.dart';
 import '../../services/training_service.dart';
 import '../../services/user_service.dart';
 import '../../widgets/search_filter.dart';
@@ -27,10 +28,13 @@ class _TrainingPageState extends State<TrainingListPage> with RouteAware {
   DateTime? _startDate;
   DateTime? _endDate;
 
+  bool _isTrainer = false;
+
   @override
   void initState() {
     super.initState();
     _loadData();
+    _checkIsTrainer();
   }
 
   @override
@@ -51,6 +55,12 @@ class _TrainingPageState extends State<TrainingListPage> with RouteAware {
     _loadData();
   }
 
+  Future<void> _checkIsTrainer() async {
+    final isTrainer = await AuthService.isTrainer();
+    setState(() {
+      _isTrainer = isTrainer;
+    });
+  }
 
   Future<void> _loadData() async {
     final trainings = await _service.fetchTrainings() ?? [];
@@ -129,7 +139,13 @@ class _TrainingPageState extends State<TrainingListPage> with RouteAware {
 
     return Scaffold(
       appBar: AppBar(
-        title: Semantics( header: true, child: Text( 'Entrenamientos', style: Theme.of(context).textTheme.headlineMedium, ), ),
+        title: Semantics(
+          header: true,
+          child: Text(
+            'Entrenamientos',
+            style: Theme.of(context).textTheme.headlineMedium,
+          ),
+        ),
       ),
       body: Column(
         children: [
@@ -179,14 +195,16 @@ class _TrainingPageState extends State<TrainingListPage> with RouteAware {
           ),
         ],
       ),
-      floatingActionButton: FloatingActionButton(
+      floatingActionButton: _isTrainer
+          ? FloatingActionButton(
         onPressed: () {
           context.go('/training/new');
         },
         child: const Icon(Icons.add),
         tooltip: 'Crear nuevo entrenamiento',
-      ),
+      )
+          : null,
     );
   }
-
 }
+

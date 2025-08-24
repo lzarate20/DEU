@@ -129,7 +129,7 @@ class _TrainingPageState extends State<TrainingPage> with RouteAware {
                                   Row(
                                     mainAxisSize: MainAxisSize.min,
                                     children: [
-                                      const Icon(Icons.fitness_center,
+                                      const Icon(Icons.list_alt,
                                           size: 16, color: Colors.grey),
                                       const SizedBox(width: 2),
                                       Text(
