@@ -44,13 +44,25 @@ class _LoginFormState extends State<LoginForm> {
       key: _formKey,
       child: Column(
         mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
+          Text(
+            '¿Ya sos usuario?',
+            style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+              fontWeight: FontWeight.bold,
+              color: Colors.blue.shade800,
+            ),
+            textAlign: TextAlign.center,
+          ),
+          const SizedBox(height: 24),
+
           TextFormField(
-            decoration: const InputDecoration(labelText: 'Usuario'),
+            decoration: const InputDecoration(labelText: 'Correo electrónico'),
             validator: (value) =>
             (value == null || value.isEmpty) ? 'Ingresá un usuario' : null,
             onSaved: (value) => _username = value ?? '',
           ),
+          const SizedBox(height: 16),
           TextFormField(
             decoration: const InputDecoration(labelText: 'Contraseña'),
             obscureText: true,
@@ -58,7 +70,9 @@ class _LoginFormState extends State<LoginForm> {
             (value == null || value.isEmpty) ? 'Ingresá la contraseña' : null,
             onSaved: (value) => _password = value ?? '',
           ),
-          const SizedBox(height: 20),
+          const SizedBox(height: 24),
+
+
           SizedBox(
             width: double.infinity,
             child: ElevatedButton(
@@ -70,6 +84,7 @@ class _LoginFormState extends State<LoginForm> {
       ),
     );
   }
+
 }
 
 

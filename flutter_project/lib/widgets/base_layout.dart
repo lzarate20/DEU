@@ -3,17 +3,12 @@ import 'package:flutter_project/widgets/theme_provider.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
-import '../configProject/global_router.dart';
 import 'header_bar.dart';
 
 class BaseLayout extends StatelessWidget {
   final Widget child;
 
   const BaseLayout({super.key, required this.child});
-
-  void _handleLogin(BuildContext context) {
-    router.go('/login');
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -25,7 +20,8 @@ class BaseLayout extends StatelessWidget {
 
         final baseCompactWidth = 60.0;
         final baseExpandedWidth = 200.0;
-        final navWidth = (isCompact ? baseCompactWidth : baseExpandedWidth) *
+        final navWidth =
+            (isCompact ? baseCompactWidth : baseExpandedWidth) *
             themeProvider.navSizeFactor;
 
         return Scaffold(
@@ -61,9 +57,7 @@ class BaseLayout extends StatelessWidget {
               Expanded(
                 child: Column(
                   children: [
-                    HeaderBar(
-                      onLoginPressed: () => _handleLogin(context),
-                    ),
+                    HeaderBar(),
                     Expanded(child: child),
                   ],
                 ),
@@ -110,13 +104,12 @@ class _NavButton extends StatelessWidget {
       child: compact
           ? Icon(icon, color: Colors.white)
           : Row(
-        children: [
-          Icon(icon, color: Colors.white),
-          const SizedBox(width: 12),
-          Text(label),
-        ],
-      ),
+              children: [
+                Icon(icon, color: Colors.white),
+                const SizedBox(width: 12),
+                Text(label),
+              ],
+            ),
     );
   }
 }
-

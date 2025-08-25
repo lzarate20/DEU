@@ -9,6 +9,7 @@ class SettingsModalContent extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final themeProvider = Provider.of<ThemeProvider>(context);
+    final allowedValues = [0.7, 1.0, 1.7];
 
     return Padding(
       padding: const EdgeInsets.all(16.0),
@@ -29,15 +30,16 @@ class SettingsModalContent extends StatelessWidget {
               overlayColor: Theme.of(context).colorScheme.primary.withOpacity(0.2),
             ),
             child: Slider(
-              min: 0.7,
-              max: 1.7,
-              divisions: 2,
+              min: allowedValues.first,
+              max: allowedValues.last,
+              divisions: allowedValues.length - 1,
               label: _labelForFactor(themeProvider.fontSizeFactor),
               value: themeProvider.fontSizeFactor,
               onChanged: (value) {
-                final rounded = double.parse(value.toStringAsFixed(1));
-                debugPrint('Nuevo fontSizeFactor: $rounded');
-                themeProvider.setFontSizeFactor(rounded);
+                double nearest = allowedValues.reduce((a, b) =>
+                (value - a).abs() < (value - b).abs() ? a : b);
+                themeProvider.setFontSizeFactor(nearest);
+                debugPrint('Nuevo fontSizeFactor: $nearest');
               },
             ),
           ),

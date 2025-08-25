@@ -39,65 +39,85 @@ class _LandingPageState extends State<LandingPage> {
     }
 
     return Scaffold(
-      backgroundColor: Colors.blue.shade50,
-      body: Padding(
-        padding: const EdgeInsets.all(32.0),
-        child: Column(
-          children: [
-            Image.asset(
-              'web/icons/header-landing-2.png',
-              height: 300,
-              width: double.infinity,
-              fit: BoxFit.cover,
+      backgroundColor: Colors.white,
+      body: Row(
+        children: [
+          Container(
+            width: 200,
+            color: Colors.blue,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Image.asset(
+                    'web/icons/logo2.png',
+                    height: 150,
+                    width: 150,
+                    fit: BoxFit.contain,
+                  ),
+                ),
+              ],
             ),
-            const SizedBox(height: 32),
-            Expanded(
-              child: Row(
+          ),
+
+          // --- Contenido principal ---
+          Expanded(
+            child: Padding(
+              padding: const EdgeInsets.all(32.0),
+              child: Column(
                 children: [
+                  const SizedBox(height: 32),
                   Expanded(
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
+                    child: Row(
                       children: [
-                        Center(
-                          child: ConstrainedBox(
-                            constraints: const BoxConstraints(maxWidth: 500),
-                            child: LoginForm(),
+                        Expanded(
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Center(
+                                child: ConstrainedBox(
+                                  constraints: const BoxConstraints(maxWidth: 500),
+                                  child: LoginForm(),
+                                ),
+                              ),
+                              const SizedBox(height: 8),
+                              ConstrainedBox(
+                                constraints: const BoxConstraints(maxWidth: 500),
+                                child: SizedBox(
+                                  width: double.infinity,
+                                  child: FilledButton(
+                                    onPressed: () {
+                                      context.go('/register');
+                                    },
+                                    child: const Text('Registrarse'),
+                                  ),
+                                ),
+                              ),
+                            ],
                           ),
                         ),
-                        const SizedBox(height: 8),
-                        ConstrainedBox(
-                          constraints: const BoxConstraints(maxWidth: 500),
-                          child: SizedBox(
-                            width: double.infinity,
-                            child: FilledButton(
-                              onPressed: () {
-                                context.go('/register');
-                              },
-                              child: const Text('Registrarse'),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: Align(
+                            alignment: Alignment.topLeft,
+                            child: Text(
+                              'Este sitio permite a los usuarios gestionar entrenamientos, visualizar estadísticas y mantenerse conectados con su equipo de manera eficiente.',
+                              style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                                fontSize: 18,
+                                color: Colors.grey.shade800,
+                              ),
                             ),
                           ),
                         ),
                       ],
                     ),
                   ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: Align(
-                      alignment: Alignment.topLeft,
-                      child: Text(
-                        'Este sitio permite a los usuarios gestionar entrenamientos, visualizar estadísticas y mantenerse conectados con su equipo de manera eficiente.',
-                        style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                          fontSize: 18,
-                          color: Colors.grey.shade800,
-                        ),
-                      ),
-                    ),
-                  ),
                 ],
               ),
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }

@@ -7,9 +7,6 @@ import '../services/auth_service.dart';
 import '../widgets/notification_icon.dart';
 
 class HeaderBar extends StatelessWidget {
-  final VoidCallback? onLoginPressed;
-
-  const HeaderBar({super.key, this.onLoginPressed});
 
   Future<void> _handleMenuSelect(BuildContext context, String value) async {
     switch (value) {
@@ -50,7 +47,7 @@ class HeaderBar extends StatelessWidget {
 
           Expanded(
             child: Semantics(
-              header: true, // Marca como <h1>
+              header: true,
               child: Text(
                 'TeamUp',
                 style: Theme.of(context)
@@ -84,28 +81,6 @@ class HeaderBar extends StatelessWidget {
             child: const NotificationIcon(),
           ),
 
-          FutureBuilder<bool>(
-            future: AuthService.isLoggedIn(),
-            builder: (context, snapshot) {
-              final isLoggedIn = snapshot.data ?? false;
-
-              if (!isLoggedIn && onLoginPressed != null) {
-                return Semantics(
-                  button: true,
-                  label: 'Iniciar sesión',
-                  child: TextButton(
-                    onPressed: onLoginPressed,
-                    style: TextButton.styleFrom(
-                      foregroundColor: Colors.white,
-                    ),
-                    child: const Text('Iniciar sesión'),
-                  ),
-                );
-              } else {
-                return const SizedBox.shrink();
-              }
-            },
-          ),
 
           PopupMenuButton<String>(
             onSelected: (value) => _handleMenuSelect(context, value),
