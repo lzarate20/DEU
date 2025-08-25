@@ -1,6 +1,10 @@
 # ---------- Etapa 1: Build de Flutter Web ----------
 FROM debian:stable-slim AS build
 
+ARG CODESPACE_NAME
+ENV API_HOST=${CODESPACE_NAME:+https://${CODESPACE_NAME}-8080.app.github.dev}
+ENV API_HOST=${API_HOST:-http://localhost:8080}
+
 # Instalar dependencias necesarias para Flutter
 RUN apt-get update && apt-get install -y \
     curl unzip xz-utils git libglu1-mesa && \
@@ -20,7 +24,7 @@ COPY . .
 
 # Descargar dependencias y buildear en release
 RUN flutter pub get
-RUN flutter build web --release
+RUN flutter build web --release --dart-define=API_HOST=$API_HOST
 
 # ---------- Etapa 2: Servidor Nginx ----------
 FROM nginx:alpine AS runtime

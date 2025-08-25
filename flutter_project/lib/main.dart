@@ -14,10 +14,6 @@ import 'configProject/api_config.dart';
 
 void main() async {
 
-  final String configString = await rootBundle.loadString('config.json');
-  final config = jsonDecode(configString);
-  ApiConfig.initialize(config['API_HOST']);
-
   setUrlStrategy(PathUrlStrategy());
   WidgetsFlutterBinding.ensureInitialized();
 
