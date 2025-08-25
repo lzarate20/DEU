@@ -1,9 +1,8 @@
 # ---------- Etapa 1: Build de Flutter Web ----------
 FROM debian:stable-slim AS build
 
-ARG CODESPACE_NAME
-ENV API_HOST=${CODESPACE_NAME:+https://${CODESPACE_NAME}-8080.app.github.dev}
-ENV API_HOST=${API_HOST:-http://localhost:8080}
+ARG API_HOST
+ENV API_HOST=${API_HOST}
 
 # Instalar dependencias necesarias para Flutter
 RUN apt-get update && apt-get install -y \

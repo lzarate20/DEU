@@ -5,6 +5,10 @@ services:
     build:
       context: ./flutter_project
       dockerfile: Dockerfile
+      args:
+        API_HOST: ${CODESPACE_NAME:+https://${CODESPACE_NAME}-8080.app.github.dev}
+    environment:
+      API_HOST: ${API_HOST:-http://localhost:8080}
     ports:
       - "80:80"
     restart: unless-stopped
