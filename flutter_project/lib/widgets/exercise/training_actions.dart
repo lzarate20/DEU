@@ -1,8 +1,10 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_project/services/auth_service.dart';
 import 'package:flutter_project/services/evaluation_service.dart';
 import 'package:flutter_project/services/training_service.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+
 import '../../models/evaluation.dart';
 import '../../pages/trainings/rate_trainees_dialog.dart';
 
@@ -28,14 +30,14 @@ class _TrainingActionsState extends State<TrainingActions> {
   final FlutterSecureStorage _secureStorage = const FlutterSecureStorage();
   bool _isOwner = false;
   bool _isTrainer = false;
-  bool _hasRated = false; // <- Nueva variable para controlar si ya calificó
+  bool _hasRated = false;
 
   @override
   void initState() {
     super.initState();
     _checkOwnership();
     _checkIsTrainer();
-    _checkIfRated(); // <- verificamos si ya calificó
+    _checkIfRated();
   }
 
   Future<void> _checkOwnership() async {
@@ -68,15 +70,16 @@ class _TrainingActionsState extends State<TrainingActions> {
 
     setState(() {
       _hasRated = existingEvaluation != null && existingEvaluation.score > 0;
-      widget.training['userRated'] = _hasRated; // actualizamos también el training
+      widget.training['userRated'] =
+          _hasRated;
     });
   }
 
   void _copyTraining() {
     TrainingService().copyTraining(widget.training);
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Entrenamiento copiado')),
-    );
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(const SnackBar(content: Text('Entrenamiento copiado')));
     widget.onCopied?.call();
   }
 
@@ -89,7 +92,9 @@ class _TrainingActionsState extends State<TrainingActions> {
       context: context,
       builder: (ctx) => AlertDialog(
         title: const Text('Eliminar entrenamiento'),
-        content: const Text('¿Estás seguro de que querés eliminar este entrenamiento?'),
+        content: const Text(
+          '¿Estás seguro de que querés eliminar este entrenamiento?',
+        ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
@@ -111,16 +116,18 @@ class _TrainingActionsState extends State<TrainingActions> {
     final trainingId = widget.training["id"];
     if (trainingId == null) return;
     await TrainingService().removeTraining(trainingId.toString());
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Entrenamiento eliminado')),
-    );
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(const SnackBar(content: Text('Entrenamiento eliminado')));
     widget.onDeleted?.call();
   }
 
   void _rateStudents() async {
     final traineesList = widget.training['trainees'] as List?;
     if (traineesList == null) return;
-    final trainees = traineesList.map((e) => int.tryParse(e.toString()) ?? 0).toList();
+    final trainees = traineesList
+        .map((e) => int.tryParse(e.toString()) ?? 0)
+        .toList();
 
     await showDialog(
       context: context,
@@ -131,15 +138,21 @@ class _TrainingActionsState extends State<TrainingActions> {
     );
   }
 
+  bool get _hasTraining {
+    final trainees = widget.training['trainees'] as List<dynamic>? ?? [];
+    debugPrint(trainees.contains(AuthService.getLoggedUserId()).toString());
+    return trainees.contains(AuthService.getLoggedUserId());
+  }
+
   void _rateTraining() async {
     final userIdStr = await AuthService.getLoggedUserId();
     final userId = int.tryParse(userIdStr ?? '');
     final trainingId = int.tryParse(widget.training['id'].toString()) ?? 0;
 
     if (userId == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Error: usuario inválido")),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text("Error: usuario inválido")));
       return;
     }
 
@@ -148,7 +161,8 @@ class _TrainingActionsState extends State<TrainingActions> {
       trainingId: trainingId,
     );
 
-    final bool hasRated = existingEvaluation != null && existingEvaluation.score > 0;
+    final bool hasRated =
+        existingEvaluation != null && existingEvaluation.score > 0;
 
     if (hasRated) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -175,7 +189,9 @@ class _TrainingActionsState extends State<TrainingActions> {
                 final starIndex = index + 1;
                 return IconButton(
                   icon: Icon(
-                    starIndex <= selectedRating ? Icons.star : Icons.star_border,
+                    starIndex <= selectedRating
+                        ? Icons.star
+                        : Icons.star_border,
                     color: Colors.amber,
                     size: 40,
                   ),
@@ -214,7 +230,9 @@ class _TrainingActionsState extends State<TrainingActions> {
         });
 
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("Calificación guardada: ${result.score} estrellas")),
+          SnackBar(
+            content: Text("Calificación guardada: ${result.score} estrellas"),
+          ),
         );
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -227,6 +245,10 @@ class _TrainingActionsState extends State<TrainingActions> {
   @override
   Widget build(BuildContext context) {
     if (!_isTrainer) {
+      if (!_hasTraining) {
+        return const SizedBox.shrink();
+      }
+
       if (_hasRated) {
         return const SizedBox.shrink();
       }
@@ -255,12 +277,12 @@ class _TrainingActionsState extends State<TrainingActions> {
           onPressed: _copyTraining,
           tooltip: 'Copiar entrenamiento',
         ),
-        IconButton(
-          icon: const Icon(Icons.star),
-          onPressed: _rateStudents,
-          tooltip: 'Puntuar alumnos',
-        ),
         if (_isOwner) ...[
+          IconButton(
+            icon: const Icon(Icons.star),
+            onPressed: _rateStudents,
+            tooltip: 'Puntuar alumnos',
+          ),
           IconButton(
             icon: const Icon(Icons.delete),
             onPressed: _confirmDelete,
@@ -271,6 +293,3 @@ class _TrainingActionsState extends State<TrainingActions> {
     );
   }
 }
-
-
-

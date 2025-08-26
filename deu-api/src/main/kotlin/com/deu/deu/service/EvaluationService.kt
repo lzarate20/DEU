@@ -53,7 +53,10 @@ class EvaluationService(
         val training = trainingService.getTraining(trainingId) ?: throw NotFoundException()
         val targetUser = training.trainer
         val averageScore: Double =
-            evaluationRepository.findAllByTrainingIdAndTargetUserId(training.id, targetUser.id)?.map { it.score }?.average()
+            evaluationRepository.findAllByTrainingIdAndTargetUserId(training.id, targetUser.id)
+                ?.map { it.score }
+                ?.takeIf { it.isNotEmpty() }
+                ?.average()
                 ?: 0.0
         return EvaluationDTO(userId =  targetUser.id, trainingId = trainingId, score = averageScore)
     }
