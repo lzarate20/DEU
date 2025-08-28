@@ -23,20 +23,23 @@ COPY . .
 
 # Descargar dependencias y buildear en release
 RUN flutter pub get
-RUN flutter build web --release --dart-define=API_HOST=$API_HOST
+RUN flutter build web --release
 
-# ---------- Etapa 2: Servidor Nginx ----------
-FROM nginx:alpine AS runtime
+# ---------- Etapa 2: Servidor Express ----------
+FROM node:20-alpine AS runtime
 
-# Copiar build resultante al root de Nginx
-COPY --from=build /app/build/web /usr/share/nginx/html
+WORKDIR /app
 
-# Copiar config custom de Nginx
-COPY nginx.conf /etc/nginx/conf.d/default.conf
+# Copiar build de Flutter
+COPY --from=build /app/build/web /app/build/web
 
-# Configuración custom de Nginx (opcional)
-# COPY nginx.conf /etc/nginx/conf.d/default.conf
+# Copiar servidor Express y package.json
+COPY server.js package.json package-lock.json ./
+
+# Instalar dependencias
+RUN npm install --production
 
 EXPOSE 80
 
-CMD ["nginx", "-g", "daemon off;"]
+CMD ["node", "server.js"]
+
