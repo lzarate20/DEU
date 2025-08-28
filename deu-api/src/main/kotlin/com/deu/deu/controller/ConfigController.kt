@@ -6,7 +6,8 @@ import com.deu.deu.service.ConfigService
 import com.deu.deu.utils.toDTO
 import org.springframework.web.bind.annotation.*
 
-@RestController
+@RestController()
+@RequestMapping("/api")
 class ConfigController(val configService: ConfigService) {
 
     @GetMapping("/config/{id}")

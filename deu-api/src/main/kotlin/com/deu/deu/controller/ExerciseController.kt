@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.*
 
 
 @RestController
+@RequestMapping("/api")
 class ExerciseController(val exerciseService: ExerciseService) {
 
     @GetMapping("/exercises/all")

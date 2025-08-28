@@ -17,7 +17,8 @@ import org.springframework.web.bind.annotation.*
 import org.springframework.web.server.ResponseStatusException
 import java.time.LocalDate
 
-@RestController
+@RestController()
+@RequestMapping("/api")
 class UserController(val userService: UserService) {
 
     @GetMapping("/users")

@@ -15,9 +15,7 @@ app.use(express.static(buildPath));
 app.use('/api', createProxyMiddleware({
     target: API_HOST,
     changeOrigin: true,
-    pathRewrite: {
-        '^/api': '',
-    },
+    pathRewrite: (path) => path,
 }));
 
 

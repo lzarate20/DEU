@@ -11,7 +11,8 @@ import com.deu.deu.service.UserService
 import com.deu.deu.utils.toTrainingDTOResponse
 import org.springframework.web.bind.annotation.*
 
-@RestController
+@RestController()
+@RequestMapping("/api")
 class TrainingController(
     val trainingService: TrainingService,
     private val userService: UserService

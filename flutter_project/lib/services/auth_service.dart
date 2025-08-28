@@ -12,7 +12,7 @@ class AuthService {
 
   static Future<bool> login(String email, String password) async {
     final response = await client.post(
-      Uri.parse('$host/api/auth'),
+      Uri.parse('$host/auth'),
       headers: {'Content-Type': 'application/json'},
       body: jsonEncode({'email': email, 'password': password}),
     );
@@ -40,7 +40,7 @@ class AuthService {
 
   static Future<bool> register(Map<String, dynamic> body) async {
     final response = await client.post(
-      Uri.parse('$host/api/auth/user'),
+      Uri.parse('$host/auth/user'),
       headers: {'Content-Type': 'application/json'},
       body: jsonEncode(body),
     );

@@ -10,7 +10,8 @@ import com.deu.deu.utils.toDTO
 import org.springframework.security.core.Authentication
 import org.springframework.web.bind.annotation.*
 
-@RestController
+@RestController()
+@RequestMapping("/api")
 class TeamController(val teamService: TeamService) {
     @GetMapping( "/teams")
     fun getGroups() : List<TeamDTOResponse>{
