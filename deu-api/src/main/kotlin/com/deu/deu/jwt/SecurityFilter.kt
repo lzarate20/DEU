@@ -49,7 +49,7 @@ class SecurityConfig {
             .csrf { it.disable() }
             .authorizeHttpRequests {
                 it
-                    .requestMatchers("/api/auth","/api/auth/user", "/error","/h2-console/**")
+                    .requestMatchers("/api/auth","/api/health","/api/auth/user", "/error","/h2-console/**")
                     .permitAll()
                     .anyRequest()
                     .fullyAuthenticated()
