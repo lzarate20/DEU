@@ -1,12 +1,11 @@
 import 'dart:convert';
 
 import 'package:flutter_project/configProject/api_config.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 import 'api_service.dart';
+import 'auth_memory.dart';
 
 class AuthService {
-  static const _storage = FlutterSecureStorage();
   static final client = AuthHttpClient();
   static final host = ApiConfig.host;
 
@@ -23,9 +22,7 @@ class AuthService {
       final userId = data['user']['id'].toString();
       final userType = data['user']['type'].toString();
 
-      await _storage.write(key: 'jwt_token', value: token);
-      await _storage.write(key: 'user_id', value: userId);
-      await _storage.write(key: 'user_type', value: userType);
+      AuthMemory.saveToken(token, userId, userType);
 
       return true;
     } else {
@@ -34,8 +31,7 @@ class AuthService {
   }
 
   static Future<bool> isLoggedIn() async {
-    final token = await _storage.read(key: 'jwt_token');
-    return token != null;
+    return AuthMemory.token != null;
   }
 
   static Future<bool> register(Map<String, dynamic> body) async {
@@ -49,26 +45,22 @@ class AuthService {
   }
 
   static Future<String?> getToken() async {
-    return await _storage.read(key: 'jwt_token');
+    return AuthMemory.token;
   }
 
   static Future<String?> getLoggedUserId() async {
-    return await _storage.read(key: 'user_id');
+    return AuthMemory.userId;
   }
 
   static Future<bool> isTrainer() async {
-    final userType = await _storage.read(key: 'user_type');
-    return userType == "TRAINER";
+    return AuthMemory.userType == "TRAINER";
   }
 
   static Future<bool> isTrainee() async {
-    final userType = await _storage.read(key: 'user_type');
-    return userType == "TRAINEE";
+    return AuthMemory.userType == "TRAINEE";
   }
 
   static Future<void> logout() async {
-    await _storage.delete(key: 'jwt_token');
-    await _storage.delete(key: 'user_id');
-    await _storage.delete(key: 'user_type');
+    AuthMemory.clear();
   }
 }

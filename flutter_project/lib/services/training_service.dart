@@ -5,21 +5,21 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:http/http.dart' as http;
 
 import 'api_service.dart' show AuthHttpClient;
+import 'auth_service.dart';
 
 
 class TrainingService {
-  static const _storage = FlutterSecureStorage();
   final String host = ApiConfig.host;
   static final client = AuthHttpClient();
 
 
   Future<List<Map<String, dynamic>>?> fetchTraining(DateTime date) async {
-    final userId = await _storage.read(key: 'user_id');
+    final userId = AuthService.getLoggedUserId();
     final formattedDate = date.toIso8601String().split('T').first;
     final url = Uri.parse('$host/user/trainings?id=$userId&date=$formattedDate');
 
     try {
-      final token = await _storage.read(key: 'jwt_token');
+      final token = await AuthService.getToken();
       final response = await client.get(url,
         headers: {
         'Authorization': 'Bearer $token',
@@ -45,7 +45,7 @@ class TrainingService {
     final url = Uri.parse('$host/training/$trainingId');
 
     try {
-      final token = await _storage.read(key: 'jwt_token');
+      final token = AuthService.getToken();
       final response = await client.get(
         url,
         headers: {
@@ -71,7 +71,7 @@ class TrainingService {
     final url = Uri.parse('$host/trainings');
 
     try {
-      final token = await _storage.read(key: 'jwt_token');
+      final token = await AuthService.getToken();
       final response = await client.get(url,
           headers: {
             'Authorization': 'Bearer $token',
@@ -96,7 +96,7 @@ class TrainingService {
   Future<bool> createTraining(Map<String, dynamic> trainingData) async {
     final url = Uri.parse('$host/training');
     try {
-      final token = await _storage.read(key: 'jwt_token');
+      final token = await AuthService.getToken();
       final response = await client.post(
         url,
         headers: {
@@ -113,7 +113,7 @@ class TrainingService {
   }
 
   Future<bool> copyTraining(Map<String, dynamic> originalTraining) async {
-    final userId = await _storage.read(key: 'user_id');
+    final userId = await AuthService.getToken();
     if (userId == null) return false;
 
     final newTraining = Map<String, dynamic>.from(originalTraining);
@@ -128,7 +128,7 @@ class TrainingService {
     final url = Uri.parse('$host/training/$id');
 
     try {
-      final token = await _storage.read(key: 'jwt_token');
+      final token = await AuthService.getToken();
       final response = await client.delete(
         url,
         headers: {
@@ -153,7 +153,7 @@ class TrainingService {
     required String idTeam,
     required String comment,
   }) async {
-    final userId = await _storage.read(key: 'user_id');
+    final userId = await AuthService.getToken();
     if (userId == null) return null;
 
     final url = Uri.parse('$host/training/comment/$idTeam');
@@ -164,7 +164,7 @@ class TrainingService {
     };
 
     try {
-      final token = await _storage.read(key: 'jwt_token');
+      final token = await AuthService.getToken();
       final response = await client.post(
         url,
         headers: {

@@ -4,6 +4,7 @@ import 'package:flutter_project/services/user_service.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../services/auth_service.dart';
 import '../../services/training_service.dart';
 
 class AssignTrainingPage extends StatefulWidget {
@@ -21,7 +22,6 @@ class AssignTrainingPage extends StatefulWidget {
 }
 
 class _AssignTrainingPageState extends State<AssignTrainingPage> {
-  static const _storage = FlutterSecureStorage();
 
   late Map<String, dynamic> training;
   List<Map<String, dynamic>> allTrainees = [];
@@ -94,7 +94,7 @@ class _AssignTrainingPageState extends State<AssignTrainingPage> {
       selectedPositions.clear();
     });
 
-    final userId = await _storage.read(key: 'user_id');
+    final userId = await AuthService.getLoggedUserId();
     final teams = await UserService().fetchUserTeams(userId.toString());
 
     final uniqueTrainees = <String, Map<String, dynamic>>{};

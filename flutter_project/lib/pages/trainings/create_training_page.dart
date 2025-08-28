@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../services/auth_service.dart';
 import '../../services/training_service.dart';
 import '../../widgets/forms/exercise/exercise_form.dart';
 import '../../widgets/forms/exercise/exercise_list_form.dart';
@@ -15,8 +16,6 @@ class CreateTrainingPage extends StatefulWidget {
 }
 
 class _CreateTrainingPageState extends State<CreateTrainingPage> {
-  final _secureStorage = const FlutterSecureStorage();
-
   final _formKey = GlobalKey<FormState>();
   final _nameCtrl = TextEditingController();
   final _descCtrl = TextEditingController();
@@ -105,7 +104,7 @@ class _CreateTrainingPageState extends State<CreateTrainingPage> {
       return;
     }
 
-    final userIdStr = await _secureStorage.read(key: 'user_id');
+    final userIdStr = await AuthService.getLoggedUserId();
     final userId = int.tryParse(userIdStr ?? '');
     if (userId == null) {
       ScaffoldMessenger.of(context).showSnackBar(

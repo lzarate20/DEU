@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:flutter_project/services/auth_service.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 import '../configProject/api_config.dart';
@@ -7,13 +8,12 @@ import '../models/user_config.dart';
 import 'api_service.dart';
 
 class ConfigService {
-  static const _storage = FlutterSecureStorage();
   static final client = AuthHttpClient();
   static final host = ApiConfig.host;
 
   static Future<UserConfig> getUserConfig() async {
-    final token = await _storage.read(key: 'jwt_token');
-    final userId = await _storage.read(key: 'user_id');
+    final token = await AuthService.getToken();
+    final userId = await AuthService.getLoggedUserId();
 
     final url = Uri.parse('$host/config/$userId');
     final response = await client.get(
@@ -36,8 +36,8 @@ class ConfigService {
     required String theme,
     required String letterSize,
   }) async {
-    final token = await _storage.read(key: 'jwt_token');
-    final userId = await _storage.read(key: 'user_id');
+    final token = await AuthService.getToken();
+    final userId = await AuthService.getLoggedUserId();
     final url = Uri.parse('$host/config');
     final body = jsonEncode({
       "idUser": userId,

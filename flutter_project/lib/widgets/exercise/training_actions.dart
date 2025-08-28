@@ -27,7 +27,6 @@ class TrainingActions extends StatefulWidget {
 }
 
 class _TrainingActionsState extends State<TrainingActions> {
-  final FlutterSecureStorage _secureStorage = const FlutterSecureStorage();
   bool _isOwner = false;
   bool _isTrainer = false;
   bool _hasRated = false;
@@ -41,7 +40,7 @@ class _TrainingActionsState extends State<TrainingActions> {
   }
 
   Future<void> _checkOwnership() async {
-    final userIdStr = await _secureStorage.read(key: 'user_id');
+    final userIdStr = await AuthService.getLoggedUserId();
     final userId = int.tryParse(userIdStr ?? '');
     final trainerId = widget.training['trainer']?['id'];
     setState(() {

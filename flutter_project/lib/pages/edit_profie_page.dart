@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
+import '../services/auth_service.dart';
 import '../services/user_service.dart';
 
 class ProfileEditPage extends StatefulWidget {
@@ -12,7 +13,6 @@ class ProfileEditPage extends StatefulWidget {
 
 class _ProfileEditPageState extends State<ProfileEditPage> {
   final _formKey = GlobalKey<FormState>();
-  final _storage = const FlutterSecureStorage();
   final userService = UserService();
 
   final _nameController = TextEditingController();
@@ -38,7 +38,7 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
   Future<void> _loadUserData() async {
     setState(() => _loading = true);
     try {
-      final userId = await _storage.read(key: 'user_id');
+      final userId = await AuthService.getLoggedUserId();
       final userData = await userService.fetchUser(userId!);
 
       if (userData != null) {

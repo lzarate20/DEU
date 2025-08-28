@@ -1,21 +1,21 @@
 import 'dart:convert';
+
 import 'package:flutter_project/configProject/api_config.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:http/http.dart' as http;
 
 import 'api_service.dart' show AuthHttpClient;
+import 'auth_service.dart';
 
 class UserService {
-  static const _storage = FlutterSecureStorage();
   final String host = ApiConfig.host;
   static final client = AuthHttpClient();
-
 
   Future<List<Map<String, dynamic>>> fetchUsers() async {
     final url = Uri.parse('$host/users');
 
     try {
-      final token = await _storage.read(key: 'jwt_token');
+      final token = await AuthService.getToken();
       final response = await client.get(
         url,
         headers: {
@@ -26,9 +26,7 @@ class UserService {
 
       if (response.statusCode == 200) {
         final List<dynamic> jsonList = jsonDecode(response.body);
-        return jsonList
-            .map((item) => item as Map<String, dynamic>)
-            .toList();
+        return jsonList.map((item) => item as Map<String, dynamic>).toList();
       } else {
         print('Error al obtener usuarios: ${response.statusCode}');
         return [];
@@ -43,7 +41,7 @@ class UserService {
     final url = Uri.parse('$host/users/$id');
 
     try {
-      final token = await _storage.read(key: 'jwt_token');
+      final token = await AuthService.getToken();
       final response = await client.get(
         url,
         headers: {
@@ -74,7 +72,7 @@ class UserService {
     final url = Uri.parse('$host/user');
 
     try {
-      final token = await _storage.read(key: 'jwt_token');
+      final token = await AuthService.getToken();
 
       final body = <String, dynamic>{};
       if (name != null) body['name'] = name;
@@ -107,7 +105,7 @@ class UserService {
     final url = Uri.parse('$host/user/$userId/teams');
 
     try {
-      final token = await _storage.read(key: 'jwt_token');
+      final token = await AuthService.getToken();
       final response = await client.get(
         url,
         headers: {
@@ -118,9 +116,7 @@ class UserService {
 
       if (response.statusCode == 200) {
         final List<dynamic> jsonList = jsonDecode(response.body);
-        return jsonList
-            .map((item) => item as Map<String, dynamic>)
-            .toList();
+        return jsonList.map((item) => item as Map<String, dynamic>).toList();
       } else {
         print('Error al obtener equipos del usuario: ${response.statusCode}');
         return [];
@@ -135,11 +131,9 @@ class UserService {
     final url = Uri.parse('$host/user/training/$trainingId');
 
     try {
-      final token = await _storage.read(key: 'jwt_token');
+      final token = await AuthService.getToken();
 
-      final body = {
-        "users": userIds,
-      };
+      final body = {"users": userIds};
 
       final response = await client.post(
         url,
@@ -165,7 +159,7 @@ class UserService {
   }
 
   Future<List<Map<String, dynamic>>> fetchNotifications() async {
-    final token = await _storage.read(key: 'jwt_token');
+    final token = await AuthService.getToken();
 
     if (token == null) {
       print('No se encontró el token JWT');
@@ -191,7 +185,7 @@ class UserService {
   }
 
   Future<bool> markNotificationsViewed() async {
-    final token = await _storage.read(key: 'jwt_token');
+    final token = await AuthService.getToken();
     if (token == null) return false;
 
     final url = Uri.parse('$host/user/notifications/viewed');
@@ -206,5 +200,4 @@ class UserService {
 
     return response.statusCode == 200;
   }
-
 }

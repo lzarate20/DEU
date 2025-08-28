@@ -1,21 +1,20 @@
 import 'dart:convert';
+
 import 'package:flutter_project/configProject/api_config.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+
 import '../models/evaluation.dart';
 import 'api_service.dart' show AuthHttpClient;
-
+import 'auth_service.dart';
 
 class EvaluationService {
-  static const _storage = FlutterSecureStorage();
   final String host = ApiConfig.host;
   static final client = AuthHttpClient();
-
 
   Future<EvaluationDTO?> postEvaluation(EvaluationDTO evaluation) async {
     final url = Uri.parse('$host/evaluation');
 
     try {
-      final token = await _storage.read(key: 'jwt_token');
+      final token = await AuthService.getToken();
       final response = await client.post(
         url,
         headers: {
@@ -46,7 +45,7 @@ class EvaluationService {
     final url = Uri.parse('$host/evaluation/$trainingId');
 
     try {
-      final token = await _storage.read(key: 'jwt_token');
+      final token = await AuthService.getToken();
       final response = await client.get(
         url,
         headers: {
@@ -78,14 +77,15 @@ class EvaluationService {
     required int userId,
     required int trainingId,
   }) async {
-    final url = Uri.parse('$host/evaluation')
-        .replace(queryParameters: {
-      'userId': userId.toString(),
-      'trainingId': trainingId.toString(),
-    });
+    final url = Uri.parse('$host/evaluation').replace(
+      queryParameters: {
+        'userId': userId.toString(),
+        'trainingId': trainingId.toString(),
+      },
+    );
 
     try {
-      final token = await _storage.read(key: 'jwt_token');
+      final token = await AuthService.getToken();
       final response = await client.get(
         url,
         headers: {
@@ -104,21 +104,24 @@ class EvaluationService {
       } else if (response.statusCode == 404) {
         return null;
       } else {
-        print('Error GET /evaluation?userId=$userId&trainingId=$trainingId: ${response.statusCode}');
+        print(
+          'Error GET /evaluation?userId=$userId&trainingId=$trainingId: ${response.statusCode}',
+        );
         return null;
       }
     } catch (e) {
-      print('Error de red GET /evaluation?userId=$userId&trainingId=$trainingId: $e');
+      print(
+        'Error de red GET /evaluation?userId=$userId&trainingId=$trainingId: $e',
+      );
       return null;
     }
   }
-
 
   Future<EvaluationDTO?> getAverageEvaluation(int trainingId) async {
     final url = Uri.parse('$host/evaluations/$trainingId');
 
     try {
-      final token = await _storage.read(key: 'jwt_token');
+      final token = await AuthService.getToken();
       final response = await client.get(
         url,
         headers: {
@@ -144,4 +147,3 @@ class EvaluationService {
     }
   }
 }
-

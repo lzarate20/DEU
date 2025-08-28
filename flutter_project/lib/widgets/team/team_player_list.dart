@@ -21,7 +21,7 @@ class PlayersList extends StatelessWidget {
     };
 
     return FutureBuilder<String?>(
-      future: const FlutterSecureStorage().read(key: 'user_id'),
+      future: Future.value(AuthService.getLoggedUserId()),
       builder: (context, snapshot) {
         final currentUserId = snapshot.data;
         final alreadyInTeam =

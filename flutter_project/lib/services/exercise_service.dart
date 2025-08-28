@@ -1,12 +1,11 @@
 import 'dart:convert';
 
 import 'package:flutter_project/configProject/api_config.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 import 'api_service.dart' show AuthHttpClient;
+import 'auth_service.dart';
 
 class ExerciseService {
-  static const _storage = FlutterSecureStorage();
   final String host = ApiConfig.host;
   static final client = AuthHttpClient();
 
@@ -14,7 +13,7 @@ class ExerciseService {
     final url = Uri.parse('$host/exercises');
 
     try {
-      final token = await _storage.read(key: 'jwt_token');
+      final token = await AuthService.getToken();
       final response = await client.get(
         url,
         headers: {
