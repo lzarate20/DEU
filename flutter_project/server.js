@@ -1,5 +1,5 @@
 import express from 'express';
-import { createProxyMiddleware } from 'http-proxy-middleware';
+import {createProxyMiddleware} from 'http-proxy-middleware';
 import path from 'path';
 import crypto from 'crypto';
 import fetch from 'node-fetch';
@@ -19,12 +19,12 @@ function generateSessionId() {
 
 function authMiddleware(req, res, next) {
     const bearer = req.headers['authorization'];
-    if (!bearer) return res.status(401).json({ error: 'No token' });
+    if (!bearer) return res.status(401).json({error: 'No token'});
 
     const sessionId = bearer.split(' ')[1];
     const session = sessions.get(sessionId);
 
-    if (!session) return res.status(401).json({ error: 'Invalid session' });
+    if (!session) return res.status(401).json({error: 'Invalid session'});
 
     req.sessionId = sessionId;
     req.userId = session.userId;
@@ -34,28 +34,30 @@ function authMiddleware(req, res, next) {
 
 // Auth endpoints
 app.post('/auth', async (req, res) => {
-    const { email, password } = req.body;
+    const {email, password} = req.body;
     try {
         const response = await fetch(`${API_HOST}/api/auth`, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ email, password })
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({email, password})
         });
-        if (!response.ok) return res.status(401).json({ error: 'Invalid credentials' });
+        if (!response.ok) return res.status(401).json({error: 'Invalid credentials'});
 
-        const { token: jwt, user } = await response.json();
+        const {token: jwt, user} = await response.json();
         const sessionId = generateSessionId();
-        sessions.set(sessionId, { userId: user.id, jwt, expiresAt: Date.now() + 3600000 });
+        sessions.set(sessionId, {userId: user.id, jwt, expiresAt: Date.now() + 3600000});
 
-        res.json({ token: sessionId, user: { id: user.id, type: user.type } });
+        res.json({token: sessionId, user: {id: user.id, type: user.type}});
     } catch {
-        res.status(500).json({ error: 'Server error' });
+        res.status(500).json({error: 'Server error'});
     }
 });
 
-app.post('/logout', authMiddleware, (req, res) => {
-    sessions.delete(req.sessionId);
-    res.json({ success: true });
+app.post('/logout', (req, res) => {
+    if (req.sessionId != null) {
+        sessions.delete(req.sessionId);
+    }
+    res.json({success: true});
 });
 
 // Proxy API requests

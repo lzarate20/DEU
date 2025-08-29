@@ -90,11 +90,16 @@ class EvaluationService {
 
       if (response.statusCode == 200) {
         final json = jsonDecode(response.body);
-        return EvaluationDTO(
-          userId: json['userId'],
-          trainingId: json['trainingId'],
-          score: (json['score'] as num).toDouble(),
-        );
+        if(json!=null) {
+          return EvaluationDTO(
+            userId: json['userId'],
+            trainingId: json['trainingId'],
+            score: (json['score'] as num).toDouble(),
+          );
+        }
+        else{
+          return null;
+        }
       } else if (response.statusCode == 404) {
         return null;
       } else {
