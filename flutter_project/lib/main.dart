@@ -7,9 +7,11 @@ import 'package:provider/provider.dart';
 
 import 'app.dart';
 
-void main() {
+void main() async {
   setUrlStrategy(PathUrlStrategy());
   WidgetsFlutterBinding.ensureInitialized();
+
+  await AuthService.checkAndLogoutIfExpired();
 
   final themeProvider = ThemeProvider();
   runApp(ChangeNotifierProvider.value(

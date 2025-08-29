@@ -18,12 +18,8 @@ class AuthHttpClient extends http.BaseClient {
     final response = await _inner.send(request);
 
     if (response.statusCode == 401 || response.statusCode == 403) {
-      await AuthService.logout();
-
-      final navigator = navigatorKey.currentState;
-      if (navigator != null) {
-        router.go('/');
-      }
+      await AuthService.logout(notifyServer: false);
+      router.go('/');
     }
 
     return response;

@@ -20,13 +20,36 @@ class AuthService {
       final token = data['token'];
       final userId = data['user']['id'].toString();
       final userType = data['user']['type'].toString();
-      AuthMemory.saveToken(token, userId, userType);
-      print(await AuthService.getToken().toString());
+      final expiration = data['expirationDate'];
+      AuthMemory.saveToken(token, userId, userType,expiration);
 
       return true;
     } else {
       return false;
     }
+  }
+
+  static Future<bool> isSessionValid() async {
+    final token = await AuthMemory.getToken();
+    final expirationStr = await AuthMemory.getTokenExpiration();
+    if (token == null || expirationStr == null) return false;
+
+    final expiration = DateTime.parse(expirationStr);
+    return DateTime.now().isBefore(expiration);
+  }
+
+  static Future<bool> isLoggedInAndValid() async {
+    final loggedIn = await isLoggedIn();
+    final valid = await isSessionValid();
+    return loggedIn && valid;
+  }
+
+  static Future<void> checkAndLogoutIfExpired() async {
+    final valid = await isSessionValid();
+    if (!valid) {
+      await logout();
+    }
+    AuthMemory.clear();
   }
 
   static Future<bool> isLoggedIn() async {
@@ -60,17 +83,21 @@ class AuthService {
     return await AuthMemory.getUserType() == "TRAINEE";
   }
 
-  static Future<void> logout() async {
+  static Future<void> logout({bool notifyServer = true}) async {
     var token = await AuthMemory.getToken();
-    if (token != null) {
-      await client.post(
-        Uri.parse('/logout'),
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: null,
-      );
+
+    if (token != null && notifyServer) {
+      try {
+        await client.post(
+          Uri.parse('/logout'),
+          headers: {'Content-Type': 'application/json'},
+          body: null,
+        );
+      } catch (_) {
+
+      }
     }
+
     AuthMemory.clear();
   }
 }
