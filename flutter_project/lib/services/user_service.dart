@@ -15,11 +15,9 @@ class UserService {
     final url = Uri.parse('$host/users');
 
     try {
-      final token = await AuthService.getToken();
       final response = await client.get(
         url,
         headers: {
-          'Authorization': 'Bearer $token',
           'Content-Type': 'application/json',
         },
       );
@@ -41,11 +39,9 @@ class UserService {
     final url = Uri.parse('$host/users/$id');
 
     try {
-      final token = await AuthService.getToken();
       final response = await client.get(
         url,
         headers: {
-          'Authorization': 'Bearer $token',
           'Content-Type': 'application/json',
         },
       );
@@ -72,7 +68,6 @@ class UserService {
     final url = Uri.parse('$host/user');
 
     try {
-      final token = await AuthService.getToken();
 
       final body = <String, dynamic>{};
       if (name != null) body['name'] = name;
@@ -83,7 +78,6 @@ class UserService {
       final response = await client.put(
         url,
         headers: {
-          'Authorization': 'Bearer $token',
           'Content-Type': 'application/json',
         },
         body: jsonEncode(body),
@@ -105,11 +99,9 @@ class UserService {
     final url = Uri.parse('$host/user/$userId/teams');
 
     try {
-      final token = await AuthService.getToken();
       final response = await client.get(
         url,
         headers: {
-          'Authorization': 'Bearer $token',
           'Content-Type': 'application/json',
         },
       );
@@ -131,14 +123,12 @@ class UserService {
     final url = Uri.parse('$host/user/training/$trainingId');
 
     try {
-      final token = await AuthService.getToken();
 
       final body = {"users": userIds};
 
       final response = await client.post(
         url,
         headers: {
-          'Authorization': 'Bearer $token',
           'Content-Type': 'application/json',
         },
         body: jsonEncode(body),
@@ -159,18 +149,11 @@ class UserService {
   }
 
   Future<List<Map<String, dynamic>>> fetchNotifications() async {
-    final token = await AuthService.getToken();
-
-    if (token == null) {
-      print('No se encontró el token JWT');
-      return [];
-    }
 
     final url = Uri.parse('$host/user/notifications');
     final response = await client.get(
       url,
       headers: {
-        'Authorization': 'Bearer $token',
         'Content-Type': 'application/json',
       },
     );
@@ -185,15 +168,11 @@ class UserService {
   }
 
   Future<bool> markNotificationsViewed() async {
-    final token = await AuthService.getToken();
-    if (token == null) return false;
-
     final url = Uri.parse('$host/user/notifications/viewed');
 
     final response = await client.post(
       url,
       headers: {
-        'Authorization': 'Bearer $token',
         'Content-Type': 'application/json',
       },
     );

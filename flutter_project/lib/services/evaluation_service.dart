@@ -14,11 +14,9 @@ class EvaluationService {
     final url = Uri.parse('$host/evaluation');
 
     try {
-      final token = await AuthService.getToken();
       final response = await client.post(
         url,
         headers: {
-          'Authorization': 'Bearer $token',
           'Content-Type': 'application/json',
         },
         body: jsonEncode(evaluation.toJson()),
@@ -45,11 +43,9 @@ class EvaluationService {
     final url = Uri.parse('$host/evaluation/$trainingId');
 
     try {
-      final token = await AuthService.getToken();
       final response = await client.get(
         url,
         headers: {
-          'Authorization': 'Bearer $token',
           'Content-Type': 'application/json',
         },
       );
@@ -85,11 +81,9 @@ class EvaluationService {
     );
 
     try {
-      final token = await AuthService.getToken();
       final response = await client.get(
         url,
         headers: {
-          'Authorization': 'Bearer $token',
           'Content-Type': 'application/json',
         },
       );
@@ -121,11 +115,9 @@ class EvaluationService {
     final url = Uri.parse('$host/evaluations/$trainingId');
 
     try {
-      final token = await AuthService.getToken();
       final response = await client.get(
         url,
         headers: {
-          'Authorization': 'Bearer $token',
           'Content-Type': 'application/json',
         },
       );

@@ -6,12 +6,10 @@ import fetch from 'node-fetch';
 
 const app = express();
 const API_HOST = process.env.API_HOST || 'http://localhost:8080';
-
-
 const buildPath = path.join(process.cwd(), 'build', 'web');
+
 app.use(express.static(buildPath));
 app.use(express.json());
-
 
 const sessions = new Map();
 
@@ -26,74 +24,54 @@ function authMiddleware(req, res, next) {
     const sessionId = bearer.split(' ')[1];
     const session = sessions.get(sessionId);
 
-    if (session) {
-        req.sessionId = sessionId;
-        req.userId = session.userId;
+    if (!session) return res.status(401).json({ error: 'Invalid session' });
 
-        req.headers['authorization'] = `Bearer ${session.jwt}`;
-
-        next();
-    } else {
-        return res.status(401).json({ error: 'Invalid session' });
-    }
+    req.sessionId = sessionId;
+    req.userId = session.userId;
+    req.headers['authorization'] = `Bearer ${session.jwt}`;
+    next();
 }
 
+// Auth endpoints
 app.post('/auth', async (req, res) => {
     const { email, password } = req.body;
-
     try {
-        const response = await fetch(`${API_HOST}/auth`, {
+        const response = await fetch(`${API_HOST}/api/auth`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ email, password })
         });
-
         if (!response.ok) return res.status(401).json({ error: 'Invalid credentials' });
 
-        const data = await response.json();
-        const { token: jwt, user } = data;
-
+        const { token: jwt, user } = await response.json();
         const sessionId = generateSessionId();
-        sessions.set(sessionId, {
-            userId: user.id,
-            jwt:jwt,
-            expiresAt: Date.now() + 3600000
-        });
+        sessions.set(sessionId, { userId: user.id, jwt, expiresAt: Date.now() + 3600000 });
 
         res.json({ token: sessionId, user: { id: user.id, type: user.type } });
-    } catch (err) {
-        console.error(err);
+    } catch {
         res.status(500).json({ error: 'Server error' });
     }
 });
 
-
 app.post('/logout', authMiddleware, (req, res) => {
-    const sessionId = req.headers['authorization']?.split(' ')[1];
-    sessions.delete(sessionId);
+    sessions.delete(req.sessionId);
     res.json({ success: true });
 });
 
-
+// Proxy API requests
 app.use('/api', authMiddleware, createProxyMiddleware({
     target: API_HOST,
     changeOrigin: true,
-    pathRewrite: path => path
+    onProxyReq: (proxyReq, req) => console.log(`[PROXY] ${req.method} ${req.url}`),
 }));
 
+// Health check
+app.get('/health', (req, res) => res.send('OK'));
 
-app.get('/health', (req, res) => {
-    res.status(200).send('OK');
-});
-
-
+// Serve Flutter web
 app.get('*', (req, res) => {
     res.sendFile(path.join(buildPath, 'index.html'));
 });
 
-
 const PORT = process.env.PORT || 80;
-app.listen(PORT, () => {
-    console.log(`Server running on port ${PORT}`);
-});
-
+app.listen(PORT, () => console.log(`Server running on port ${PORT}`));

@@ -11,18 +11,17 @@ class AuthService {
 
   static Future<bool> login(String email, String password) async {
     final response = await client.post(
-      Uri.parse('$host/auth'),
+      Uri.parse('/auth'),
       headers: {'Content-Type': 'application/json'},
       body: jsonEncode({'email': email, 'password': password}),
     );
-
     if (response.statusCode == 200) {
       final data = jsonDecode(response.body);
       final token = data['token'];
       final userId = data['user']['id'].toString();
       final userType = data['user']['type'].toString();
-
       AuthMemory.saveToken(token, userId, userType);
+      print(await AuthService.getToken().toString());
 
       return true;
     } else {
@@ -31,7 +30,8 @@ class AuthService {
   }
 
   static Future<bool> isLoggedIn() async {
-    return AuthMemory.token != null;
+    var token = await AuthMemory.getToken();
+    return token != null;
   }
 
   static Future<bool> register(Map<String, dynamic> body) async {
@@ -45,22 +45,32 @@ class AuthService {
   }
 
   static Future<String?> getToken() async {
-    return AuthMemory.token;
+    return await AuthMemory.getToken();
   }
 
   static Future<String?> getLoggedUserId() async {
-    return AuthMemory.userId;
+    return await  AuthMemory.getUserId();
   }
 
   static Future<bool> isTrainer() async {
-    return AuthMemory.userType == "TRAINER";
+    return await AuthMemory.getUserType() == "TRAINER";
   }
 
   static Future<bool> isTrainee() async {
-    return AuthMemory.userType == "TRAINEE";
+    return await AuthMemory.getUserType() == "TRAINEE";
   }
 
   static Future<void> logout() async {
+    var token = await AuthMemory.getToken();
+    if (token != null) {
+      await client.post(
+        Uri.parse('/logout'),
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: null,
+      );
+    }
     AuthMemory.clear();
   }
 }

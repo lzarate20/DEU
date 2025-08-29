@@ -23,6 +23,7 @@ class _LoginFormState extends State<LoginForm> {
 
       final success = await AuthService.login(_username, _password);
 
+
       if (success) {
         final userConfig = await ConfigService.getUserConfig();
         final themeProvider = Provider.of<ThemeProvider>(context, listen: false);

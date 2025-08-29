@@ -13,11 +13,10 @@ class ExerciseService {
     final url = Uri.parse('$host/exercises');
 
     try {
-      final token = await AuthService.getToken();
+
       final response = await client.get(
         url,
         headers: {
-          'Authorization': 'Bearer $token',
           'Content-Type': 'application/json',
         },
       );

@@ -13,11 +13,9 @@ class TeamService {
     final url = Uri.parse('$host/teams');
 
     try {
-      final token = AuthService.getToken();
       final response = await client.get(
         url,
         headers: {
-          'Authorization': 'Bearer $token',
           'Content-Type': 'application/json',
         },
       );
@@ -42,10 +40,9 @@ class TeamService {
 
   Future<List<Map<String, dynamic>>?> fetchMyTeams() async {
     try {
-      final token = AuthService.getToken();
-      final userId = AuthService.getLoggedUserId();
+      final userId = await AuthService.getLoggedUserId();
 
-      if (token == null || userId == null) {
+      if (userId == null) {
         return null;
       }
 
@@ -54,7 +51,6 @@ class TeamService {
       final response = await client.get(
         url,
         headers: {
-          'Authorization': 'Bearer $token',
           'Content-Type': 'application/json',
         },
       );
@@ -77,11 +73,9 @@ class TeamService {
 
   Future<Map<String, dynamic>?> fetchTeamById(String id) async {
     final url = Uri.parse('$host/teams/$id');
-    final token = AuthService.getToken();
     final response = await client.get(
       url,
       headers: {
-        'Authorization': 'Bearer $token',
         'Content-Type': 'application/json',
       },
     );
@@ -94,12 +88,10 @@ class TeamService {
 
   Future<void> createTeam(String name) async {
     final url = Uri.parse('$host/team');
-    final token = AuthService.getToken();
 
     final response = await client.post(
       url,
       headers: {
-        'Authorization': 'Bearer $token',
         'Content-Type': 'application/json',
       },
       body: jsonEncode({'name': name}),
@@ -114,12 +106,10 @@ class TeamService {
 
   Future<bool> addUserToTeam(String teamId, String userId) async {
     final url = Uri.parse('$host/teams/$teamId/user/$userId');
-    final token = AuthService.getToken();
 
     final response = await client.post(
       url,
       headers: {
-        'Authorization': 'Bearer $token',
         'Content-Type': 'application/json',
       },
     );

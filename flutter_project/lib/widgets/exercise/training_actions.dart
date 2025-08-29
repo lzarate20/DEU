@@ -30,6 +30,7 @@ class _TrainingActionsState extends State<TrainingActions> {
   bool _isOwner = false;
   bool _isTrainer = false;
   bool _hasRated = false;
+  bool _hasTraining = false;
 
   @override
   void initState() {
@@ -37,6 +38,7 @@ class _TrainingActionsState extends State<TrainingActions> {
     _checkOwnership();
     _checkIsTrainer();
     _checkIfRated();
+    _checkHasTraining;
   }
 
   Future<void> _checkOwnership() async {
@@ -137,10 +139,12 @@ class _TrainingActionsState extends State<TrainingActions> {
     );
   }
 
-  bool get _hasTraining {
+  Future<void> _checkHasTraining() async {
     final trainees = widget.training['trainees'] as List<dynamic>? ?? [];
-    debugPrint(trainees.contains(AuthService.getLoggedUserId()).toString());
-    return trainees.contains(AuthService.getLoggedUserId());
+    final userId = await AuthService.getLoggedUserId();
+    setState(() {
+      _hasTraining = trainees.contains(userId);
+    });
   }
 
   void _rateTraining() async {

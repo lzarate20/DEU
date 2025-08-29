@@ -14,15 +14,13 @@ class TrainingService {
 
 
   Future<List<Map<String, dynamic>>?> fetchTraining(DateTime date) async {
-    final userId = AuthService.getLoggedUserId();
+    final userId = await AuthService.getLoggedUserId();
     final formattedDate = date.toIso8601String().split('T').first;
     final url = Uri.parse('$host/user/trainings?id=$userId&date=$formattedDate');
 
     try {
-      final token = await AuthService.getToken();
       final response = await client.get(url,
         headers: {
-        'Authorization': 'Bearer $token',
         'Content-Type': 'application/json',
       }
       );
@@ -45,11 +43,9 @@ class TrainingService {
     final url = Uri.parse('$host/training/$trainingId');
 
     try {
-      final token = AuthService.getToken();
       final response = await client.get(
         url,
         headers: {
-          'Authorization': 'Bearer $token',
           'Content-Type': 'application/json',
         },
       );
@@ -71,10 +67,8 @@ class TrainingService {
     final url = Uri.parse('$host/trainings');
 
     try {
-      final token = await AuthService.getToken();
       final response = await client.get(url,
           headers: {
-            'Authorization': 'Bearer $token',
             'Content-Type': 'application/json',
           }
       );
@@ -96,11 +90,9 @@ class TrainingService {
   Future<bool> createTraining(Map<String, dynamic> trainingData) async {
     final url = Uri.parse('$host/training');
     try {
-      final token = await AuthService.getToken();
       final response = await client.post(
         url,
         headers: {
-          'Authorization': 'Bearer $token',
           'Content-Type': 'application/json',
         },
         body: jsonEncode(trainingData),
@@ -113,7 +105,7 @@ class TrainingService {
   }
 
   Future<bool> copyTraining(Map<String, dynamic> originalTraining) async {
-    final userId = await AuthService.getToken();
+    final userId = await AuthService.getLoggedUserId();
     if (userId == null) return false;
 
     final newTraining = Map<String, dynamic>.from(originalTraining);
@@ -128,11 +120,9 @@ class TrainingService {
     final url = Uri.parse('$host/training/$id');
 
     try {
-      final token = await AuthService.getToken();
       final response = await client.delete(
         url,
         headers: {
-          'Authorization': 'Bearer $token',
           'Content-Type': 'application/json',
         },
       );
@@ -153,7 +143,7 @@ class TrainingService {
     required String idTeam,
     required String comment,
   }) async {
-    final userId = await AuthService.getToken();
+    final userId = await AuthService.getLoggedUserId();
     if (userId == null) return null;
 
     final url = Uri.parse('$host/training/comment/$idTeam');
@@ -164,11 +154,9 @@ class TrainingService {
     };
 
     try {
-      final token = await AuthService.getToken();
       final response = await client.post(
         url,
         headers: {
-          'Authorization': 'Bearer $token',
           'Content-Type': 'application/json',
         },
         body: jsonEncode(body),

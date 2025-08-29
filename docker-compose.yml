@@ -8,6 +8,8 @@ services:
     ports:
       - "80:80"
     restart: unless-stopped
+    environment:
+      - API_HOST=http://backend:8080   # nombre del servicio backend
 
   backend:
     build:

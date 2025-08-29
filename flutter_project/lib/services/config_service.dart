@@ -1,7 +1,6 @@
 import 'dart:convert';
 
 import 'package:flutter_project/services/auth_service.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 import '../configProject/api_config.dart';
 import '../models/user_config.dart';
@@ -12,16 +11,12 @@ class ConfigService {
   static final host = ApiConfig.host;
 
   static Future<UserConfig> getUserConfig() async {
-    final token = await AuthService.getToken();
     final userId = await AuthService.getLoggedUserId();
 
     final url = Uri.parse('$host/config/$userId');
     final response = await client.get(
       url,
-      headers: {
-        'Authorization': 'Bearer $token',
-        'Content-Type': 'application/json',
-      },
+      headers: {'Content-Type': 'application/json'},
     );
 
     if (response.statusCode == 200) {
@@ -36,7 +31,6 @@ class ConfigService {
     required String theme,
     required String letterSize,
   }) async {
-    final token = await AuthService.getToken();
     final userId = await AuthService.getLoggedUserId();
     final url = Uri.parse('$host/config');
     final body = jsonEncode({
@@ -47,10 +41,7 @@ class ConfigService {
 
     final response = await client.patch(
       url,
-      headers: {
-        'Authorization': 'Bearer $token',
-        'Content-Type': 'application/json',
-      },
+      headers: {'Content-Type': 'application/json'},
       body: body,
     );
 
