@@ -1,8 +1,8 @@
+import 'package:flutter_project/services/auth_memory.dart';
 import 'package:flutter_project/services/auth_service.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:flutter_project/widgets/theme_provider.dart';
 import 'package:http/http.dart' as http;
 
-import '../configProject/global_config.dart';
 import '../configProject/global_router.dart';
 
 class AuthHttpClient extends http.BaseClient {
@@ -20,6 +20,7 @@ class AuthHttpClient extends http.BaseClient {
     if (response.statusCode == 401 || response.statusCode == 403) {
       await AuthService.logout(notifyServer: false);
       router.go('/');
+      AuthMemory.clear();
     }
 
     return response;

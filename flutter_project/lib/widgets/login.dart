@@ -29,7 +29,11 @@ class _LoginFormState extends State<LoginForm> {
         final themeProvider = Provider.of<ThemeProvider>(context, listen: false);
         await themeProvider.initFromConfig(userConfig);
         if (!mounted) return;
-        context.go('/home');
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (mounted) {
+            context.go('/home');
+          }
+        });
       } else {
         if (!mounted) return;
         ScaffoldMessenger.of(context).showSnackBar(

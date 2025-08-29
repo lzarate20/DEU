@@ -33,7 +33,7 @@ function authMiddleware(req, res, next) {
 }
 
 // Auth endpoints
-app.post('/auth', async (req, res) => {
+app.post('/api/auth', async (req, res) => {
     const {email, password} = req.body;
     try {
         const response = await fetch(`${API_HOST}/api/auth`, {
@@ -53,7 +53,23 @@ app.post('/auth', async (req, res) => {
     }
 });
 
-app.post('/logout', (req, res) => {
+app.post('/api/auth/user', async (req, res) => {
+    try {
+        const response = await fetch(`${API_HOST}/api/auth/user`, {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify(req.body)
+        });
+        res.sendStatus(response.status);
+
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({error: 'Server error'});
+    }
+});
+
+
+app.post('/api/logout', (req, res) => {
     if (req.sessionId != null) {
         sessions.delete(req.sessionId);
     }
@@ -64,7 +80,15 @@ app.post('/logout', (req, res) => {
 app.use('/api', authMiddleware, createProxyMiddleware({
     target: API_HOST,
     changeOrigin: true,
-    onProxyReq: (proxyReq, req) => console.log(`[PROXY] ${req.method} ${req.url}`),
+    selfHandleResponse: false,
+    onProxyReq: (proxyReq, req, res) => {
+        if (req.body) {
+            const bodyData = JSON.stringify(req.body);
+            proxyReq.setHeader('Content-Length', Buffer.byteLength(bodyData));
+            proxyReq.write(bodyData);
+            proxyReq.end();
+        }
+    },
 }));
 
 // Health check

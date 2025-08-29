@@ -1,3 +1,11 @@
+import 'package:flutter/foundation.dart';
+
 class ApiConfig {
-  static const String host = '/api';
+  static String get host {
+    if (kReleaseMode) {
+      return '/api';
+    } else {
+      return 'http://localhost:8080/api';
+    }
+  }
 }

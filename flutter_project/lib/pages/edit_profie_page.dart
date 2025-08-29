@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 import '../services/auth_service.dart';
 import '../services/user_service.dart';
@@ -29,6 +28,10 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
   late String _originalName;
   late String _originalEmail;
 
+  bool _showCurrentPassword = false;
+  bool _showNewPassword = false;
+  bool _showConfirmPassword = false;
+
   @override
   void initState() {
     super.initState();
@@ -44,7 +47,8 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
       if (userData != null) {
         _nameController.text = userData['name'] ?? '';
         _emailController.text = userData['email'] ?? '';
-        _userTypeController.text = (userData['type'] ?? '').toLowerCase() == 'trainer'
+        _userTypeController.text =
+            (userData['type'] ?? '').toLowerCase() == 'trainer'
             ? 'Entrenador'
             : 'Jugador';
 
@@ -71,7 +75,9 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
       final success = await userService.updateUser(
         name: _editMode ? _nameController.text : null,
         email: _editMode ? _emailController.text : null,
-        currentPassword: _changePassword ? _currentPasswordController.text : null,
+        currentPassword: _changePassword
+            ? _currentPasswordController.text
+            : null,
         newPassword: _changePassword ? _newPasswordController.text : null,
       );
 
@@ -80,7 +86,6 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
         setState(() {
           _editMode = false;
           _changePassword = false;
-          // Actualizamos valores originales
           _originalName = _nameController.text;
           _originalEmail = _emailController.text;
         });
@@ -105,11 +110,8 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
   }
 
   void _showSnackBar(String msg) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(msg)),
-    );
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(msg)));
   }
-
 
   Widget _buildTextField({
     required String label,
@@ -117,9 +119,11 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
     bool readOnly = false,
     TextInputType keyboardType = TextInputType.text,
     bool obscureText = false,
+    bool isPasswordField = false,
+    bool showPassword = false,
+    VoidCallback? togglePasswordVisibility,
   }) {
     if (readOnly) {
-      // Mostrar como campo no editable
       return Padding(
         padding: const EdgeInsets.symmetric(vertical: 10),
         child: ConstrainedBox(
@@ -127,14 +131,14 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(
-                label,
-                style: Theme.of(context).textTheme.bodyMedium,
-              ),
+              Text(label, style: Theme.of(context).textTheme.bodyMedium),
               const SizedBox(height: 4),
               Container(
                 width: double.infinity,
-                padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 8),
+                padding: const EdgeInsets.symmetric(
+                  vertical: 12,
+                  horizontal: 8,
+                ),
                 decoration: BoxDecoration(
                   border: Border(
                     bottom: BorderSide(
@@ -154,19 +158,26 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
       );
     }
 
-    // Campo editable normal
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 10),
       child: ConstrainedBox(
         constraints: const BoxConstraints(maxWidth: 400),
         child: TextFormField(
           controller: controller,
-          obscureText: obscureText,
+          obscureText: obscureText && !showPassword,
           keyboardType: keyboardType,
           decoration: InputDecoration(
             labelText: label,
             labelStyle: Theme.of(context).textTheme.bodyMedium,
             border: const UnderlineInputBorder(),
+            suffixIcon: isPasswordField
+                ? IconButton(
+                    icon: Icon(
+                      showPassword ? Icons.visibility : Icons.visibility_off,
+                    ),
+                    onPressed: togglePasswordVisibility,
+                  )
+                : null,
           ),
           validator: (value) {
             if (value == null || value.isEmpty) {
@@ -179,34 +190,46 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
     );
   }
 
-
   Widget _buildPasswordSection() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text("Cambiar contraseña",
-            style: Theme.of(context)
-                .textTheme
-                .titleLarge
-                ?.copyWith(fontWeight: FontWeight.bold)),
+        Text(
+          "Cambiar contraseña",
+          style: Theme.of(
+            context,
+          ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
+        ),
         const SizedBox(height: 8),
         _buildTextField(
           label: 'Contraseña actual',
           controller: _currentPasswordController,
-          readOnly: false,
           obscureText: true,
+          isPasswordField: true,
+          showPassword: _showCurrentPassword,
+          togglePasswordVisibility: () {
+            setState(() => _showCurrentPassword = !_showCurrentPassword);
+          },
         ),
         _buildTextField(
           label: 'Nueva contraseña',
           controller: _newPasswordController,
-          readOnly: false,
           obscureText: true,
+          isPasswordField: true,
+          showPassword: _showNewPassword,
+          togglePasswordVisibility: () {
+            setState(() => _showNewPassword = !_showNewPassword);
+          },
         ),
         _buildTextField(
           label: 'Confirmar nueva contraseña',
           controller: _confirmPasswordController,
-          readOnly: false,
           obscureText: true,
+          isPasswordField: true,
+          showPassword: _showConfirmPassword,
+          togglePasswordVisibility: () {
+            setState(() => _showConfirmPassword = !_showConfirmPassword);
+          },
         ),
       ],
     );
@@ -235,7 +258,6 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
       ],
     );
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -281,50 +303,50 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
       body: _loading
           ? const Center(child: CircularProgressIndicator())
           : Padding(
-        padding: const EdgeInsets.all(16),
-        child: ListView(
-          children: [
-            Form(
-              key: _formKey,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+              padding: const EdgeInsets.all(16),
+              child: ListView(
                 children: [
-                  Text("Información de perfil",
-                      style: Theme.of(context)
-                          .textTheme
-                          .titleLarge
-                          ?.copyWith(fontWeight: FontWeight.bold)),
-                  const SizedBox(height: 8),
-                  _buildTextField(
-                    label: 'Nombre y apellido',
-                    controller: _nameController,
-                    readOnly: !_editMode,
+                  Form(
+                    key: _formKey,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          "Información de perfil",
+                          style: Theme.of(context).textTheme.titleLarge
+                              ?.copyWith(fontWeight: FontWeight.bold),
+                        ),
+                        const SizedBox(height: 8),
+                        _buildTextField(
+                          label: 'Nombre y apellido',
+                          controller: _nameController,
+                          readOnly: !_editMode,
+                        ),
+                        _buildTextField(
+                          label: 'Email',
+                          controller: _emailController,
+                          readOnly: !_editMode,
+                          keyboardType: TextInputType.emailAddress,
+                        ),
+                        _buildTextField(
+                          label: 'Tipo de usuario',
+                          controller: _userTypeController,
+                          readOnly: true,
+                        ),
+                        if (_changePassword) ...[
+                          const Divider(height: 32),
+                          _buildPasswordSection(),
+                        ],
+                        if (showActions) ...[
+                          const SizedBox(height: 20),
+                          _buildActionButtons(),
+                        ],
+                      ],
+                    ),
                   ),
-                  _buildTextField(
-                    label: 'Email',
-                    controller: _emailController,
-                    readOnly: !_editMode,
-                    keyboardType: TextInputType.emailAddress,
-                  ),
-                  _buildTextField(
-                    label: 'Tipo de usuario',
-                    controller: _userTypeController,
-                    readOnly: true,
-                  ),
-                  if (_changePassword) ...[
-                    const Divider(height: 32),
-                    _buildPasswordSection(),
-                  ],
-                  if (showActions) ...[
-                    const SizedBox(height: 20),
-                    _buildActionButtons(),
-                  ],
                 ],
               ),
             ),
-          ],
-        ),
-      ),
     );
   }
 
@@ -339,5 +361,3 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
     super.dispose();
   }
 }
-
-

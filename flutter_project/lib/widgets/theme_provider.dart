@@ -25,6 +25,13 @@ class ThemeProvider extends ChangeNotifier {
     _saveConfig();
   }
 
+  void reset() {
+    isDarkMode = false;
+    fontSizeFactor = 1.0;
+    fontFamily = 'Roboto';
+    notifyListeners();
+  }
+
   void setFontSizeFactor(double factor) {
     fontSizeFactor = factor;
     notifyListeners();

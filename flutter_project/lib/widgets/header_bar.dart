@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_project/services/auth_memory.dart';
 import 'package:flutter_project/widgets/settings.dart';
 import 'package:flutter_project/widgets/theme_provider.dart';
 import 'package:go_router/go_router.dart';
@@ -31,6 +32,9 @@ class HeaderBar extends StatelessWidget {
   Future<void> _logout(BuildContext context) async {
     await AuthService.logout();
     context.go('/');
+    AuthMemory.clear();
+    final themeProvider = Provider.of<ThemeProvider>(context);
+    themeProvider.reset();
   }
 
   @override

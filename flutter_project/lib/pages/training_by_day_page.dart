@@ -53,7 +53,7 @@ class _TrainingPageState extends State<TrainingPage> with RouteAware {
     return Scaffold(
       body: LayoutBuilder(
         builder: (context, constraints) {
-          final isSmallScreen = constraints.maxWidth < 800; // Umbral para pantalla pequeña
+          final isSmallScreen = constraints.maxWidth < 800;
 
           return Row(
             children: [
@@ -188,7 +188,7 @@ class _TrainingPageState extends State<TrainingPage> with RouteAware {
                               isScrollControlled: true,
                               builder: (_) => Padding(
                                 padding: const EdgeInsets.all(16.0),
-                                child: _buildCalendar(),
+                                child: _buildCalendar(isSmallScreen: true),
                               ),
                             );
                           },
@@ -207,7 +207,7 @@ class _TrainingPageState extends State<TrainingPage> with RouteAware {
     );
   }
 
-  Widget _buildCalendar() {
+  Widget _buildCalendar({bool isSmallScreen = false}) {
     return TableCalendar(
       locale: "es",
       firstDay: DateTime(2025),
@@ -217,7 +217,9 @@ class _TrainingPageState extends State<TrainingPage> with RouteAware {
       onDaySelected: (selectedDay, focusedDay) {
         setState(() => _selectedDay = selectedDay);
         _loadTraining();
-        Navigator.pop(context); // Cierra el modal al seleccionar
+        if (isSmallScreen) {
+          Navigator.pop(context);
+        }
       },
       calendarFormat: CalendarFormat.month,
       availableCalendarFormats: const {CalendarFormat.month: 'Mes'},
@@ -226,6 +228,7 @@ class _TrainingPageState extends State<TrainingPage> with RouteAware {
       daysOfWeekHeight: 30,
     );
   }
+
 
 }
 

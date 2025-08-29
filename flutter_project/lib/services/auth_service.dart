@@ -11,7 +11,7 @@ class AuthService {
 
   static Future<bool> login(String email, String password) async {
     final response = await client.post(
-      Uri.parse('/auth'),
+      Uri.parse('$host/auth'),
       headers: {'Content-Type': 'application/json'},
       body: jsonEncode({'email': email, 'password': password}),
     );
@@ -89,7 +89,7 @@ class AuthService {
     if (token != null && notifyServer) {
       try {
         await client.post(
-          Uri.parse('/logout'),
+          Uri.parse('$host/logout'),
           headers: {'Content-Type': 'application/json'},
           body: null,
         );
