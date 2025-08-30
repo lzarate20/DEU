@@ -45,7 +45,6 @@ class _LandingPageState extends State<LandingPage> {
           final isNarrow = constraints.maxWidth < 800;
 
           if (isNarrow) {
-            // Vista para pantallas pequeñas
             return SingleChildScrollView(
               child: Column(
                 children: [
@@ -101,7 +100,6 @@ class _LandingPageState extends State<LandingPage> {
               ),
             );
           } else {
-            // Vista para pantallas grandes
             return Row(
               children: [
                 Container(
