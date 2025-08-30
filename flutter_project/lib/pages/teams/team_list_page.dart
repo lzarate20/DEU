@@ -128,6 +128,8 @@ class _TeamListPageState extends State<TeamListPage> with RouteAware {
       ),
       floatingActionButton: _isTrainer
           ? FloatingActionButton(
+          backgroundColor: Colors.blue,
+          foregroundColor: Colors.white,
         onPressed: () async {
           final TextEditingController _controller = TextEditingController();
 

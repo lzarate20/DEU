@@ -197,6 +197,8 @@ class _TrainingPageState extends State<TrainingListPage> with RouteAware {
       ),
       floatingActionButton: _isTrainer
           ? FloatingActionButton(
+        backgroundColor: Colors.blue,
+        foregroundColor: Colors.white,
         onPressed: () {
           context.go('/training/new');
         },

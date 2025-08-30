@@ -99,7 +99,6 @@ class _NavButtonState extends State<_NavButton> {
   Widget build(BuildContext context) {
     final currentRoute =  GoRouter.of(context).state.path;
     final buttonRoute = _NavButton.labelToRoute[widget.label] ?? '/${widget.label.toLowerCase()}';
-    print(buttonRoute);
     final isActive = currentRoute == buttonRoute;
 
     Color bgColor;
