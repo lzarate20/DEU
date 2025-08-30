@@ -70,7 +70,7 @@ class BaseLayout extends StatelessWidget {
   }
 }
 
-class _NavButton extends StatelessWidget {
+class _NavButton extends StatefulWidget {
   final IconData icon;
   final String label;
   final bool compact;
@@ -89,27 +89,55 @@ class _NavButton extends StatelessWidget {
   };
 
   @override
+  State<_NavButton> createState() => _NavButtonState();
+}
+
+class _NavButtonState extends State<_NavButton> {
+  bool _hovering = false;
+
+  @override
   Widget build(BuildContext context) {
-    return TextButton(
-      style: TextButton.styleFrom(
-        foregroundColor: Colors.white,
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-        alignment: compact ? Alignment.center : Alignment.centerLeft,
-        minimumSize: const Size(double.infinity, 48),
+    final currentRoute =  GoRouter.of(context).state.path;
+    final buttonRoute = _NavButton.labelToRoute[widget.label] ?? '/${widget.label.toLowerCase()}';
+    print(buttonRoute);
+    final isActive = currentRoute == buttonRoute;
+
+    Color bgColor;
+    if (isActive) {
+      bgColor = Colors.blue.shade700;
+    } else if (_hovering) {
+      bgColor = Colors.blue.shade800;
+    } else {
+      bgColor = Colors.transparent;
+    }
+
+    return MouseRegion(
+      onEnter: (_) => setState(() => _hovering = true),
+      onExit: (_) => setState(() => _hovering = false),
+      child: TextButton(
+        style: TextButton.styleFrom(
+          foregroundColor: Colors.white,
+          backgroundColor: bgColor,
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+          alignment: widget.compact ? Alignment.center : Alignment.centerLeft,
+          minimumSize: const Size(double.infinity, 48),
+        ),
+        onPressed: () {
+          if (!isActive) {
+            context.go(buttonRoute);
+          }
+        },
+        child: widget.compact
+            ? Icon(widget.icon, color: Colors.white)
+            : Row(
+          children: [
+            Icon(widget.icon, color: Colors.white),
+            const SizedBox(width: 12),
+            Text(widget.label),
+          ],
+        ),
       ),
-      onPressed: () {
-        final route = labelToRoute[label] ?? '/${label.toLowerCase()}';
-        context.go(route);
-      },
-      child: compact
-          ? Icon(icon, color: Colors.white)
-          : Row(
-              children: [
-                Icon(icon, color: Colors.white),
-                const SizedBox(width: 12),
-                Text(label),
-              ],
-            ),
     );
   }
 }
+
