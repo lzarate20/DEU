@@ -4,10 +4,7 @@ import com.deu.deu.dto.*
 import com.deu.deu.exception.BadRequestException
 import com.deu.deu.exception.NotFoundException
 import com.deu.deu.exception.UserNotFoundException
-import com.deu.deu.model.Notification
-import com.deu.deu.model.Team
-import com.deu.deu.model.Training
-import com.deu.deu.model.User
+import com.deu.deu.model.*
 import com.deu.deu.repository.NotificationRepository
 import com.deu.deu.repository.TeamRepository
 import com.deu.deu.repository.TrainingRepository
@@ -120,6 +117,9 @@ class UserService(
             training.trainees.plus(user)
             trainingRepository.save(training.copy(trainees = training.trainees + user))
             userRepository.save(user.copy(trainings = user.trainings + training))
+            val notificationContext = NotificationContext("TRAINING",trainingId.toString())
+            val notificationDTO = NotificationDTO("Nuevo entrenamiento",notificationContext)
+            this.addNotification(id,notificationDTO)
         }
     }
 

@@ -67,7 +67,7 @@ class UserController(val userService: UserService) {
         return userService.getUserTrainingsByDate(date, id)
     }
 
-    @GetMapping("/user/trainings")
+    @GetMapping("/user/trainings/team")
     fun getFutureTrainingsUserByTeam(
         @RequestParam("team_id") teamId: Int,
         @RequestParam("id") id: Int,
@@ -79,7 +79,9 @@ class UserController(val userService: UserService) {
 
     @PostMapping("/user/training/{id}")
     fun postTrainingToUser(@PathVariable("id") id: Int, @RequestBody users: UserListRequest) {
-        users.users.forEach { u -> userService.addTraining(u, id) }
+        users.users.forEach { u ->
+            userService.addTraining(u, id)
+        }
     }
 
     @GetMapping("/user/notifications")

@@ -5,14 +5,14 @@ import '../training/training_icon.dart';
 
 class TrainingCard extends StatelessWidget {
   final Map<String, dynamic> training;
-  final Map<String, dynamic> trainer;
+  final Map<String, dynamic>? trainer;
   final VoidCallback onTap;
   final VoidCallback onAdd;
 
   const TrainingCard({
     super.key,
     required this.training,
-    required this.trainer,
+    this.trainer,
     required this.onTap,
     required this.onAdd,
   });
@@ -27,7 +27,7 @@ class TrainingCard extends StatelessWidget {
     final exercises = training['exercises'];
     final exercisesCount = exercises is List ? exercises.length : 0;
 
-    final trainerName = trainer['name'] ?? 'Desconocido';
+    final trainerName = trainer?['name'] ?? '';
 
     return Card(
       margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
@@ -63,13 +63,14 @@ class TrainingCard extends StatelessWidget {
             ),
             const SizedBox(height: 8),
             const Divider(height: 16, color: Colors.grey),
-            Row(
-              children: [
-                const Icon(Icons.person, size: 16, color: Colors.grey),
-                const SizedBox(width: 4),
-                Text('Entrenador: $trainerName'),
-              ],
-            ),
+            if (trainer != null)
+              Row(
+                children: [
+                  const Icon(Icons.person, size: 16, color: Colors.grey),
+                  const SizedBox(width: 4),
+                  Text('Entrenador: $trainerName'),
+                ],
+              ),
           ],
         ),
         onTap: onTap,

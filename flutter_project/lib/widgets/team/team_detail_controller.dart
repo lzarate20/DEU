@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_project/services/training_service.dart';
+import 'package:flutter_project/services/user_service.dart';
 import '../../services/team_service.dart';
 
 
 class TeamDetailController extends ChangeNotifier {
   final TeamService _teamService = TeamService();
+  final TrainingService _trainingService = TrainingService();
   Map<String, dynamic>? _team;
   bool _loading = false;
 
@@ -33,4 +36,23 @@ class TeamDetailController extends ChangeNotifier {
     }
     return success;
   }
+
+  Future<List<Map<String, dynamic>>?> fetchFutureTrainingsUserByTeam(int teamId, int userId) async {
+    try {
+      final trainings = await _trainingService.fetchFutureTrainingsUserByTeam(teamId, userId);
+      return trainings;
+    } catch (e) {
+      return null;
+    }
+  }
+
+  Map<String, dynamic>? get teamTrainer {
+    final List<dynamic> users = _team?['users'] ?? [];
+    return users.firstWhere(
+          (user) => user['type'] == 'TRAINER',
+      orElse: () => null,
+    );
+  }
+
+  String? get teamTrainerId => teamTrainer?['id']?.toString();
 }

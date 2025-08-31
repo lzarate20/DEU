@@ -1,34 +1,29 @@
 import 'dart:convert';
-import 'package:flutter/cupertino.dart';
+
 import 'package:flutter_project/configProject/api_config.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:http/http.dart' as http;
 
 import 'api_service.dart' show AuthHttpClient;
 import 'auth_service.dart';
-
 
 class TrainingService {
   final String host = ApiConfig.host;
   static final client = AuthHttpClient();
 
-
   Future<List<Map<String, dynamic>>?> fetchTraining(DateTime date) async {
     final userId = await AuthService.getLoggedUserId();
     final formattedDate = date.toIso8601String().split('T').first;
-    final url = Uri.parse('$host/user/trainings?id=$userId&date=$formattedDate');
+    final url = Uri.parse(
+      '$host/user/trainings?id=$userId&date=$formattedDate',
+    );
 
     try {
-      final response = await client.get(url,
-        headers: {
-        'Content-Type': 'application/json',
-      }
+      final response = await client.get(
+        url,
+        headers: {'Content-Type': 'application/json'},
       );
       if (response.statusCode == 200) {
         final List<dynamic> jsonList = jsonDecode(response.body);
-        return jsonList
-            .map((item) => item as Map<String, dynamic>)
-            .toList();
+        return jsonList.map((item) => item as Map<String, dynamic>).toList();
       } else {
         print('Error: ${response.statusCode}');
         return List.empty();
@@ -39,16 +34,16 @@ class TrainingService {
     }
   }
 
-  Future<List<Map<String, dynamic>>?> fetchFutureTrainingsUserByTeam(int teamId) async {
-    final userId = await AuthService.getLoggedUserId();
-    final url = Uri.parse('$host/user/trainings?team_id=$teamId&id=$userId');
+  Future<List<Map<String, dynamic>>?> fetchFutureTrainingsUserByTeam(
+    int teamId,
+    int userId,
+  ) async {
+    final url = Uri.parse('$host/user/trainings/team?team_id=$teamId&id=$userId');
 
     try {
       final response = await client.get(
         url,
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: {'Content-Type': 'application/json'},
       );
 
       if (response.statusCode == 200) {
@@ -64,16 +59,13 @@ class TrainingService {
     }
   }
 
-
   Future<Map<String, dynamic>?> fetchTrainingById(String trainingId) async {
     final url = Uri.parse('$host/training/$trainingId');
 
     try {
       final response = await client.get(
         url,
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: {'Content-Type': 'application/json'},
       );
 
       if (response.statusCode == 200) {
@@ -93,16 +85,13 @@ class TrainingService {
     final url = Uri.parse('$host/trainings');
 
     try {
-      final response = await client.get(url,
-          headers: {
-            'Content-Type': 'application/json',
-          }
+      final response = await client.get(
+        url,
+        headers: {'Content-Type': 'application/json'},
       );
       if (response.statusCode == 200) {
         final List<dynamic> jsonList = jsonDecode(response.body);
-        return jsonList
-            .map((item) => item as Map<String, dynamic>)
-            .toList();
+        return jsonList.map((item) => item as Map<String, dynamic>).toList();
       } else {
         print('Error: ${response.statusCode}');
         return List.empty();
@@ -118,9 +107,7 @@ class TrainingService {
     try {
       final response = await client.post(
         url,
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: {'Content-Type': 'application/json'},
         body: jsonEncode(trainingData),
       );
       return response.statusCode == 200 || response.statusCode == 201;
@@ -148,9 +135,7 @@ class TrainingService {
     try {
       final response = await client.delete(
         url,
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: {'Content-Type': 'application/json'},
       );
 
       if (response.statusCode == 200 || response.statusCode == 204) {
@@ -174,17 +159,12 @@ class TrainingService {
 
     final url = Uri.parse('$host/training/comment/$idTeam');
 
-    final Map<String, dynamic> body = {
-      'userId': userId,
-      'comment': comment,
-    };
+    final Map<String, dynamic> body = {'userId': userId, 'comment': comment};
 
     try {
       final response = await client.post(
         url,
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: {'Content-Type': 'application/json'},
         body: jsonEncode(body),
       );
 
@@ -200,5 +180,4 @@ class TrainingService {
       return null;
     }
   }
-
 }
