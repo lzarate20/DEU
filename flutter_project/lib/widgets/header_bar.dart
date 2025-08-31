@@ -40,9 +40,9 @@ class HeaderBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final themeProvider = Provider.of<ThemeProvider>(context);
-
+    final theme = Theme.of(context);
     return Container(
-      color: Colors.blue,
+      color: theme.colorScheme.primary,
       padding: const EdgeInsets.symmetric(horizontal: 16),
       height: 60,
       child: Row(

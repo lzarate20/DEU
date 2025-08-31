@@ -39,6 +39,32 @@ class TrainingService {
     }
   }
 
+  Future<List<Map<String, dynamic>>?> fetchFutureTrainingsUserByTeam(int teamId) async {
+    final userId = await AuthService.getLoggedUserId();
+    final url = Uri.parse('$host/user/trainings?team_id=$teamId&id=$userId');
+
+    try {
+      final response = await client.get(
+        url,
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      );
+
+      if (response.statusCode == 200) {
+        final List<dynamic> jsonList = jsonDecode(response.body);
+        return jsonList.map((item) => item as Map<String, dynamic>).toList();
+      } else {
+        print('Error: ${response.statusCode}');
+        return List.empty();
+      }
+    } catch (e) {
+      print('Error de red: $e');
+      return List.empty();
+    }
+  }
+
+
   Future<Map<String, dynamic>?> fetchTrainingById(String trainingId) async {
     final url = Uri.parse('$host/training/$trainingId');
 

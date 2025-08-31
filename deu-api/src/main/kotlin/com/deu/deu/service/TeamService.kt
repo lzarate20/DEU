@@ -93,4 +93,5 @@ class TeamService(
         this.addUser(team.id, user)
         userRepository.save(user.copy(teams = user.teams + team))
     }
+
 }

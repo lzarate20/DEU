@@ -1,7 +1,6 @@
 package com.deu.deu.controller
 
 import com.deu.deu.dto.*
-import com.deu.deu.exception.InvalidUserIdException
 import com.deu.deu.exception.UserNotFoundException
 import com.deu.deu.jwt.JwtUserDetails
 import com.deu.deu.model.Notification
@@ -9,7 +8,6 @@ import com.deu.deu.service.UserService
 import com.deu.deu.utils.toDTO
 import org.springframework.format.annotation.DateTimeFormat
 import org.springframework.http.HttpStatus
-import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.security.core.userdetails.UserDetails
@@ -62,23 +60,35 @@ class UserController(val userService: UserService) {
     }
 
     @GetMapping("/user/trainings")
-    fun getTrainings(@RequestParam("date") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) date: LocalDate, @RequestParam("id") id: Int):List<TrainingDTOResponse> {
-        return userService.getUserTrainingsByDate(date,id)
+    fun getTrainings(
+        @RequestParam("date") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) date: LocalDate,
+        @RequestParam("id") id: Int
+    ): List<TrainingDTOResponse> {
+        return userService.getUserTrainingsByDate(date, id)
+    }
+
+    @GetMapping("/user/trainings")
+    fun getFutureTrainingsUserByTeam(
+        @RequestParam("team_id") teamId: Int,
+        @RequestParam("id") id: Int,
+        @AuthenticationPrincipal userDetails: JwtUserDetails
+    ): List<TrainingDTOResponse> {
+        val trainerId = userDetails.id
+        return userService.getTrainingsForUserOnTeam(trainerId, teamId, id)
     }
 
     @PostMapping("/user/training/{id}")
-    fun postTrainingToUser(@PathVariable("id") id: Int,@RequestBody users:UserListRequest)
-    {
-        users.users.forEach{u->userService.addTraining(u,id)}
+    fun postTrainingToUser(@PathVariable("id") id: Int, @RequestBody users: UserListRequest) {
+        users.users.forEach { u -> userService.addTraining(u, id) }
     }
 
     @GetMapping("/user/notifications")
-    fun getNotifications(@AuthenticationPrincipal userDetails: JwtUserDetails):List<Notification>{
+    fun getNotifications(@AuthenticationPrincipal userDetails: JwtUserDetails): List<Notification> {
         return userService.getNotifications(userDetails.id)
     }
 
     @PostMapping("/user/notifications/viewed")
-    fun markNotifcationsAsViewed(@AuthenticationPrincipal userDetails: UserDetails){
+    fun markNotifcationsAsViewed(@AuthenticationPrincipal userDetails: UserDetails) {
         userService.markNotificationsAsViewed(userDetails.username)
     }
 

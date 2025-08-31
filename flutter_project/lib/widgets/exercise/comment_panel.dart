@@ -57,19 +57,19 @@ class _CommentsPanelState extends State<CommentsPanel> {
       height: MediaQuery.of(context).size.height * 0.45,
       child: Material(
         elevation: 8,
-        color: theme.colorScheme.surface, // fondo adaptativo
+        color: theme.colorScheme.surface,
         child: Column(
           children: [
-            // Encabezado
+
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-              color: theme.colorScheme.primary, // barra adaptativa
+              color: theme.colorScheme.primary,
               child: Row(
                 children: [
                   Text(
                     'Comentarios',
                     style: TextStyle(
-                      color: theme.colorScheme.onPrimary, // texto legible
+                      color: theme.colorScheme.onPrimary,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
@@ -81,7 +81,7 @@ class _CommentsPanelState extends State<CommentsPanel> {
                 ],
               ),
             ),
-            // Lista de comentarios
+
             Expanded(
               child: ListView(
                 padding: const EdgeInsets.symmetric(horizontal: 8),

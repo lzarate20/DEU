@@ -91,6 +91,7 @@ ThemeData buildTheme(
   final colorScheme = ColorScheme.fromSeed(
     seedColor: Colors.lightBlue,
     brightness: brightness,
+    primary: Colors.blue,
   );
 
   final baseTextTheme = brightness == Brightness.dark

@@ -13,7 +13,7 @@ class PlayersList extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
 
-    // Mapa para traducir posiciones
+
     final Map<String, String> positionMap = {
       'DEFENCE': 'Defensa',
       'MIDFIELD': 'Mediocampo',

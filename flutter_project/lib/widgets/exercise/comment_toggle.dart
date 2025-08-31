@@ -13,10 +13,9 @@ class CommentToggleBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    // Color de fondo destacado
     final bgColor = theme.brightness == Brightness.dark
-        ? Colors.blueGrey.shade800
-        : Colors.blueGrey.shade100;
+        ? theme.colorScheme.primary
+        : theme.colorScheme.primary;
     final contentColor = theme.colorScheme.onSurface;
 
     return GestureDetector(

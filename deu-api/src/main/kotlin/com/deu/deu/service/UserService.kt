@@ -1,6 +1,7 @@
 package com.deu.deu.service
 
 import com.deu.deu.dto.*
+import com.deu.deu.exception.BadRequestException
 import com.deu.deu.exception.NotFoundException
 import com.deu.deu.exception.UserNotFoundException
 import com.deu.deu.model.Notification
@@ -8,6 +9,7 @@ import com.deu.deu.model.Team
 import com.deu.deu.model.Training
 import com.deu.deu.model.User
 import com.deu.deu.repository.NotificationRepository
+import com.deu.deu.repository.TeamRepository
 import com.deu.deu.repository.TrainingRepository
 import com.deu.deu.repository.UserRepository
 import com.deu.deu.utils.toDTO
@@ -26,7 +28,8 @@ class UserService(
     private val trainingService: TrainingService,
     private val notificationRepository: NotificationRepository,
     private val passwordEncoder: PasswordEncoder,
-    private val trainingRepository: TrainingRepository
+    private val trainingRepository: TrainingRepository,
+    private val teamRepository: TeamRepository
 ) {
 
     fun findAllUsers(): List<UserDTOResponse> {
@@ -126,6 +129,22 @@ class UserService(
             val user = it.copy(trainings = it.trainings.filter { training -> training.id != id }.toList())
             userRepository.save(user)
         }
+    }
+
+    fun getTrainingsForUserOnTeam(trainerId: Int, teamId: Int, id: Int): List<TrainingDTOResponse> {
+        val user = userRepository.findByIdOrNull(id) ?: throw UserNotFoundException()
+        val team = teamRepository.findByIdOrNull(teamId) ?: throw NotFoundException("No se encontro el team")
+        val trainerTeam = team.users.get(0)
+        if (trainerTeam.id != trainerId) {
+            throw BadRequestException("El team no corresponde al usuario logueado")
+        }
+        val userTeam = team.users.filter { it.id == user.id }.firstOrNull()
+        if (userTeam == null) {
+            throw BadRequestException("El usuario no se encuentra en el equipo")
+        }
+        val today = LocalDate.now()
+        return user.trainings.filter { it -> it.trainer.id == trainerId }.filter { it.date.isBefore(today) || it.date.isEqual(today) }
+            .map { it -> it.toTrainingDTOResponse() }
     }
 
 
