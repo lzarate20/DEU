@@ -22,7 +22,7 @@ class SearchFilters extends StatelessWidget {
     this.onPickStartDate,
     this.onPickEndDate,
     this.onClearDates,
-    this.hintText
+    this.hintText,
   });
 
   @override
@@ -31,53 +31,79 @@ class SearchFilters extends StatelessWidget {
 
     return Column(
       children: [
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-          child: TextField(
-            controller: controller,
-            decoration: InputDecoration(
-              labelText: hintText ?? 'Buscar por nombre, tipo o entrenador',
-              prefixIcon: const Icon(Icons.search),
-              border: const OutlineInputBorder(),
+        Semantics(
+          container: true,
+          label: 'Búsqueda de entrenamientos',
+          textField: true,
+          hint: 'Ingresa texto para buscar entrenamientos',
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+            child: TextField(
+              controller: controller,
+              decoration: InputDecoration(
+                labelText: hintText ?? 'Buscar por nombre, tipo o entrenador',
+                prefixIcon: const Icon(Icons.search),
+                border: const OutlineInputBorder(),
+              ),
+              onChanged: onSearch,
             ),
-            onChanged: onSearch,
           ),
         ),
-        if (showDateFilters) ...[
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-            child: Row(
-              children: [
-                Expanded(
-                  child: ElevatedButton.icon(
-                    onPressed: onPickStartDate,
-                    icon: const Icon(Icons.date_range),
-                    label: Text(startDate == null
-                        ? 'Desde'
-                        : 'Desde: ${dateFormat.format(startDate!)}'),
+        if (showDateFilters)
+          Semantics(
+            container: true,
+            label: 'Filtros de fecha',
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: Semantics(
+                      button: true,
+                      label: startDate == null
+                          ? 'Seleccionar fecha desde'
+                          : 'Fecha desde: ${dateFormat.format(startDate!)}',
+                      child: ElevatedButton.icon(
+                        onPressed: onPickStartDate,
+                        icon: const Icon(Icons.date_range),
+                        label: Text(startDate == null
+                            ? 'Desde'
+                            : 'Desde: ${dateFormat.format(startDate!)}'),
+                      ),
+                    ),
                   ),
-                ),
-                const SizedBox(width: 10),
-                Expanded(
-                  child: ElevatedButton.icon(
-                    onPressed: onPickEndDate,
-                    icon: const Icon(Icons.date_range),
-                    label: Text(endDate == null
-                        ? 'Hasta'
-                        : 'Hasta: ${dateFormat.format(endDate!)}'),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: Semantics(
+                      button: true,
+                      label: endDate == null
+                          ? 'Seleccionar fecha hasta'
+                          : 'Fecha hasta: ${dateFormat.format(endDate!)}',
+                      child: ElevatedButton.icon(
+                        onPressed: onPickEndDate,
+                        icon: const Icon(Icons.date_range),
+                        label: Text(endDate == null
+                            ? 'Hasta'
+                            : 'Hasta: ${dateFormat.format(endDate!)}'),
+                      ),
+                    ),
                   ),
-                ),
-                IconButton(
-                  onPressed: onClearDates,
-                  tooltip: 'Limpiar fechas',
-                  icon: const Icon(Icons.clear, color: Colors.red),
-                )
-              ],
+                  Semantics(
+                    button: true,
+                    label: 'Limpiar fechas',
+                    child: IconButton(
+                      onPressed: onClearDates,
+                      tooltip: 'Limpiar fechas',
+                      icon: const Icon(Icons.clear, color: Colors.red),
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
-        ],
       ],
     );
   }
 }
+
 

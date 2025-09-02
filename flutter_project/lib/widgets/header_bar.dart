@@ -8,7 +8,6 @@ import '../services/auth_service.dart';
 import '../widgets/notification_icon.dart';
 
 class HeaderBar extends StatelessWidget {
-
   Future<void> _handleMenuSelect(BuildContext context, String value) async {
     switch (value) {
       case 'perfil':
@@ -33,7 +32,7 @@ class HeaderBar extends StatelessWidget {
     await AuthService.logout();
     context.go('/');
     AuthMemory.clear();
-    final themeProvider = Provider.of<ThemeProvider>(context);
+    final themeProvider = Provider.of<ThemeProvider>(context, listen: false);
     themeProvider.reset();
   }
 
@@ -41,6 +40,7 @@ class HeaderBar extends StatelessWidget {
   Widget build(BuildContext context) {
     final themeProvider = Provider.of<ThemeProvider>(context);
     final theme = Theme.of(context);
+
     return Container(
       color: theme.colorScheme.primary,
       padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -54,39 +54,27 @@ class HeaderBar extends StatelessWidget {
               header: true,
               child: Text(
                 'TeamUp',
-                style: Theme.of(context)
-                    .textTheme
-                    .titleLarge
-                    ?.copyWith(color: Colors.white),
+                style: theme.textTheme.titleLarge?.copyWith(color: Colors.white),
                 overflow: TextOverflow.ellipsis,
               ),
             ),
           ),
 
-          Semantics(
-            button: true,
-            label: 'Cambiar tema',
-            child: IconButton(
-              tooltip: 'Cambiar tema',
-              icon: Icon(
-                themeProvider.isDarkMode
-                    ? Icons.light_mode
-                    : Icons.dark_mode,
-                color: Colors.white,
-              ),
-              onPressed: themeProvider.toggleTheme,
+
+          IconButton(
+            tooltip: 'Cambiar tema',
+            icon: Icon(
+              themeProvider.isDarkMode ? Icons.light_mode : Icons.dark_mode,
+              color: Colors.white,
             ),
+            onPressed: themeProvider.toggleTheme,
           ),
 
-
-          Semantics(
-            button: true,
-            label: 'Notificaciones',
-            child: const NotificationIcon(),
+          NotificationIcon(
           ),
-
 
           PopupMenuButton<String>(
+            tooltip: 'Menú de opciones',
             onSelected: (value) => _handleMenuSelect(context, value),
             icon: const Icon(Icons.more_vert, color: Colors.white),
             itemBuilder: (context) => const [
@@ -100,4 +88,5 @@ class HeaderBar extends StatelessWidget {
     );
   }
 }
+
 

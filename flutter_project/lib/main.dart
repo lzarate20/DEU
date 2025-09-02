@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter_project/services/auth_memory.dart';
 import 'package:flutter_project/services/auth_service.dart';
 import 'package:flutter_project/services/config_service.dart';
@@ -19,7 +20,7 @@ void main() async {
     value: themeProvider,
     child: MyApp(),
   ));
-
+  SemanticsBinding.instance.ensureSemantics();
   AuthService.isLoggedIn().then((isAuthenticated) async {
     if (isAuthenticated) {
       final config = await ConfigService.getUserConfig();

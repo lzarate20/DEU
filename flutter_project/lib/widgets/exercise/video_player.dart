@@ -56,7 +56,8 @@ class _VideoPlayerAreaState extends State<VideoPlayerArea> {
       placeholder: Container(color: Colors.black),
     );
 
-    // Luego reemplazamos los actuales
+
+
     _chewieController?.dispose();
     _videoPlayerController?.dispose();
 

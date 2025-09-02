@@ -1,13 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_project/pages/training_by_day_page.dart';
-import 'package:go_router/go_router.dart';
-import 'package:provider/provider.dart';
 
 import '../services/team_service.dart';
-import '../widgets/accesible_list.dart';
-import '../widgets/selectable_card.dart';
 import '../widgets/team_grid.dart';
-import '../widgets/theme_provider.dart';
 
 class DashboardPage extends StatefulWidget {
   const DashboardPage({super.key});
@@ -38,7 +33,6 @@ class _DashboardPageState extends State<DashboardPage> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context).textTheme;
-    final color = context.watch<ThemeProvider>().textColor;
 
     return Scaffold(
       body: SingleChildScrollView(
@@ -60,11 +54,8 @@ class _DashboardPageState extends State<DashboardPage> {
 
               Semantics(
                 container: true,
-                label: 'Sección de entrenamientos',
-                child: const SizedBox(
-                  height: 560,
-                  child: TrainingPage(),
-                ),
+                label: 'Listado de entrenamientos',
+                child: const SizedBox(height: 560, child: TrainingPage()),
               ),
 
               const SizedBox(height: 24),
@@ -73,7 +64,9 @@ class _DashboardPageState extends State<DashboardPage> {
                 header: true,
                 child: Text(
                   'Mis Equipos',
-                  style: theme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
+                  style: theme.titleLarge?.copyWith(
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
               ),
               const Divider(thickness: 2),
@@ -92,7 +85,11 @@ class _DashboardPageState extends State<DashboardPage> {
                   ),
                 )
               else
-                TeamsGrid(teams: _teams),
+                Semantics(
+                  container: true,
+                  label: 'Listado de mis equipos',
+                  child: TeamsGrid(teams: _teams),
+                ),
             ],
           ),
         ),
@@ -100,7 +97,3 @@ class _DashboardPageState extends State<DashboardPage> {
     );
   }
 }
-
-
-
-

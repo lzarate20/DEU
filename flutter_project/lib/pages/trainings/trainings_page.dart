@@ -18,17 +18,15 @@ class TrainingListPage extends StatefulWidget {
 class _TrainingPageState extends State<TrainingListPage> with RouteAware {
   final TrainingService _service = TrainingService();
   final UserService _userService = UserService();
-
   final TextEditingController _searchController = TextEditingController();
-  String _searchQuery = '';
 
+  String _searchQuery = '';
   List<Map<String, dynamic>> _trainings = [];
   List<Map<String, dynamic>> _users = [];
-
   DateTime? _startDate;
   DateTime? _endDate;
-
   bool _isTrainer = false;
+
 
   @override
   void initState() {
@@ -62,6 +60,7 @@ class _TrainingPageState extends State<TrainingListPage> with RouteAware {
     });
   }
 
+
   Future<void> _loadData() async {
     final trainings = await _service.fetchTrainings() ?? [];
     final users = await _userService.fetchUsers();
@@ -72,9 +71,7 @@ class _TrainingPageState extends State<TrainingListPage> with RouteAware {
   }
 
   Future<void> _pickDate(BuildContext context, bool isStart) async {
-    final initialDate = isStart
-        ? (_startDate ?? DateTime.now())
-        : (_endDate ?? DateTime.now());
+    final initialDate = isStart ? (_startDate ?? DateTime.now()) : (_endDate ?? DateTime.now());
     final firstDate = DateTime(2020);
     final lastDate = DateTime(2030);
 
@@ -96,9 +93,8 @@ class _TrainingPageState extends State<TrainingListPage> with RouteAware {
     }
   }
 
-  @override
-  Widget build(BuildContext context) {
-    final filteredTrainings = _trainings.where((training) {
+  List<Map<String, dynamic>> get _filteredTrainings {
+    return _trainings.where((training) {
       final name = (training['name'] ?? '').toString().toLowerCase();
       final trainingType = (training['trainingType'] ?? '').toString().toLowerCase();
       final dateStr = training['date'] ?? '';
@@ -125,18 +121,17 @@ class _TrainingPageState extends State<TrainingListPage> with RouteAware {
         if (trainingDate == null) {
           matchesDate = false;
         } else {
-          if (_startDate != null && trainingDate.isBefore(_startDate!)) {
-            matchesDate = false;
-          }
-          if (_endDate != null && trainingDate.isAfter(_endDate!)) {
-            matchesDate = false;
-          }
+          if (_startDate != null && trainingDate.isBefore(_startDate!)) matchesDate = false;
+          if (_endDate != null && trainingDate.isAfter(_endDate!)) matchesDate = false;
         }
       }
 
       return matchesText && matchesDate;
     }).toList();
+  }
 
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: Semantics(
@@ -149,64 +144,79 @@ class _TrainingPageState extends State<TrainingListPage> with RouteAware {
       ),
       body: Column(
         children: [
-          SearchFilters(
-            controller: _searchController,
-            onSearch: (value) {
-              setState(() {
-                _searchQuery = value.toLowerCase();
-              });
-            },
-            startDate: _startDate,
-            endDate: _endDate,
-            onPickStartDate: () => _pickDate(context, true),
-            onPickEndDate: () => _pickDate(context, false),
-            onClearDates: () {
-              setState(() {
-                _startDate = null;
-                _endDate = null;
-              });
-            },
-          ),
-          Expanded(
-            child: _trainings.isEmpty || _users.isEmpty
-                ? const Center(child: CircularProgressIndicator())
-                : filteredTrainings.isEmpty
-                ? const Center(child: Text('No hay entrenamientos disponibles.'))
-                : ListView.builder(
-              itemCount: filteredTrainings.length,
-              itemBuilder: (context, index) {
-                final training = filteredTrainings[index];
-                final trainerId = training['trainer']?['id'];
-                final trainer = _users.firstWhere(
-                      (user) => user['id'] == trainerId,
-                  orElse: () => {'name': 'Desconocido'},
-                );
-
-                return TrainingCard(
-                  training: training,
-                  trainer: trainer,
-                  onTap: () {
-                    context.go('/training/${training['id']}', extra: training);
-                  },
-                  onAdd: () {},
-                );
-              },
-            ),
-          ),
+          _buildSearchSection(),
+          _buildTrainingList(),
         ],
       ),
-      floatingActionButton: _isTrainer
-          ? FloatingActionButton(
-        backgroundColor: Colors.blue,
-        foregroundColor: Colors.white,
-        onPressed: () {
-          context.go('/training/new');
+      floatingActionButton: _isTrainer ? _buildFab() : null,
+    );
+  }
+
+
+
+  Widget _buildSearchSection() {
+    return Semantics(
+      container: true,
+      label: 'Búsqueda de entrenamientos',
+      child: SearchFilters(
+        controller: _searchController,
+        onSearch: (value) => setState(() => _searchQuery = value.toLowerCase()),
+        startDate: _startDate,
+        endDate: _endDate,
+        onPickStartDate: () => _pickDate(context, true),
+        onPickEndDate: () => _pickDate(context, false),
+        onClearDates: () {
+          setState(() {
+            _startDate = null;
+            _endDate = null;
+          });
         },
-        child: const Icon(Icons.add),
-        tooltip: 'Crear nuevo entrenamiento',
-      )
-          : null,
+      ),
+    );
+  }
+
+  Widget _buildTrainingList() {
+    return Expanded(
+      child: Semantics(
+        container: true,
+        label: 'Lista de entrenamientos',
+        explicitChildNodes: true,
+        child: _trainings.isEmpty || _users.isEmpty
+            ? const Center(child: CircularProgressIndicator())
+            : _filteredTrainings.isEmpty
+            ? const Center(child: Text('No hay entrenamientos disponibles.'))
+            : ListView.builder(
+          itemCount: _filteredTrainings.length,
+          itemBuilder: (context, index) {
+            final training = _filteredTrainings[index];
+            final trainerId = training['trainer']?['id'];
+            final trainer = _users.firstWhere(
+                  (user) => user['id'] == trainerId,
+              orElse: () => {'name': 'Desconocido'},
+            );
+
+            return TrainingCard(
+              training: training,
+              trainer: trainer,
+              onTap: () => context.go('/training/${training['id']}', extra: training),
+              onAdd: () {},
+            );
+          },
+        ),
+      ),
+    );
+  }
+
+
+  Widget _buildFab() {
+    return FloatingActionButton(
+      backgroundColor: Colors.blue,
+      foregroundColor: Colors.white,
+      onPressed: () => context.go('/training/new'),
+      child: const Icon(Icons.add),
+      tooltip: 'Crear nuevo entrenamiento',
     );
   }
 }
+
 

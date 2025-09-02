@@ -33,16 +33,19 @@ class _CreateTrainingPageState extends State<CreateTrainingPage> {
   final List<GlobalKey<ExerciseFormState>> _exerciseFormKeys = [];
 
   Future<void> _pickDate() async {
+    final today = DateTime.now();
+
     final picked = await showDatePicker(
       context: context,
-      initialDate: DateTime.now(),
-      firstDate: DateTime(2020),
+      initialDate: today,
+      firstDate: today,
       lastDate: DateTime(2030),
     );
     if (picked != null) {
       setState(() => _selectedDate = picked);
     }
   }
+
 
   void _addExerciseForm() {
     setState(() => _exerciseFormKeys.add(GlobalKey<ExerciseFormState>()));
@@ -63,6 +66,13 @@ class _CreateTrainingPageState extends State<CreateTrainingPage> {
     if (_selectedDate == null) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Seleccioná una fecha para el entrenamiento.')),
+      );
+      return;
+    }
+
+    if (_selectedDate!.isBefore(DateTime.now())) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('La fecha debe ser futura.')),
       );
       return;
     }

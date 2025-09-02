@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_project/services/training_service.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
@@ -28,7 +29,7 @@ class _NotificationIconState extends State<NotificationIcon> {
       final date = DateTime.parse(isoString);
       return DateFormat('dd/MM/yyyy HH:mm').format(date);
     } catch (e) {
-      return isoString; // si no se puede parsear, devuelve original
+      return isoString;
     }
   }
 
@@ -71,7 +72,6 @@ class _NotificationIconState extends State<NotificationIcon> {
 
     _closeDropdown();
 
-    // Mostrar un loader mientras se carga el detalle
     showDialog(
       context: context,
       barrierDismissible: false,
@@ -102,20 +102,18 @@ class _NotificationIconState extends State<NotificationIcon> {
           break;
 
         default:
-          Navigator.pop(context); // cerrar loader
+          Navigator.pop(context);
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(content: Text('Tipo de notificación desconocido')),
           );
       }
     } catch (e) {
-      Navigator.pop(context); // cerrar loader
+      Navigator.pop(context);
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Error al cargar: $e')),
       );
     }
   }
-
-
 
   OverlayEntry _createOverlayEntry() {
     RenderBox renderBox = context.findRenderObject() as RenderBox;
@@ -124,12 +122,14 @@ class _NotificationIconState extends State<NotificationIcon> {
     return OverlayEntry(
       builder: (context) => Stack(
         children: [
+          // Detecta taps fuera para cerrar el dropdown
           Positioned.fill(
             child: GestureDetector(
               behavior: HitTestBehavior.translucent,
               onTap: _closeDropdown,
             ),
           ),
+          // Dropdown
           Positioned(
             width: 250,
             child: CompositedTransformFollower(
@@ -138,28 +138,30 @@ class _NotificationIconState extends State<NotificationIcon> {
               child: Material(
                 elevation: 4,
                 borderRadius: BorderRadius.circular(8),
-                child: ConstrainedBox(
-                  constraints: const BoxConstraints(maxHeight: 300),
-                  child: notifications.isEmpty
-                      ? const Padding(
-                    padding: EdgeInsets.all(16),
-                    child: Text("No hay notificaciones"),
-                  )
-                      : ListView.builder(
-                    shrinkWrap: true,
-                    itemCount: notifications.length,
-                    itemBuilder: (context, index) {
-                      final notif = notifications[index];
-                      return ListTile(
-                        leading: const Icon(Icons.notifications),
-                        title: Text(notif['message'] ?? ''),
-                        subtitle: Text(
-                          _formatDate(notif['date']),
-                        ),
-                        dense: true,
-                        onTap: () => _handleNotificationTap(notif),
-                      );
-                    },
+                child: FocusScope(
+                  autofocus: true,
+                  canRequestFocus: true,
+                  child: ConstrainedBox(
+                    constraints: const BoxConstraints(maxHeight: 300),
+                    child: notifications.isEmpty
+                        ? const Padding(
+                      padding: EdgeInsets.all(16),
+                      child: Text("No hay notificaciones"),
+                    )
+                        : ListView.builder(
+                      shrinkWrap: true,
+                      itemCount: notifications.length,
+                      itemBuilder: (context, index) {
+                        final notif = notifications[index];
+                        return ListTile(
+                          leading: const Icon(Icons.notifications),
+                          title: Text(notif['message'] ?? ''),
+                          subtitle: Text(_formatDate(notif['date'])),
+                          dense: true,
+                          onTap: () => _handleNotificationTap(notif),
+                        );
+                      },
+                    ),
                   ),
                 ),
               ),
@@ -179,12 +181,41 @@ class _NotificationIconState extends State<NotificationIcon> {
       child: Stack(
         clipBehavior: Clip.none,
         children: [
-          IconButton(
-            icon: const Icon(Icons.notifications, color: Colors.white),
-            onPressed: () {
-              _loadNotifications();
-              _toggleDropdown();
-            },
+          Tooltip(
+            message: "Notificaciones",
+            child: IconButton(
+              icon: const Icon(Icons.notifications, color: Colors.white),
+              onPressed: () async {
+                _loadNotifications(); // recarga notificaciones
+                final RenderBox button = context.findRenderObject() as RenderBox;
+                final overlay = Overlay.of(context).context.findRenderObject() as RenderBox;
+
+                final selected = await showMenu<Map<String, dynamic>>(
+                  context: context,
+                  position: RelativeRect.fromRect(
+                    Rect.fromPoints(
+                      button.localToGlobal(Offset.zero, ancestor: overlay),
+                      button.localToGlobal(button.size.bottomRight(Offset.zero), ancestor: overlay),
+                    ),
+                    Offset.zero & overlay.size,
+                  ),
+                  items: notifications.map((notif) {
+                    return PopupMenuItem<Map<String, dynamic>>(
+                      value: notif,
+                      child: ListTile(
+                        leading: const Icon(Icons.notifications),
+                        title: Text(notif['message'] ?? ''),
+                        subtitle: Text(_formatDate(notif['date'])),
+                      ),
+                    );
+                  }).toList(),
+                );
+
+                if (selected != null) {
+                  _handleNotificationTap(selected);
+                }
+              },
+            ),
           ),
           if (count > 0)
             Positioned(
@@ -214,8 +245,8 @@ class _NotificationIconState extends State<NotificationIcon> {
       ),
     );
   }
-
 }
+
 
 
 
