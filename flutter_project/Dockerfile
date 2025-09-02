@@ -22,6 +22,7 @@ WORKDIR /app
 COPY . .
 
 # Descargar dependencias y buildear en release
+RUN flutter clean
 RUN flutter pub get
 RUN flutter build web --release
 
