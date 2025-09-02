@@ -5,7 +5,9 @@
   "main": "server.js",
   "type": "module",
   "scripts": {
-    "start": "node server.js"
+    "build-flutter": "flutter build web",
+    "start": "node server.js",
+    "dev": "npm run build-flutter && npm run start"
   },
   "dependencies": {
     "express": "^4.18.2",

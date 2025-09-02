@@ -9,7 +9,6 @@ import org.springframework.context.annotation.Bean
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Component
 import java.time.*
-import java.util.*
 
 @Component
 class DataInitializer(
@@ -48,14 +47,14 @@ class DataInitializer(
             val team = Team(name = "Fitness Team", users = listOf(trainer, trainee))
             teamRepository.save(team)
 
-            // Crear un video de ejercicio
+            // Crear videos de ejercicios
             val video = Video(name = "Warmup Video", url = "https://videos.pexels.com/video-files/29160300/12594551_1920_1080_30fps.mp4")
-            val video2 = Video(name = "Warmup Video", url = "https://videos.pexels.com/video-files/32469700/13847440_2560_1440_25fps.mp4")
+            val video2 = Video(name = "Warmup Video 2", url = "https://videos.pexels.com/video-files/32469700/13847440_2560_1440_25fps.mp4")
 
             videoRepository.save(video)
             videoRepository.save(video2)
 
-            // Crear un ejercicio
+            // Crear ejercicios
             val exercise = Exercise(
                 name = "Push-ups",
                 description = "Standard push-up exercise",
@@ -81,41 +80,67 @@ class DataInitializer(
             exerciseRepository.save(exercise)
             exerciseRepository.save(exercise2)
 
-            // Crear un entrenamiento
+            // Crear entrenamientos para hoy
+            val today = LocalDate.now()
             val training = Training(
                 name = "Morning Strength Training",
                 description = "A strength training session for the morning.",
                 trainer = trainer,
-                date = LocalDate.from(Instant.now().atZone(ZoneId.systemDefault()).toLocalDate()),
+                date = today,
                 type = TrainingType.STRENGTH,
-                exercises = listOf(exercise,exercise2),
+                exercises = listOf(exercise, exercise2),
                 comments = listOf()
             )
             val training2 = Training(
-                name = "Morning Strength Training 2",
+                name = "Morning Speed Training",
                 description = "A speed training session for the morning.",
                 trainer = trainer,
-                date = LocalDate.from(Instant.now().atZone(ZoneId.systemDefault()).toLocalDate()),
+                date = today,
                 type = TrainingType.SPEED,
                 exercises = listOf(exercise),
                 comments = listOf()
             )
-            trainingRepository.saveAll(listOf(training,training2))
 
-            // Crear un comentario
+            // Crear un entrenamiento para el día previo
+            val trainingPrev = Training(
+                name = "Yesterday Endurance Training",
+                description = "An endurance training session created for the previous day.",
+                trainer = trainer,
+                date = today.minusDays(1),
+                type = TrainingType.DRIBBLING,
+                exercises = listOf(exercise),
+                comments = listOf()
+            )
+
+            trainingRepository.saveAll(listOf(training, training2, trainingPrev))
+
+            // Crear comentarios
             val comment = Comment(idUser = trainee, comment = "Great workout!")
             val comment2 = Comment(idUser = trainee, comment = "Nice work!")
             commentRepository.save(comment)
+            commentRepository.save(comment2)
 
-            val notification = Notification(message = "Una notificacion", date = LocalDateTime.now(), viewed = false, context = NotificationContext("TRAINING","1"))
+            // Crear notificación
+            val notification = Notification(
+                message = "Una notificacion",
+                date = LocalDateTime.now(),
+                viewed = false,
+                context = NotificationContext("TRAINING", "1")
+            )
             notificationRepository.save(notification)
-            val updatedTrainer = trainer.copy(trainings = listOf(training,training2), notifcations = listOf(notification))
+
+            // Actualizar trainer con entrenamientos y notificaciones
+            val updatedTrainer = trainer.copy(
+                trainings = listOf(training, training2, trainingPrev),
+                notifcations = listOf(notification)
+            )
             userRepository.save(updatedTrainer)
-            // Agregar el comentario al entrenamiento
+
+            // Agregar comentarios al entrenamiento
             val updatedTraining = training.copy(comments = listOf(comment, comment2))
             trainingRepository.save(updatedTraining)
 
-            // Crear una configuración de tema para el usuario
+            // Crear configuración de tema para el usuario
             val config = Config(user = trainer, theme = ThemeType.DAY, letterSize = LetterSize.SMALL)
             configRepository.save(config)
         }

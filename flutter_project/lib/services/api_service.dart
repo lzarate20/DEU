@@ -15,6 +15,10 @@ class AuthHttpClient extends http.BaseClient {
       request.headers['Authorization'] = 'Bearer $token';
     }
 
+
+    request.headers['Content-Type'] = 'application/json; charset=UTF-8';
+    request.headers['Accept'] = 'application/json; charset=UTF-8';
+
     final response = await _inner.send(request);
 
     if (response.statusCode == 401 || response.statusCode == 403) {
@@ -26,3 +30,4 @@ class AuthHttpClient extends http.BaseClient {
     return response;
   }
 }
+

@@ -1,9 +1,7 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_project/services/auth_service.dart';
 import 'package:flutter_project/services/evaluation_service.dart';
 import 'package:flutter_project/services/training_service.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 import '../../models/evaluation.dart';
 import '../../pages/trainings/rate_trainees_dialog.dart';
@@ -38,7 +36,7 @@ class _TrainingActionsState extends State<TrainingActions> {
     _checkOwnership();
     _checkIsTrainer();
     _checkIfRated();
-    _checkHasTraining;
+    _checkHasTraining();
   }
 
   Future<void> _checkOwnership() async {
@@ -63,16 +61,15 @@ class _TrainingActionsState extends State<TrainingActions> {
     final trainingId = int.tryParse(widget.training['id'].toString()) ?? 0;
 
     if (userId == null) return;
+    final trainerId = widget.training['trainer']?['id'];
 
     final existingEvaluation = await EvaluationService().getUserEvaluation(
-      userId: userId,
+      userId: trainerId,
       trainingId: trainingId,
     );
-
     setState(() {
       _hasRated = existingEvaluation != null && existingEvaluation.score > 0;
-      widget.training['userRated'] =
-          _hasRated;
+      widget.training['userRated'] = _hasRated;
     });
   }
 
@@ -143,7 +140,7 @@ class _TrainingActionsState extends State<TrainingActions> {
     final trainees = widget.training['trainees'] as List<dynamic>? ?? [];
     final userId = await AuthService.getLoggedUserId();
     setState(() {
-      _hasTraining = trainees.contains(userId);
+      _hasTraining = trainees.map((e) => e.toString()).contains(userId.toString());
     });
   }
 
@@ -218,8 +215,9 @@ class _TrainingActionsState extends State<TrainingActions> {
     );
 
     if (rating != null && rating > 0) {
+      final trainerId = widget.training['trainer']?['id'];
       final evaluation = EvaluationDTO(
-        userId: userId,
+        userId: trainerId,
         trainingId: trainingId,
         score: rating.toDouble(),
       );
@@ -253,8 +251,17 @@ class _TrainingActionsState extends State<TrainingActions> {
       }
 
       if (_hasRated) {
-        return const SizedBox.shrink();
+        return IconButton(
+          onPressed: null,
+          icon: const Icon(
+            Icons.star,
+            color: Colors.amber,
+            size: 24,
+          ),
+          tooltip: "Ya puntuaste este entrenamiento",
+        );
       }
+
       return Row(
         children: [
           IconButton(

@@ -13,7 +13,10 @@ void main() async {
   setUrlStrategy(PathUrlStrategy());
   WidgetsFlutterBinding.ensureInitialized();
 
-  await AuthMemory.clear();
+  /*final sessionValid = await AuthService.isLoggedInAndSessionValid();
+  if(!sessionValid){
+    AuthMemory.clear();
+  }*/
 
   final themeProvider = ThemeProvider();
   runApp(ChangeNotifierProvider.value(

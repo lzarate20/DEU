@@ -100,4 +100,27 @@ class AuthService {
 
     AuthMemory.clear();
   }
+
+  static Future<bool> isSessionActiveOnServer() async {
+    final token = await getToken();
+    if (token == null) return false;
+
+    try {
+      final response = await client.get(
+        Uri.parse('$host/session'),
+        headers: {'Authorization': 'Bearer $token'},
+      );
+      return response.statusCode == 200;
+    } catch (_) {
+      return false;
+    }
+  }
+
+  static Future<bool> isLoggedInAndSessionValid() async {
+    final loggedIn = await isLoggedIn();
+    final localValid = await isSessionValid();
+    final serverValid = await isSessionActiveOnServer();
+
+    return loggedIn && localValid && serverValid;
+  }
 }
